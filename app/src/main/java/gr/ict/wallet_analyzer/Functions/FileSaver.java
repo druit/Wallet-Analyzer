@@ -4,12 +4,15 @@ import android.content.Context;
 import android.os.Environment;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
-public class ImageFile {
+public class FileSaver {
     private Context context;
 
-    public ImageFile(Context context) {
+    public FileSaver(Context context) {
         this.context = context;
     }
 
