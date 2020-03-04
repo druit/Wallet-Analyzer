@@ -2,15 +2,21 @@ package gr.ict.wallet_analyzer.Functions;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Objects;
 
-public class TesseractOCR implements Runnable {
+public class TesseractOCR {
     private TessBaseAPI mTess;
 
     private Context context;
@@ -21,28 +27,13 @@ public class TesseractOCR implements Runnable {
         try {
             mTess = new TessBaseAPI();
 
-            String appFolder = context.getFilesDir().toString();
+            String dataPath = context.getFilesDir().toString() + "/tesseract/tessdata/";
 
-            String dataPath = appFolder + "/tesseract/";
-            String langPath = dataPath + "tessdata/" + language + ".traineddata/";
+            String traineddataName = language + ".traineddata";
+            File endFile = copyAssets("tessdata/", traineddataName, dataPath);
 
-            System.out.println(dataPath);
-            System.out.println(langPath);
-
-            File f = new File(langPath);
-
-            if (!f.exists()) {
-                if (!f.mkdirs()) {
-                    System.out.println(langPath + "can't be created! ----------");
-                    Toast.makeText(context, langPath + " can't be created.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-
-//            ----------------------------
-
-
-            mTess.init(dataPath, language); // myDir + "/tessdata/eng.traineddata" must be present
+            String lastString = Objects.requireNonNull(endFile.getParent()).replace("tessdata", "");
+            mTess.init(lastString, language); // myDir + "/tessdata/eng.traineddata" must be present
 
 
         } catch (Exception exception) {
@@ -71,11 +62,16 @@ public class TesseractOCR implements Runnable {
             @Override
             public void run() {
                 if (bitmap != null) {
-                    String srcText = getOCRResult(bitmap);
+                    try {
+                        String srcText = getOCRResult(bitmap);
 
-                    if (srcText != null && !srcText.equals("")) {
-                        textView.setText(srcText);
+                        if (srcText != null && !srcText.equals("")) {
+                            textView.setText(srcText);
+                        }
+                    } catch (Exception e) {
+                        Log.i("OCR ERROR", Objects.requireNonNull(e.getMessage()));
                     }
+
                     mProgressDialog.dismiss();
                     onDestroy();
                 }
@@ -83,16 +79,54 @@ public class TesseractOCR implements Runnable {
         }).start();
     }
 
-    @Override
-    public void run() {
-//        if (bitmap != null) {
-//            String srcText = getOCRResult(bitmap);
-//
-//            if (srcText != null && !srcText.equals("")) {
-//                textView.setText(srcText);
-//            }
-//            mProgressDialog.dismiss();
-//            onDestroy();
-//        }
+    private File copyAssets(String dataPath, String fileToCopy, String externalPath) {
+        File theFile = null;
+        AssetManager assetManager = context.getAssets();
+        String[] files = null;
+        try {
+            files = assetManager.list(dataPath);
+        } catch (IOException e) {
+            Log.e("tag", "Failed to get asset file list.", e);
+        }
+        if (files != null) for (String filename : files) {
+            if (filename.equals(fileToCopy)) {
+                InputStream in = null;
+                OutputStream out = null;
+                try {
+                    in = assetManager.open(dataPath + filename);
+                    File outFile = new File(context.getExternalFilesDir(externalPath), filename);
+                    out = new FileOutputStream(outFile);
+                    copyFile(in, out);
+
+                    theFile = outFile;
+                } catch (IOException e) {
+                    Log.e("tag", "Failed to copy asset file: " + filename, e);
+                } finally {
+                    if (in != null) {
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                            // NOOP
+                        }
+                    }
+                    if (out != null) {
+                        try {
+                            out.close();
+                        } catch (IOException e) {
+                            // NOOP
+                        }
+                    }
+                }
+            }
+        }
+        return theFile;
+    }
+
+    private void copyFile(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+        }
     }
 }
