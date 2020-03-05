@@ -1,52 +1,77 @@
 package gr.ict.wallet_analyzer;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Objects;
+
+import androidx.appcompat.app.AppCompatActivity;
+import gr.ict.wallet_analyzer.Functions.CheckPermissions;
+import gr.ict.wallet_analyzer.Functions.TesseractOCR;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    public static int REQUEST_IMAGE_CAPTURE = 542;
+    public ImageView imageView;
+    public TextView textView;
+    public TesseractOCR tesseractOCR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-       FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-    }
+        //   check permissions
+        CheckPermissions checkPermissions = new CheckPermissions();
+        checkPermissions.checkPermissions(this);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+        Button button = findViewById(R.id.scan_button);
+        button.setOnClickListener(this);
+        imageView = findViewById(R.id.ocr_image);
+        textView = findViewById(R.id.ocr_text);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        try {
+            tesseractOCR = new TesseractOCR(this, "eng");
+        } catch (Exception exception) {
+            System.out.print(exception.getMessage());
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    private void scanButton() {
+        //prepare intent
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            try {
+                // TODO: change language dynamically
+
+                Bitmap bmp = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
+
+                imageView.setImageBitmap(bmp);
+                tesseractOCR.doOCR(bmp, textView);
+            } catch (Exception ex) {
+                Log.i(getClass().getSimpleName(), Objects.requireNonNull(ex.getMessage()));
+                Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        scanButton();
     }
 }
