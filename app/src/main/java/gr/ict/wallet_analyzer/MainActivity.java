@@ -2,7 +2,6 @@ package gr.ict.wallet_analyzer;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -27,7 +26,6 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,15 +34,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.List;
 
-import androidx.appcompat.app.AppCompatActivity;
-import gr.ict.wallet_analyzer.Functions.CheckPermissions;
-import gr.ict.wallet_analyzer.Functions.TesseractOCR;
-
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    public static int REQUEST_IMAGE_CAPTURE = 542;
-    public ImageView imageView;
-    public TextView textView;
-    public TesseractOCR tesseractOCR;
+public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
     private TextView textView;
@@ -56,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-      
         imageView = (ImageView) findViewById(R.id.ocr_image);
         textView = (TextView) findViewById(R.id.ocr_text);
         scan = (Button) findViewById(R.id.ocr_scan);
@@ -108,14 +97,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 processTextDedectResult(firebaseVisionText);
             }
         })
-        .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                scan.setEnabled(true);
-                Toast.makeText(MainActivity.this,"Error: "+ e.getMessage(),Toast.LENGTH_LONG).show();
-                e.printStackTrace();
-            }
-        });
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        scan.setEnabled(true);
+                        Toast.makeText(MainActivity.this,"Error: "+ e.getMessage(),Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+                    }
+                });
     }
 
     private void processTextDedectResult(FirebaseVisionText result) {
