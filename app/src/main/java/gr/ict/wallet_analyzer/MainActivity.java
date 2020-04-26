@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private TextView textView;
     private Bitmap imageBitmap;
-    private Button scan,selectImage;
+    private Button scan,selectImage,login,register;
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Override
@@ -49,13 +49,27 @@ public class MainActivity extends AppCompatActivity {
         imageView = (ImageView) findViewById(R.id.ocr_image);
         textView = (TextView) findViewById(R.id.ocr_text);
         scan = (Button) findViewById(R.id.ocr_scan);
+        login = (Button) findViewById(R.id.login);
         selectImage = (Button) findViewById(R.id.ocr_folder);
+        register = (Button)findViewById(R.id.register);
 
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dispatchTakePictureIntent();
                 textView.setText("");
+            }
+        });
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Login(Login.class);
+            }
+        });
+        register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Login(Register.class);
             }
         });
 
@@ -66,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void Login(Class activity) {
+        Intent intent = new Intent(this,activity);
+        startActivity(intent);
     }
 
     private void dispatchTakePictureIntent() {
