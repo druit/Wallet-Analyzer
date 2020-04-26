@@ -16,7 +16,6 @@
     <Button
         android:id="@id/ocr_scan"
         android:layout_width="wrap_content"
-
         android:layout_height="wrap_content"
         android:layout_below="@id/ocr_image"
         android:layout_alignParentStart="true"
@@ -28,9 +27,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/ocr_image"
-        android:layout_alignParentEnd="true"
         android:layout_marginEnd="44dp"
-        android:text="Folder" />
+        android:text="Folder"
+        android:id="@id/ocr_folder"
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:id="@id/ocr_text"
@@ -40,7 +40,27 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="-6dp"
         android:maxLines="10"
         android:text="Display Detected Text from image."
         android:textSize="26dp" />
+
+    <Button
+        android:id="@+id/login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:layout_marginStart="160dp"
+        android:layout_below="@id/ocr_image" />
+    <Button
+        android:id="@+id/register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="Register"
+        android:layout_marginStart="160dp"
+        android:layout_below="@id/ocr_image" />
 </RelativeLayout>
