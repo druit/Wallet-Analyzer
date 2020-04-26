@@ -2,43 +2,33 @@ package gr.ict.wallet_analyzer;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Bundle;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.ml.vision.FirebaseVision;
-import com.google.firebase.ml.vision.common.FirebaseVisionImage;
-import com.google.firebase.ml.vision.text.FirebaseVisionText;
-import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
-import com.google.firebase.ml.vision.text.RecognizedLanguage;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.provider.MediaStore;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.text.FirebaseVisionText;
+import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    static final int REQUEST_IMAGE_CAPTURE = 1;
     private ImageView imageView;
     private TextView textView;
     private Bitmap imageBitmap;
+  
     private Button scan,selectImage,login,register;
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -46,12 +36,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        imageView = (ImageView) findViewById(R.id.ocr_image);
-        textView = (TextView) findViewById(R.id.ocr_text);
-        scan = (Button) findViewById(R.id.ocr_scan);
-        login = (Button) findViewById(R.id.login);
-        selectImage = (Button) findViewById(R.id.ocr_folder);
-        register = (Button)findViewById(R.id.register);
+  
+        imageView = findViewById(R.id.ocr_image);
+        textView = findViewById(R.id.ocr_text);
+        scan = findViewById(R.id.ocr_scan);
+        login = findViewById(R.id.login);
+        selectImage = findViewById(R.id.ocr_folder);
+        register = findViewById(R.id.register);
 
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             imageBitmap = (Bitmap) extras.get("data");
@@ -107,57 +98,35 @@ public class MainActivity extends AppCompatActivity {
 
     private void detectTextFromImage() {
         FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromBitmap(imageBitmap);
-        FirebaseVisionTextRecognizer detector =  FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
         scan.setEnabled(false);
         detector.processImage(firebaseVisionImage).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
             @Override
             public void onSuccess(FirebaseVisionText firebaseVisionText) {
                 scan.setEnabled(true);
-                processTextDedectResult(firebaseVisionText);
+                processTextDetectResult(firebaseVisionText);
             }
         })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         scan.setEnabled(true);
-                        Toast.makeText(MainActivity.this,"Error: "+ e.getMessage(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         e.printStackTrace();
                     }
                 });
     }
 
-    private void processTextDedectResult(FirebaseVisionText result) {
+    private void processTextDetectResult(FirebaseVisionText result) {
         List<FirebaseVisionText.TextBlock> blockList = result.getTextBlocks();
-        if(blockList.size() == 0){
-            Toast.makeText(MainActivity.this,"No Text Found in Image, please try again",Toast.LENGTH_LONG).show();
-        }else {
+        if (blockList.size() == 0) {
+            Toast.makeText(MainActivity.this, "No Text Found in Image, please try again", Toast.LENGTH_LONG).show();
+        } else {
 
-            for (FirebaseVisionText.TextBlock block: result.getTextBlocks()) {
+            for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
                 String blockText = block.getText();
                 textView.setText(blockText);
             }
         }
-//        String resultText = result.getText();
-//        for (FirebaseVisionText.TextBlock block: result.getTextBlocks()) {
-//            String blockText = block.getText();
-//            Float blockConfidence = block.getConfidence();
-//            List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
-//            Point[] blockCornerPoints = block.getCornerPoints();
-//            Rect blockFrame = block.getBoundingBox();
-//            for (FirebaseVisionText.Line line: block.getLines()) {
-//                String lineText = line.getText();
-//                Float lineConfidence = line.getConfidence();
-//                List<RecognizedLanguage> lineLanguages = line.getRecognizedLanguages();
-//                Point[] lineCornerPoints = line.getCornerPoints();
-//                Rect lineFrame = line.getBoundingBox();
-//                for (FirebaseVisionText.Element element: line.getElements()) {
-//                    String elementText = element.getText();
-//                    Float elementConfidence = element.getConfidence();
-//                    List<RecognizedLanguage> elementLanguages = element.getRecognizedLanguages();
-//                    Point[] elementCornerPoints = element.getCornerPoints();
-//                    Rect elementFrame = element.getBoundingBox();
-//                }
-//            }
-//        }
     }
 }
