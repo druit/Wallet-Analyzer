@@ -4,41 +4,43 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fillViewport="true"
+    android:background="@drawable/gradient_background"
     tools:context=".MainActivity">
 
     <ImageView
         android:id="@+id/ocr_image"
-  
         android:layout_width="match_parent"
-        android:layout_height="450dp" />
+        android:layout_height="450dp"
+        android:contentDescription="TODO" />
 
     <Button
+        android:id="@id/ocr_scan"
         android:layout_width="wrap_content"
+
         android:layout_height="wrap_content"
-            
-        android:layout_marginStart="44dp"
-        android:text="SCAN"
         android:layout_below="@id/ocr_image"
         android:layout_alignParentStart="true"
-        android:id="@id/ocr_scan"/>
+        android:layout_marginStart="44dp"
+        android:text="SCAN" />
+
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="44dp"
-        android:text="Folder"
-        android:layout_below="@id/ocr_image"
         android:id="@id/ocr_folder"
-        android:layout_alignParentEnd="true" />
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/ocr_image"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="44dp"
+        android:text="Folder" />
+
+    <TextView
+        android:id="@id/ocr_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ocr_scan"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:id="@id/ocr_text"
-        android:layout_below="@id/ocr_scan"
-        android:text="Display Detected Text from image."
-        android:textSize="26dp"
-        android:maxLines="10"
         android:layout_alignParentBottom="true"
-        />
+        android:maxLines="10"
+        android:text="Display Detected Text from image."
+        android:textSize="26dp" />
 </RelativeLayout>
