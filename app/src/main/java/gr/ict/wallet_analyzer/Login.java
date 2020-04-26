@@ -1,8 +1,5 @@
 package gr.ict.wallet_analyzer;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +10,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -22,14 +22,12 @@ import com.google.firebase.auth.FirebaseUser;
 public class Login extends AppCompatActivity {
 
 
-    private EditText email,password;
+    private EditText email, password;
     private Button login;
 
     //Firebase
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-
-
 
 
     @SuppressLint("WrongViewCast")
@@ -39,9 +37,9 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
-        email = (EditText) findViewById(R.id.email);
-        password = (EditText) findViewById(R.id.password);
-        login =(Button) findViewById(R.id.login_button);
+        email = findViewById(R.id.email);
+        password = findViewById(R.id.password);
+        login = findViewById(R.id.login);
         mAuth = FirebaseAuth.getInstance();
 
 //        mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -55,11 +53,11 @@ public class Login extends AppCompatActivity {
 
         login.setOnClickListener(
                 new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signIn();
-            }
-        });
+                    @Override
+                    public void onClick(View view) {
+                        signIn();
+                    }
+                });
 
     }
 
@@ -71,26 +69,26 @@ public class Login extends AppCompatActivity {
 ////        updateUI(currentUser);
     }
 
-    private void signIn(){
+    private void signIn() {
         String mail = email.getText().toString();
         String pass = password.getText().toString();
 
-        if(TextUtils.isEmpty(mail) || TextUtils.isEmpty((pass))){
+        if (TextUtils.isEmpty(mail) || TextUtils.isEmpty((pass))) {
             Toast.makeText(Login.this, "Field are empty.", Toast.LENGTH_LONG).show();
         }
-        mAuth.signInWithEmailAndPassword(mail,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword(mail, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if(!task.isSuccessful()){
+                if (!task.isSuccessful()) {
                     Toast.makeText(Login.this, "Something went wrong", Toast.LENGTH_LONG).show();
-                }else {
+                } else {
                     FirebaseUser user = mAuth.getCurrentUser();
-                    if(user.isEmailVerified()) {
-                        Log.d("MY_USER:",user.getUid());
+                    if (user.isEmailVerified()) {
+                        Log.d("MY_USER:", user.getUid());
                         startActivity(new Intent(Login.this, Home.class));
                         Toast.makeText(Login.this, "Logged in successful.", Toast.LENGTH_LONG).show();
 
-                    }else{
+                    } else {
                         Toast.makeText(Login.this, "Please verify your email.", Toast.LENGTH_LONG).show();
                     }
 //                  updateUI(user);

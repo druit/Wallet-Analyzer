@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap imageBitmap;
   
     private Button scan,selectImage,login,register;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

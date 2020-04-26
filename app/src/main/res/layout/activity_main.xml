@@ -29,7 +29,6 @@
         android:layout_below="@id/ocr_image"
         android:layout_marginEnd="44dp"
         android:text="Folder"
-        android:id="@id/ocr_folder"
         android:layout_alignParentEnd="true" />
 
     <TextView
