@@ -1,4 +1,4 @@
-package gr.ict.wallet_analyzer;
+package gr.ict.wallet_analyzer.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,6 +22,8 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 
 import java.util.List;
 
+import gr.ict.wallet_analyzer.R;
+
 public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         imageView = findViewById(R.id.ocr_image);
         textView = findViewById(R.id.ocr_text);
         scan = findViewById(R.id.ocr_scan);
-        login = findViewById(R.id.login);
+        login = findViewById(R.id.login_button);
         selectImage = findViewById(R.id.ocr_folder);
         register = findViewById(R.id.register);
 
@@ -53,13 +55,13 @@ public class MainActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Login(Login.class);
+                Login(LoginActivity.class);
             }
         });
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Login(Register.class);
+                Login(RegisterActivity.class);
             }
         });
 
