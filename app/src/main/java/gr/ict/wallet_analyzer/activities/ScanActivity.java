@@ -31,7 +31,7 @@ public class ScanActivity extends AppCompatActivity {
     private TextView textView;
     private Bitmap imageBitmap;
   
-    private Button scan,selectImage,login,register;
+    private Button scan,openCamera;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,27 +41,13 @@ public class ScanActivity extends AppCompatActivity {
         imageView = findViewById(R.id.ocr_image);
         textView = findViewById(R.id.ocr_text);
         scan = findViewById(R.id.ocr_scan);
-        login = findViewById(R.id.login_button);
-        selectImage = findViewById(R.id.ocr_folder);
-        register = findViewById(R.id.register);
+        openCamera = findViewById(R.id.ocr_folder);
 
-        selectImage.setOnClickListener(new View.OnClickListener() {
+        openCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dispatchTakePictureIntent();
                 textView.setText("");
-            }
-        });
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Login(LoginActivity.class);
-            }
-        });
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Login(RegisterActivity.class);
             }
         });
 
@@ -72,11 +58,6 @@ public class ScanActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    private void Login(Class activity) {
-        Intent intent = new Intent(this,activity);
-        startActivity(intent);
     }
 
     private void dispatchTakePictureIntent() {
