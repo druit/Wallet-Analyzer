@@ -69,10 +69,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void updateUiWithUser(FirebaseUser user) {
-        String welcome = getString(R.string.welcome) + user.getDisplayName();
         // TODO : initiate successful logged in experience
+        Toast.makeText(LoginActivity.this, "Logged in successful.", Toast.LENGTH_LONG).show();
 
-        Intent intent = new Intent(this, ScanActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
@@ -95,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (user != null && user.isEmailVerified()) {
                         Log.d("MY_USER:", user.getUid());
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        Toast.makeText(LoginActivity.this, "Logged in successful.", Toast.LENGTH_LONG).show();
+                        updateUiWithUser(user);
                     } else {
                         Toast.makeText(LoginActivity.this, "Please verify your email.", Toast.LENGTH_LONG).show();
                     }
