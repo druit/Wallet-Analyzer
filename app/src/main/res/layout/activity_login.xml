@@ -122,7 +122,6 @@
         android:layout_marginEnd="48dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/button_background"
-        android:enabled="false"
         android:paddingStart="50dp"
         android:paddingTop="10dp"
         android:paddingEnd="50dp"

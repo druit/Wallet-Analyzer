@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
 
         final EditText emailEditText = findViewById(R.id.email);
         final EditText passwordEditText = findViewById(R.id.password);
-        final Button loginButton = findViewById(R.id.login_button);
+        Button loginButton = findViewById(R.id.login_button);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
 
         passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
         String welcome = getString(R.string.welcome) + user.getDisplayName();
         // TODO : initiate successful logged in experience
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, ScanActivity.class);
         startActivity(intent);
     }
 
@@ -96,7 +96,6 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d("MY_USER:", user.getUid());
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         Toast.makeText(LoginActivity.this, "Logged in successful.", Toast.LENGTH_LONG).show();
-
                     } else {
                         Toast.makeText(LoginActivity.this, "Please verify your email.", Toast.LENGTH_LONG).show();
                     }
