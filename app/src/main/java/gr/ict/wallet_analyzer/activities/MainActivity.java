@@ -1,13 +1,15 @@
 package gr.ict.wallet_analyzer.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ListView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import Adapters.MyListAdapter;
 import gr.ict.wallet_analyzer.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,5 +27,25 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
+        // list view
+        ListView list;
+
+        String[] maintitle = {
+                "Title 1", "Title 2",
+                "Title 3", "Title 4",
+                "Title 5", "Title 5", "Title 5",
+        };
+
+        String[] subtitle = {
+                "$5", "$5,42",
+                "$13,50", "$25",
+                "$32", "$32", "$32",
+        };
+
+        MyListAdapter adapter = new MyListAdapter(this, maintitle, subtitle);
+        list = findViewById(R.id.list);
+        list.setAdapter(adapter);
     }
 }
