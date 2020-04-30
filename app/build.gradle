@@ -18,6 +18,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+
     sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
 }
 
@@ -40,4 +45,7 @@ dependencies {
     // For example, to use Firebase Authentication and Cloud Firestore
     implementation 'com.google.firebase:firebase-auth:19.2.0'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
+
+    // graph library
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }
