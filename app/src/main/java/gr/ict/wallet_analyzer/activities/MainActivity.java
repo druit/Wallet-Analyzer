@@ -5,10 +5,11 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -93,6 +94,12 @@ public class MainActivity extends AppCompatActivity {
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(false);
 
-
+        Spinner spinner = findViewById(R.id.month_spinner);
+        String[] items = new String[]{"January", "February", "March", "April"};
+        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
+        //There are multiple variations of this, but this is the basic variant.
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, items);
+        //set the spinners adapter to the previously created one.
+        spinner.setAdapter(spinnerAdapter);
     }
 }
