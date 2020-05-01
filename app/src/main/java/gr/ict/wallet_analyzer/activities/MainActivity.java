@@ -4,10 +4,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -41,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         // list view
         ListView list;
 
@@ -61,6 +67,17 @@ public class MainActivity extends AppCompatActivity {
         list = findViewById(R.id.list);
         list.setAdapter(adapter);
 
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView receiptTextView = view.findViewById(R.id.title);
+                String receiptString = receiptTextView.getText().toString();
+
+                showPopUp(receiptString);
+            }
+        });
+
+        // GraphView
         LineChart chart = findViewById(R.id.chart);
 
         YourData[] dataObjects = {
@@ -94,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(false);
 
+        // Spinner above the graph
         Spinner spinner = findViewById(R.id.month_spinner);
         String[] items = new String[]{"January", "February", "March", "April"};
         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
@@ -101,5 +119,33 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, items);
         //set the spinners adapter to the previously created one.
         spinner.setAdapter(spinnerAdapter);
+    }
+
+    private void showPopUp(String receiptString) {
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.receipt_popup, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        TextView textView = popupView.findViewById(R.id.receipt_text);
+        textView.setText(receiptString);
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
     }
 }
