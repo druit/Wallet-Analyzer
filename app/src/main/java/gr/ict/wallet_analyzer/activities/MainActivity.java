@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -30,6 +31,8 @@ import java.util.List;
 
 import Adapters.MyListAdapter;
 import data_class.YourData;
+import eightbitlab.com.blurview.BlurView;
+import eightbitlab.com.blurview.RenderScriptBlur;
 import gr.ict.wallet_analyzer.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -73,7 +76,10 @@ public class MainActivity extends AppCompatActivity {
                 TextView receiptTextView = view.findViewById(R.id.title);
                 String receiptString = receiptTextView.getText().toString();
 
-                showPopUp(receiptString);
+                TextView priceTextView = view.findViewById(R.id.subtitle);
+                String priceString = priceTextView.getText().toString();
+
+                showPopUp(receiptString, priceString);
             }
         });
 
@@ -121,19 +127,42 @@ public class MainActivity extends AppCompatActivity {
         spinner.setAdapter(spinnerAdapter);
     }
 
-    private void showPopUp(String receiptString) {
+    private void showPopUp(String receiptString, String priceString) {
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.receipt_popup, null);
 
         // create the popup window
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
         boolean focusable = true; // lets taps outside the popup also dismiss it
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
 
-        TextView textView = popupView.findViewById(R.id.receipt_text);
-        textView.setText(receiptString);
+        TextView receiptTextView = popupView.findViewById(R.id.receipt_text);
+        receiptTextView.setText(receiptString);
+
+        TextView textView = popupView.findViewById(R.id.price_text_view);
+        textView.setText(priceString);
+
+        // TODO: add ListView for every product in the receipt
+
+        // blur effect
+        float radius = 10f;
+
+        View decorView = getWindow().getDecorView();
+        //ViewGroup you want to start blur from. Choose root as close to BlurView in hierarchy as possible.
+        ViewGroup rootView = decorView.findViewById(android.R.id.content);
+        //Set drawable to draw in the beginning of each blurred frame (Optional).
+        //Can be used in case your layout has a lot of transparent space and your content
+        //gets kinda lost after after blur is applied.
+        Drawable windowBackground = decorView.getBackground();
+
+        BlurView blurView = popupView.findViewById(R.id.blurView);
+        blurView.setupWith(rootView)
+                .setFrameClearDrawable(windowBackground)
+                .setBlurAlgorithm(new RenderScriptBlur(this))
+                .setBlurRadius(radius)
+                .setHasFixedTransformationMatrix(true);
 
         // show the popup window
         // which view you pass in doesn't matter, it is only used for the window tolken
