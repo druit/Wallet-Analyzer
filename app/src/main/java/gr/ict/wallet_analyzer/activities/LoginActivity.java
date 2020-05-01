@@ -26,6 +26,7 @@ import gr.ict.wallet_analyzer.R;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    private ProgressBar loadingProgressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         final EditText emailEditText = findViewById(R.id.email);
         final EditText passwordEditText = findViewById(R.id.password);
         Button loginButton = findViewById(R.id.login_button);
-        final ProgressBar loadingProgressBar = findViewById(R.id.loading);
+        loadingProgressBar = findViewById(R.id.loading);
 
         passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -71,6 +72,7 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUiWithUser(FirebaseUser user) {
         // TODO : initiate successful logged in experience
         Toast.makeText(LoginActivity.this, "Logged in successful.", Toast.LENGTH_LONG).show();
+        loadingProgressBar.setVisibility(View.INVISIBLE);
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
