@@ -100,22 +100,43 @@ public class MainActivity extends AppCompatActivity {
 
         LineDataSet dataSet = new LineDataSet(entries, "April"); // add entries to dataset
 
+        // make line curvy
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+        // circles color
+        dataSet.setCircleColor(Color.rgb(95, 115, 193));
+        dataSet.setCircleHoleColor(Color.rgb(95, 115, 193));
+
         // Gradient fill
         dataSet.setDrawFilled(true);
         Drawable drawable = ContextCompat.getDrawable(this, R.drawable.graph_gradient);
         dataSet.setFillDrawable(drawable);
 
+        // line color
         dataSet.setColor(Color.rgb(95, 115, 193));
+        // values text color
         dataSet.setValueTextColor(Color.rgb(255, 255, 255));
 
         LineData lineData = new LineData(dataSet);
         chart.setData(lineData);
         chart.invalidate(); // refresh
 
-        chart.getAxisRight().setEnabled(false);
-        chart.getAxisLeft().setEnabled(false);
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(false);
+
+        // hide values in left and right side
+        chart.getAxisRight().setDrawLabels(false);
+        chart.getAxisLeft().setDrawLabels(false);
+
+        // no zoom
+        chart.setScaleEnabled(false);
+
+        // grid lines color
+        chart.getXAxis().setGridColor(R.color.colorButton);
+        chart.getAxisLeft().setGridColor(R.color.colorButton);
+        chart.getAxisRight().setGridColor(R.color.colorButton);
+
+        chart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
 
         // Spinner above the graph
         Spinner spinner = findViewById(R.id.month_spinner);
