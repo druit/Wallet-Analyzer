@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="ocr_folder" type="id" />
-    <item name="ocr_scan" type="id" />
+    <item name="ocr_photo" type="id" />
+    <item name="ocr_analyze" type="id" />
     <item name="ocr_text" type="id" />
 </resources>
