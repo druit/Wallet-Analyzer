@@ -55,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
         ListView list;
 
         String[] maintitle = {
-                "Title 1", "Title 2",
-                "Title 3", "Title 4",
-                "Title 5", "Title 5", "Title 5",
+                "Receipt 1", "Receipt 2",
+                "Receipt 3", "Receipt 4",
+                "Receipt 5", "Receipt 5", "Receipt 5",
         };
 
         String[] subtitle = {
@@ -165,7 +165,24 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = popupView.findViewById(R.id.price_text_view);
         textView.setText(priceString);
 
-        // TODO: add ListView for every product in the receipt
+        // list view in popup
+        ListView list;
+
+        String[] maintitle = {
+                "Item 1", "Item 2",
+                "Item 3", "Item 4",
+                "Item 5", "Item 5", "Item 5",
+        };
+
+        String[] subtitle = {
+                "$5", "$5,42",
+                "$13,50", "$25",
+                "$32", "$32", "$32",
+        };
+
+        MyListAdapter adapter = new MyListAdapter(this, maintitle, subtitle);
+        list = popupView.findViewById(R.id.list_popup);
+        list.setAdapter(adapter);
 
         // blur effect
         float radius = 10f;

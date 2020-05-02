@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="36dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="36dp"
         android:text="Test Pop-Up"
         android:textColor="#E1E1E1"
         android:textSize="20sp"
@@ -36,7 +36,7 @@
         android:layout_marginEnd="40dp"
         android:text="$32,5"
         android:textColor="@color/color1"
-        android:textSize="42sp"
+        android:textSize="52sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/receipt_text"
@@ -62,5 +62,13 @@
         android:textColor="@color/color2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView4" />
+
+    <ListView
+        android:id="@+id/list_popup"
+        android:layout_width="match_parent"
+        android:layout_height="550dp"
+        android:layout_marginTop="100dp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
