@@ -22,6 +22,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import data_class.User;
 import gr.ict.wallet_analyzer.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -75,6 +76,8 @@ public class LoginActivity extends AppCompatActivity {
         loadingProgressBar.setVisibility(View.INVISIBLE);
 
         Intent intent = new Intent(this, MainActivity.class);
+
+
         startActivity(intent);
     }
 

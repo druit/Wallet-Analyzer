@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Adapters.MyListAdapter;
+import data_class.User;
 import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
@@ -57,19 +59,19 @@ public class MainActivity extends AppCompatActivity {
 
         // list view
         ListView list;
-
+        
         String[] maintitle = {
                 "Receipt 1", "Receipt 2",
                 "Receipt 3", "Receipt 4",
                 "Receipt 5", "Receipt 5", "Receipt 5",
         };
 
+
         String[] subtitle = {
                 "$5", "$5,42",
                 "$13,50", "$25",
                 "$32", "$32", "$32",
         };
-
         MyListAdapter adapter = new MyListAdapter(this, maintitle, subtitle);
         list = findViewById(R.id.list);
         list.setAdapter(adapter);
@@ -161,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.action_settings:
+                                openSettings();
                                 // TODO: add settings page
                                 return true;
                             case R.id.action_logout:
@@ -178,6 +181,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    private void openSettings(){
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.settings, null);
+
+        // create the popup window
+        int width = 1000;
+        int height = 1000;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, -300);
+
+        // open Edit Profile
+        popupView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
+                startActivity(intent);
+                return false;
+            }
+        });
+
+    }
+
 
     private void showPopUp(String receiptString, String priceString) {
         // inflate the layout of the popup window

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,8 +18,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
@@ -26,11 +34,17 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+import data_class.History;
+import data_class.Receipt;
 import gr.ict.wallet_analyzer.R;
 
 public class ScanActivity extends AppCompatActivity {
@@ -43,11 +57,14 @@ public class ScanActivity extends AppCompatActivity {
     private Bitmap imageBitmap;
     private Uri photoURI;
 
+    //Firebase
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
-
         imageView = findViewById(R.id.ocr_image);
         textView = findViewById(R.id.ocr_text);
         scanButton = findViewById(R.id.ocr_analyze);
@@ -132,6 +149,22 @@ public class ScanActivity extends AppCompatActivity {
 
     private void processTextDetectResult(FirebaseVisionText result) {
         textView.setText("");
+        String maintitle[] = {
+                "Receipt 1", "Receipt 2",
+                "Receipt 3", "Receipt 4",
+                "Receipt 5", "Receipt 5", "Receipt 5",
+        };
+
+
+//        Log.d("TEST",Arrays.toString(maintitle));  0Zwnpai9lIRNEDcRYKmVxobFWvx1
+//        mDatabase = FirebaseDatabase.getInstance().getReference();
+//        Receipt receipt = new Receipt(Arrays.toString(maintitle),"Alamanas 13","SuperMarket","http://test.com","15.20","1234455200174");
+//        String id = mDatabase.push().getKey();
+//        History history1 = new History("TEST","test2@");
+//            Log.d("TEST",id);
+//            mDatabase.child("users").child(id).setValue(receipt);
+            Toast.makeText(ScanActivity.this, "Added", Toast.LENGTH_LONG).show();
+
         List<FirebaseVisionText.TextBlock> blockList = result.getTextBlocks();
         if (blockList.size() == 0) {
             Toast.makeText(ScanActivity.this, "No Text Found in Image, please try again", Toast.LENGTH_LONG).show();

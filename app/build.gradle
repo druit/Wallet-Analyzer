@@ -46,6 +46,7 @@ dependencies {
     // For example, to use Firebase Authentication and Cloud Firestore
     implementation 'com.google.firebase:firebase-auth:19.2.0'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
+    implementation 'com.google.firebase:firebase-database:19.3.0'
 
     // graph library
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'

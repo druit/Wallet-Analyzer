@@ -2,17 +2,19 @@ package data_class;
 
 import android.media.Image;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Receipt {
-    private List<String> items;
+    private List<Item> items;
     private String address;
     private String storeType;
     private String image;
     private String totalPrice;
     private String barcode;
 
-    public Receipt (List items,String address,String storeType,String image, String totalPrice,String barcode){
+    public Receipt (ArrayList<Item> items, String address, String storeType, String image, String totalPrice, String barcode){
         this.items = items;
         this.address = address;
         this.storeType = storeType;
@@ -20,6 +22,7 @@ public class Receipt {
         this.totalPrice = totalPrice;
         this.barcode = barcode;
     }
+
 
     public String getAddress() {
         return address;
@@ -61,11 +64,11 @@ public class Receipt {
         this.barcode = barcode;
     }
 
-    public List<String> getItems() {
+    public List<Item> getItems() {
         return items;
     }
 
-    public void setItems(List<String> items) {
+    public void setItems(ArrayList<Item> items) {
         this.items = items;
     }
 }

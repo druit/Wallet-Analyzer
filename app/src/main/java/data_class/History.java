@@ -8,17 +8,31 @@ import java.util.List;
 
 public class History {
 
-    private ArrayList<String>  receipts;
+    private Receipt receipts;
+    private String id;
 
-    public History( ArrayList<String>  receipts) {
+    public History(String id,Receipt receipts) {
+        this.id = id;
         this.receipts = receipts;
     }
 
-    public ArrayList<String> getReceipts() {
+    public Receipt getReceipts() {
         return receipts;
     }
 
-    public void setReceipts(ArrayList<String> receipts) {
+    public void setReceipts(Receipt receipts) {
         this.receipts = receipts;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }
+//
+
+
+
