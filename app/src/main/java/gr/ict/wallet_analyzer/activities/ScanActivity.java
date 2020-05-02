@@ -131,14 +131,14 @@ public class ScanActivity extends AppCompatActivity {
     }
 
     private void processTextDetectResult(FirebaseVisionText result) {
+        textView.setText("");
         List<FirebaseVisionText.TextBlock> blockList = result.getTextBlocks();
         if (blockList.size() == 0) {
             Toast.makeText(ScanActivity.this, "No Text Found in Image, please try again", Toast.LENGTH_LONG).show();
         } else {
-
             for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
                 String blockText = block.getText();
-                textView.setText(blockText);
+                textView.append(blockText);
             }
         }
     }
