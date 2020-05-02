@@ -1,6 +1,7 @@
 package data_class;
 
 import android.media.Image;
+import android.net.Uri;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -11,10 +12,10 @@ public class Receipt {
     private String address;
     private String storeType;
     private String image;
-    private String totalPrice;
+    private double totalPrice;
     private String barcode;
 
-    public Receipt (ArrayList<Item> items, String address, String storeType, String image, String totalPrice, String barcode){
+    public Receipt (ArrayList<Item> items, String address, String storeType, String image, double totalPrice, String barcode){
         this.items = items;
         this.address = address;
         this.storeType = storeType;
@@ -48,11 +49,11 @@ public class Receipt {
         this.image = image;
     }
 
-    public String getTotalPrice() {
+    public double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(String totalPrice) {
+    public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
