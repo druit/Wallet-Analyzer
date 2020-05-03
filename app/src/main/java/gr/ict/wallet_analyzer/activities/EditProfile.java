@@ -36,13 +36,14 @@ public class EditProfile extends AppCompatActivity {
         lastname = findViewById(R.id.lastName);
         profileImage = findViewById(R.id.profileImage);
 
+        if(!user.getDisplayName().isEmpty()) {
+            int firstSpace = user.getDisplayName().indexOf(" "); // detect the first space character
+            String first = user.getDisplayName().substring(0, firstSpace);  // get everything upto the first space character
+            String last = user.getDisplayName().substring(firstSpace).trim();
 
-        int firstSpace =  user.getDisplayName().indexOf(" "); // detect the first space character
-        String first =  user.getDisplayName().substring(0, firstSpace);  // get everything upto the first space character
-        String last = user.getDisplayName().substring(firstSpace).trim();
-
-        firstname.setText(first);
-        lastname.setText(last);
+            firstname.setText(first);
+            lastname.setText(last);
+        }
 
         profileImage.setImageResource(R.drawable.guest);
 
