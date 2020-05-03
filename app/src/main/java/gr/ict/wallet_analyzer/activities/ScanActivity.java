@@ -3,6 +3,7 @@ package gr.ict.wallet_analyzer.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.icu.text.Edits;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -36,14 +37,17 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import data_class.History;
+import data_class.Item;
 import data_class.Receipt;
 import gr.ict.wallet_analyzer.R;
 
@@ -149,21 +153,7 @@ public class ScanActivity extends AppCompatActivity {
 
     private void processTextDetectResult(FirebaseVisionText result) {
         textView.setText("");
-        String maintitle[] = {
-                "Receipt 1", "Receipt 2",
-                "Receipt 3", "Receipt 4",
-                "Receipt 5", "Receipt 5", "Receipt 5",
-        };
 
-
-//        Log.d("TEST",Arrays.toString(maintitle));  0Zwnpai9lIRNEDcRYKmVxobFWvx1
-//        mDatabase = FirebaseDatabase.getInstance().getReference();
-//        Receipt receipt = new Receipt(Arrays.toString(maintitle),"Alamanas 13","SuperMarket","http://test.com","15.20","1234455200174");
-//        String id = mDatabase.push().getKey();
-//        History history1 = new History("TEST","test2@");
-//            Log.d("TEST",id);
-//            mDatabase.child("users").child(id).setValue(receipt);
-            Toast.makeText(ScanActivity.this, "Added", Toast.LENGTH_LONG).show();
 
         List<FirebaseVisionText.TextBlock> blockList = result.getTextBlocks();
         if (blockList.size() == 0) {
@@ -173,6 +163,20 @@ public class ScanActivity extends AppCompatActivity {
                 String blockText = block.getText();
                 textView.append(blockText);
             }
+//            Create Histories with scanning
+            //TO DO
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            Item newItem = new Item("Kalodio",10.05);
+            List<Item> list = new ArrayList<>();
+            list.add(newItem);
+            list.add(newItem);
+            Receipt receipt1 = new Receipt(list,"Alamanas 13","SuperMarket","http://test.com",15.20,"1231321312300");
+            String id = mDatabase.push().getKey();
+            History history1 = new History(id,receipt1);
+            mAuth = FirebaseAuth.getInstance();
+            FirebaseUser user = mAuth.getCurrentUser();
+            mDatabase.child("users").child(user.getUid()).child("Hitories").child(id).setValue(history1);
+            Toast.makeText(ScanActivity.this, "Added", Toast.LENGTH_LONG).show();
         }
     }
 

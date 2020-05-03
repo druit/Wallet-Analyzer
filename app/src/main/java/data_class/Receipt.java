@@ -15,7 +15,7 @@ public class Receipt {
     private double totalPrice;
     private String barcode;
 
-    public Receipt (ArrayList<Item> items, String address, String storeType, String image, double totalPrice, String barcode){
+    public Receipt (List<Item> items, String address, String storeType, String image, double totalPrice, String barcode){
         this.items = items;
         this.address = address;
         this.storeType = storeType;
@@ -69,7 +69,7 @@ public class Receipt {
         return items;
     }
 
-    public void setItems(ArrayList<Item> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
     }
 }
