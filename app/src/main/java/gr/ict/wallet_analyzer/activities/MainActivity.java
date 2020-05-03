@@ -3,7 +3,9 @@ package gr.ict.wallet_analyzer.activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -21,6 +24,7 @@ import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -30,11 +34,19 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import Adapters.MyListAdapter;
+import data_class.History;
+import data_class.Receipt;
 import data_class.User;
 import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
@@ -43,10 +55,28 @@ import gr.ict.wallet_analyzer.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    private FirebaseAuth mAuth;
+    ImageView profileImage,profileImagePop;
+    TextView nameProfile,nameProfilePop, profileEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        profileImage = findViewById(R.id.profileImage);
+        nameProfile = findViewById(R.id.nameMain);
+
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        profileImage.setImageResource(R.drawable.guest);
+
+        setProfile("MAIN");
+
+
+
 
         FloatingActionButton scanButton = findViewById(R.id.scan_button);
         scanButton.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         // list view
         ListView list;
-        
+
         String[] maintitle = {
                 "Receipt 1", "Receipt 2",
                 "Receipt 3", "Receipt 4",
@@ -72,6 +102,29 @@ public class MainActivity extends AppCompatActivity {
                 "$13,50", "$25",
                 "$32", "$32", "$32",
         };
+
+        DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("Hitories");
+        declare.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+
+                for(DataSnapshot child: children){
+                    Log.d("TEST",child.getValue().toString());
+                }
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w("ERROR", "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+
+
+
+
         MyListAdapter adapter = new MyListAdapter(this, maintitle, subtitle);
         list = findViewById(R.id.list);
         list.setAdapter(adapter);
@@ -181,6 +234,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void setProfile(String type) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if(user != null) {
+            switch(type){
+                case "MAIN":
+                    if(!user.getDisplayName().isEmpty()){
+                        nameProfile.setText(user.getDisplayName());
+                    }
+                    break;
+                case "POP":
+                    if(!user.getDisplayName().isEmpty()){
+                        nameProfilePop.setText(user.getDisplayName());
+                        profileEmail.setText(user.getEmail());
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+    }
+
     private void openSettings(){
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater)
@@ -194,8 +271,17 @@ public class MainActivity extends AppCompatActivity {
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
 
         // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window tolken
+        // which view you pass in doesn't matter, it is only used for the window token
         popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, -300);
+
+        profileImagePop = popupView.findViewById(R.id.profileImagePop);
+        nameProfilePop = popupView.findViewById(R.id.profileName);
+        profileEmail = popupView.findViewById(R.id.profileEmail);
+
+        // TODO: add settings page
+        profileImagePop.setImageResource(R.drawable.guest);
+
+        setProfile("POP");
 
         // open Edit Profile
         popupView.setOnLongClickListener(new View.OnLongClickListener() {
