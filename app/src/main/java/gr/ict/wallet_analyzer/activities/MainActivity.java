@@ -3,7 +3,6 @@ package gr.ict.wallet_analyzer.activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -45,9 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Adapters.MyListAdapter;
-import data_class.History;
-import data_class.Receipt;
-import data_class.User;
 import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
@@ -55,9 +50,9 @@ import gr.ict.wallet_analyzer.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    ImageView profileImage, profileImagePop;
+    TextView nameProfile, nameProfilePop, profileEmail;
     private FirebaseAuth mAuth;
-    ImageView profileImage,profileImagePop;
-    TextView nameProfile,nameProfilePop, profileEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
         profileImage.setImageResource(R.drawable.guest);
 
         setProfile("MAIN");
-
-
 
 
         FloatingActionButton scanButton = findViewById(R.id.scan_button);
@@ -109,20 +102,16 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 
-                for(DataSnapshot child: children){
-                    Log.d("TEST",child.getValue().toString());
+                for (DataSnapshot child : children) {
+                    Log.d("TEST", child.getValue().toString());
                 }
             }
-
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.w("ERROR", "loadPost:onCancelled", databaseError.toException());
             }
         });
-
-
-
 
 
         MyListAdapter adapter = new MyListAdapter(this, maintitle, subtitle);
@@ -217,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                         switch (item.getItemId()) {
                             case R.id.action_settings:
                                 openSettings();
-                                // TODO: add settings page
+                                // TODO: add activity_settings page
                                 return true;
                             case R.id.action_logout:
                                 FirebaseAuth.getInstance().signOut();
@@ -237,15 +226,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void setProfile(String type) {
         FirebaseUser user = mAuth.getCurrentUser();
-        if(user != null) {
-            switch(type){
+        if (user != null) {
+            switch (type) {
                 case "MAIN":
-                    if(!user.getDisplayName().isEmpty()){
+                    if (!user.getDisplayName().isEmpty()) {
                         nameProfile.setText(user.getDisplayName());
                     }
                     break;
                 case "POP":
-                    if(!user.getDisplayName().isEmpty()){
+                    if (!user.getDisplayName().isEmpty()) {
                         nameProfilePop.setText(user.getDisplayName());
                         profileEmail.setText(user.getEmail());
                     }
@@ -254,21 +243,23 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         }
-
-
     }
 
-    private void openSettings(){
+    private void openSettings() {
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater)
                 getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = inflater.inflate(R.layout.settings, null);
+        View popupView = inflater.inflate(R.layout.activity_settings, null);
 
         // create the popup window
         int width = 1000;
         int height = 1000;
         boolean focusable = true; // lets taps outside the popup also dismiss it
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        // blur effect
+        BlurView settingsBlur = popupView.findViewById(R.id.settings_blur);
+        setBlurEffect(settingsBlur);
 
         // show the popup window
         // which view you pass in doesn't matter, it is only used for the window token
@@ -278,21 +269,20 @@ public class MainActivity extends AppCompatActivity {
         nameProfilePop = popupView.findViewById(R.id.profileName);
         profileEmail = popupView.findViewById(R.id.profileEmail);
 
-        // TODO: add settings page
+        // TODO: add activity_settings page
         profileImagePop.setImageResource(R.drawable.guest);
 
         setProfile("POP");
 
         // open Edit Profile
-        popupView.setOnLongClickListener(new View.OnLongClickListener() {
+        FloatingActionButton floatingActionButton = popupView.findViewById(R.id.edit_button);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
                 startActivity(intent);
-                return false;
             }
         });
-
     }
 
 
@@ -333,22 +323,8 @@ public class MainActivity extends AppCompatActivity {
         list.setAdapter(adapter);
 
         // blur effect
-        float radius = 10f;
-
-        View decorView = getWindow().getDecorView();
-        //ViewGroup you want to start blur from. Choose root as close to BlurView in hierarchy as possible.
-        ViewGroup rootView = decorView.findViewById(android.R.id.content);
-        //Set drawable to draw in the beginning of each blurred frame (Optional).
-        //Can be used in case your layout has a lot of transparent space and your content
-        //gets kinda lost after after blur is applied.
-        Drawable windowBackground = decorView.getBackground();
-
         BlurView blurView = popupView.findViewById(R.id.blurView);
-        blurView.setupWith(rootView)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurAlgorithm(new RenderScriptBlur(this))
-                .setBlurRadius(radius)
-                .setHasFixedTransformationMatrix(true);
+        setBlurEffect(blurView);
 
         // show the popup window
         // which view you pass in doesn't matter, it is only used for the window tolken
@@ -366,5 +342,24 @@ public class MainActivity extends AppCompatActivity {
 
     public void onBackPressed() {
         finishAffinity();
+    }
+
+    private void setBlurEffect(BlurView blurView) {
+        // blur effect
+        float radius = 10f;
+
+        View decorView = getWindow().getDecorView();
+        //ViewGroup you want to start blur from. Choose root as close to BlurView in hierarchy as possible.
+        ViewGroup rootView = decorView.findViewById(android.R.id.content);
+        //Set drawable to draw in the beginning of each blurred frame (Optional).
+        //Can be used in case your layout has a lot of transparent space and your content
+        //gets kinda lost after after blur is applied.
+        Drawable windowBackground = decorView.getBackground();
+
+        blurView.setupWith(rootView)
+                .setFrameClearDrawable(windowBackground)
+                .setBlurAlgorithm(new RenderScriptBlur(this))
+                .setBlurRadius(radius)
+                .setHasFixedTransformationMatrix(true);
     }
 }

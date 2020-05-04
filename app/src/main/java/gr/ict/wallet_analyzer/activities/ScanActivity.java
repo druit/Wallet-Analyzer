@@ -3,12 +3,10 @@ package gr.ict.wallet_analyzer.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.icu.text.Edits;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,13 +17,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -35,16 +30,11 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import data_class.History;
 import data_class.Item;
@@ -154,7 +144,6 @@ public class ScanActivity extends AppCompatActivity {
     private void processTextDetectResult(FirebaseVisionText result) {
         textView.setText("");
 
-
         List<FirebaseVisionText.TextBlock> blockList = result.getTextBlocks();
         if (blockList.size() == 0) {
             Toast.makeText(ScanActivity.this, "No Text Found in Image, please try again", Toast.LENGTH_LONG).show();
@@ -166,16 +155,16 @@ public class ScanActivity extends AppCompatActivity {
 //            Create Histories with scanning
             //TO DO
             mDatabase = FirebaseDatabase.getInstance().getReference();
-            Item newItem = new Item("Kalodio",10.05);
+            Item newItem = new Item("Kalodio", 10.05);
             List<Item> list = new ArrayList<>();
             list.add(newItem);
             list.add(newItem);
-            Receipt receipt1 = new Receipt(list,"Alamanas 13","SuperMarket","http://test.com",15.20,"1231321312300");
+            Receipt receipt1 = new Receipt(list, "Alamanas 13", "SuperMarket", "http://test.com", 15.20, "1231321312300");
             String id = mDatabase.push().getKey();
-            History history1 = new History(id,receipt1);
+            History history = new History(id, receipt1);
             mAuth = FirebaseAuth.getInstance();
             FirebaseUser user = mAuth.getCurrentUser();
-            mDatabase.child("users").child(user.getUid()).child("Hitories").child(id).setValue(history1);
+            mDatabase.child("users").child(user.getUid()).child("Hitories").child(id).setValue(history);
             Toast.makeText(ScanActivity.this, "Added", Toast.LENGTH_LONG).show();
         }
     }
