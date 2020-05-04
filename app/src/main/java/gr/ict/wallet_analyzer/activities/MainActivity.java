@@ -45,8 +45,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import Adapters.ItemAdapter;
 import Adapters.MyListAdapter;
 import data_class.History;
+import data_class.Receipt;
 import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
@@ -183,7 +185,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void showPopUp(String receiptString, String priceString) {
+    private void showPopUp(int itemPosition) {
+        Receipt listItemReceipt = historyListView.get(itemPosition).getReceipt();
+
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.receipt_popup, null);
@@ -195,18 +199,17 @@ public class MainActivity extends AppCompatActivity {
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
 
         TextView receiptTextView = popupView.findViewById(R.id.receipt_text);
-        receiptTextView.setText(receiptString);
+        receiptTextView.setText(listItemReceipt.getAddress());
 
         TextView textView = popupView.findViewById(R.id.price_text_view);
-        textView.setText(priceString);
+        textView.setText(listItemReceipt.getTotalPrice() + "€");
 
         // list view in popup
         ListView list;
 
-        // TODO: fix this
-        MyListAdapter adapter = new MyListAdapter(this, historyListView);
+        ItemAdapter itemAdapter = new ItemAdapter(this, listItemReceipt.getItems());
         list = popupView.findViewById(R.id.list_popup);
-        list.setAdapter(adapter);
+        list.setAdapter(itemAdapter);
 
         // blur effect
         BlurView blurView = popupView.findViewById(R.id.blurView);
@@ -293,14 +296,7 @@ public class MainActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO: get the correct items depending on the receipt
-                TextView receiptTextView = view.findViewById(R.id.title);
-                String receiptString = receiptTextView.getText().toString();
-
-                TextView priceTextView = view.findViewById(R.id.subtitle);
-                String priceString = priceTextView.getText().toString();
-
-                showPopUp(receiptString, priceString);
+                showPopUp(position);
             }
         });
     }

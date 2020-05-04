@@ -57,7 +57,7 @@
             android:id="@+id/sum_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="$45"
+            android:text="45€"
             android:textColor="@color/color3"
             android:textSize="36sp" />
 
@@ -86,7 +86,7 @@
             android:id="@+id/monthly_limit_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="$120"
+            android:text="120€"
             android:textColor="@color/color1"
             android:textSize="36sp" />
 

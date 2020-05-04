@@ -1,5 +1,6 @@
 package Adapters;
 
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -8,34 +9,34 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import data_class.History;
+import data_class.Item;
 import gr.ict.wallet_analyzer.R;
 
-public class MyListAdapter extends ArrayAdapter<String> {
+public class ItemAdapter extends ArrayAdapter<String> {
 
     private final Activity context;
-    private ArrayList<History> historyArrayList;
+    private List<Item> itemArrayList;
 
-    public MyListAdapter(Activity context, ArrayList<History> historyArrayList) {
+    public ItemAdapter(Activity context, List<Item> itemArrayList) {
         super(context, R.layout.mylist);
 
         this.context = context;
-        this.historyArrayList = historyArrayList;
+        this.itemArrayList = itemArrayList;
     }
 
     public View getView(int position, View view, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
         @SuppressLint("ViewHolder") View rowView = inflater.inflate(R.layout.mylist, null, true);
 
-        History history = historyArrayList.get(position);
+        Item item = itemArrayList.get(position);
 
         TextView titleText = rowView.findViewById(R.id.title);
         TextView subtitleText = rowView.findViewById(R.id.subtitle);
 
-        titleText.setText(history.getReceipt().getAddress());
-        subtitleText.setText(history.getReceipt().getTotalPrice() + "€");
+        titleText.setText(item.getName());
+        subtitleText.setText(item.getPrice() + "€");
 
         return rowView;
     }
@@ -46,7 +47,7 @@ public class MyListAdapter extends ArrayAdapter<String> {
 
     @Override
     public int getCount() {
-        return historyArrayList.size();
+        return itemArrayList.size();
     }
 
     @Override
