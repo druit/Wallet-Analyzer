@@ -281,6 +281,8 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 
+                historyListView.clear();
+
                 for (DataSnapshot child : children) {
                     historyListView.add(child.getValue(History.class));
                     adapter.notifyDataSetChanged();
