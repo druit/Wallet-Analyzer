@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showPopUp(int itemPosition) {
+    private void showReceiptPopup(int itemPosition) {
         Receipt listItemReceipt = historyListView.get(itemPosition).getReceipt();
 
         // inflate the layout of the popup window
@@ -211,6 +211,15 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = popupView.findViewById(R.id.price_text_view);
         textView.setText(listItemReceipt.getTotalPrice() + "€");
 
+        // set date of the receipt
+        TextView dateTextView = popupView.findViewById(R.id.date_text_view);
+        String date = new SimpleDateFormat("dd/MM/yyyy").format(listItemReceipt.getDate());
+        dateTextView.setText(date);
+
+        // set receipt category
+        TextView categoryTextView = popupView.findViewById(R.id.category_text_view);
+        categoryTextView.setText(listItemReceipt.getStoreType());
+
         // list view in popup
         ListView list;
 
@@ -223,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
         setBlurEffect(blurView);
 
         // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window tolken
         popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
 
         // dismiss the popup window when touched
@@ -305,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                showPopUp(position);
+                showReceiptPopup(position);
             }
         });
     }
