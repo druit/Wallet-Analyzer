@@ -152,8 +152,8 @@ public class ScanActivity extends AppCompatActivity {
                 String blockText = block.getText();
                 textView.append(blockText);
             }
-//            Create Histories with scanning
-            //TO DO
+            // Create History with scanning
+            // TODO: get items from scanned receipt
             mDatabase = FirebaseDatabase.getInstance().getReference();
             Item newItem = new Item("Kalodio", 10.05);
             List<Item> list = new ArrayList<>();
@@ -164,7 +164,7 @@ public class ScanActivity extends AppCompatActivity {
             History history = new History(id, receipt1);
             mAuth = FirebaseAuth.getInstance();
             FirebaseUser user = mAuth.getCurrentUser();
-            mDatabase.child("users").child(user.getUid()).child("Hitories").child(id).setValue(history);
+            mDatabase.child("users").child(user.getUid()).child("history").child(id).setValue(history);
             Toast.makeText(ScanActivity.this, "Added", Toast.LENGTH_LONG).show();
         }
     }

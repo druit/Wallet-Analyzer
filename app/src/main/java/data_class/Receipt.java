@@ -15,6 +15,8 @@ public class Receipt {
     private double totalPrice;
     private String barcode;
 
+    public Receipt() {}
+
     public Receipt (List<Item> items, String address, String storeType, String image, double totalPrice, String barcode){
         this.items = items;
         this.address = address;

@@ -39,10 +39,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import Adapters.MyListAdapter;
+import data_class.History;
 import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
@@ -54,22 +58,21 @@ public class MainActivity extends AppCompatActivity {
     TextView nameProfile, nameProfilePop, profileEmail;
     private FirebaseAuth mAuth;
 
+    private ArrayList<History> historyListView = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         profileImage = findViewById(R.id.profileImage);
         nameProfile = findViewById(R.id.nameMain);
 
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
 
         profileImage.setImageResource(R.drawable.guest);
 
         setProfile("MAIN");
-
 
         FloatingActionButton scanButton = findViewById(R.id.scan_button);
         scanButton.setOnClickListener(new View.OnClickListener() {
@@ -81,119 +84,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // list view
-        ListView list;
-
-        String[] maintitle = {
-                "Receipt 1", "Receipt 2",
-                "Receipt 3", "Receipt 4",
-                "Receipt 5", "Receipt 5", "Receipt 5",
-        };
-
-
-        String[] subtitle = {
-                "$5", "$5,42",
-                "$13,50", "$25",
-                "$32", "$32", "$32",
-        };
-
-        DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("Hitories");
-        declare.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-
-                for (DataSnapshot child : children) {
-                    Log.d("TEST", child.getValue().toString());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.w("ERROR", "loadPost:onCancelled", databaseError.toException());
-            }
-        });
-
-
-        MyListAdapter adapter = new MyListAdapter(this, maintitle, subtitle);
-        list = findViewById(R.id.list);
-        list.setAdapter(adapter);
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView receiptTextView = view.findViewById(R.id.title);
-                String receiptString = receiptTextView.getText().toString();
-
-                TextView priceTextView = view.findViewById(R.id.subtitle);
-                String priceString = priceTextView.getText().toString();
-
-                showPopUp(receiptString, priceString);
-            }
-        });
+        setListView();
 
         // GraphView
-        LineChart chart = findViewById(R.id.chart);
+        setGraphView();
 
-        YourData[] dataObjects = {
-                new YourData(1, 5),
-                new YourData(2, 8),
-                new YourData(3, 3),
-                new YourData(4, 13)
-        };
-        List<Entry> entries = new ArrayList<>();
-        for (YourData data : dataObjects) {
-            // turn your data into Entry objects
-            entries.add(new Entry(data.getX(), data.getY()));
-        }
-
-        LineDataSet dataSet = new LineDataSet(entries, "April"); // add entries to dataset
-
-        // make line curvy
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-
-        // circles color
-        dataSet.setCircleColor(Color.rgb(95, 115, 193));
-        dataSet.setCircleHoleColor(Color.rgb(95, 115, 193));
-
-        // Gradient fill
-        dataSet.setDrawFilled(true);
-        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.graph_gradient);
-        dataSet.setFillDrawable(drawable);
-
-        // line color
-        dataSet.setColor(Color.rgb(95, 115, 193));
-        // values text color
-        dataSet.setValueTextColor(Color.rgb(255, 255, 255));
-
-        LineData lineData = new LineData(dataSet);
-        chart.setData(lineData);
-        chart.invalidate(); // refresh
-
-        chart.getDescription().setEnabled(false);
-        chart.getLegend().setEnabled(false);
-
-        // hide values in left and right side
-        chart.getAxisRight().setDrawLabels(false);
-        chart.getAxisLeft().setDrawLabels(false);
-
-        // no zoom
-        chart.setScaleEnabled(false);
-
-        // grid lines color
-        chart.getXAxis().setGridColor(R.color.colorButton);
-        chart.getAxisLeft().setGridColor(R.color.colorButton);
-        chart.getAxisRight().setGridColor(R.color.colorButton);
-
-        chart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
-
-        // Spinner above the graph
-        Spinner spinner = findViewById(R.id.month_spinner);
-        String[] items = new String[]{"January", "February", "March", "April"};
-        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
-        //There are multiple variations of this, but this is the basic variant.
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, items);
-        //set the spinners adapter to the previously created one.
-        spinner.setAdapter(spinnerAdapter);
+        // spinner for the graph
+        monthlyGraph();
 
         LinearLayout menuOpenerLayout = findViewById(R.id.menu_opener);
         menuOpenerLayout.setOnClickListener(new View.OnClickListener() {
@@ -306,19 +203,8 @@ public class MainActivity extends AppCompatActivity {
         // list view in popup
         ListView list;
 
-        String[] maintitle = {
-                "Item 1", "Item 2",
-                "Item 3", "Item 4",
-                "Item 5", "Item 5", "Item 5",
-        };
-
-        String[] subtitle = {
-                "$5", "$5,42",
-                "$13,50", "$25",
-                "$32", "$32", "$32",
-        };
-
-        MyListAdapter adapter = new MyListAdapter(this, maintitle, subtitle);
+        // TODO: fix this
+        MyListAdapter adapter = new MyListAdapter(this, historyListView);
         list = popupView.findViewById(R.id.list_popup);
         list.setAdapter(adapter);
 
@@ -361,5 +247,117 @@ public class MainActivity extends AppCompatActivity {
                 .setBlurAlgorithm(new RenderScriptBlur(this))
                 .setBlurRadius(radius)
                 .setHasFixedTransformationMatrix(true);
+    }
+
+    private void monthlyGraph() {
+        DateFormat dateFormat = new SimpleDateFormat("MM");
+        Date date = new Date();
+        Log.d("Month", dateFormat.format(date));
+
+        // Spinner above the graph
+        Spinner spinner = findViewById(R.id.month_spinner);
+        String[] items = new String[]{"January", "February", "March", "April"};
+        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
+        //There are multiple variations of this, but this is the basic variant.
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, items);
+        //set the spinners adapter to the previously created one.
+        spinner.setAdapter(spinnerAdapter);
+    }
+
+    private void setListView() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        ListView list;
+
+        final MyListAdapter adapter = new MyListAdapter(this, historyListView);
+        list = findViewById(R.id.list);
+        list.setAdapter(adapter);
+
+        DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("history");
+        declare.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+
+                for (DataSnapshot child : children) {
+                    historyListView.add(child.getValue(History.class));
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w("ERROR", "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO: get the correct items depending on the receipt
+                TextView receiptTextView = view.findViewById(R.id.title);
+                String receiptString = receiptTextView.getText().toString();
+
+                TextView priceTextView = view.findViewById(R.id.subtitle);
+                String priceString = priceTextView.getText().toString();
+
+                showPopUp(receiptString, priceString);
+            }
+        });
+    }
+
+    private void setGraphView() {
+        LineChart chart = findViewById(R.id.chart);
+
+        YourData[] dataObjects = {
+                new YourData(1, 5),
+                new YourData(2, 8),
+                new YourData(3, 3),
+                new YourData(4, 13)
+        };
+        List<Entry> entries = new ArrayList<>();
+        for (YourData data : dataObjects) {
+            // turn your data into Entry objects
+            entries.add(new Entry(data.getX(), data.getY()));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "April"); // add entries to dataset
+
+        // make line curvy
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+        // circles color
+        dataSet.setCircleColor(Color.rgb(95, 115, 193));
+        dataSet.setCircleHoleColor(Color.rgb(95, 115, 193));
+
+        // Gradient fill
+        dataSet.setDrawFilled(true);
+        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.graph_gradient);
+        dataSet.setFillDrawable(drawable);
+
+        // line color
+        dataSet.setColor(Color.rgb(95, 115, 193));
+        // values text color
+        dataSet.setValueTextColor(Color.rgb(255, 255, 255));
+
+        LineData lineData = new LineData(dataSet);
+        chart.setData(lineData);
+        chart.invalidate(); // refresh
+
+        chart.getDescription().setEnabled(false);
+        chart.getLegend().setEnabled(false);
+
+        // hide values in left and right side
+        chart.getAxisRight().setDrawLabels(false);
+        chart.getAxisLeft().setDrawLabels(false);
+
+        // no zoom
+        chart.setScaleEnabled(false);
+
+        // grid lines color
+        chart.getXAxis().setGridColor(R.color.colorButton);
+        chart.getAxisLeft().setGridColor(R.color.colorButton);
+        chart.getAxisRight().setGridColor(R.color.colorButton);
+
+        chart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
     }
 }
