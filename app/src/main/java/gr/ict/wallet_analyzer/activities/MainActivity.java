@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView profileImage, profileImagePop;
     TextView nameProfile, nameProfilePop, profileEmail;
-    private FirebaseAuth mAuth;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     private ArrayList<History> historyListView = new ArrayList<>();
 
@@ -70,20 +70,11 @@ public class MainActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
         nameProfile = findViewById(R.id.nameMain);
 
-        mAuth = FirebaseAuth.getInstance();
-
-        profileImage.setImageResource(R.drawable.guest);
-
+        // set profile name and image
         setProfile("MAIN");
 
-        FloatingActionButton scanButton = findViewById(R.id.scan_button);
-        scanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
-                startActivity(intent);
-            }
-        });
+        // floating button that opens the scan activity
+        setFloatingButton();
 
         // list view
         setListView();
@@ -94,6 +85,11 @@ public class MainActivity extends AppCompatActivity {
         // spinner for the graph
         monthlyGraph();
 
+        // open menu when clicked on the username on top right corner
+        setMenuOpener();
+    }
+
+    private void setMenuOpener() {
         LinearLayout menuOpenerLayout = findViewById(R.id.menu_opener);
         menuOpenerLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,7 +119,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setFloatingButton() {
+        FloatingActionButton scanButton = findViewById(R.id.scan_button);
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
     private void setProfile(String type) {
+        profileImage.setImageResource(R.drawable.guest);
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             switch (type) {
@@ -183,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private void showPopUp(int itemPosition) {
         Receipt listItemReceipt = historyListView.get(itemPosition).getReceipt();
