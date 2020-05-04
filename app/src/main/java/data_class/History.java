@@ -1,23 +1,23 @@
 package data_class;
 
-import java.util.List;
-
 public class History {
 
-    private Receipt receipts;
+    private Receipt receipt;
     private String id;
 
-    public History(String id,Receipt receipts) {
+    public History() {}
+
+    public History(String id, Receipt receipt) {
         this.id = id;
-        this.receipts = receipts;
+        this.receipt = receipt;
     }
 
-    public Receipt getReceipts() {
-        return receipts;
+    public Receipt getReceipt() {
+        return receipt;
     }
 
-    public void setReceipts(Receipt receipts) {
-        this.receipts = receipts;
+    public void setReceipt(Receipt receipt) {
+        this.receipt = receipt;
     }
 
     public String getId() {
