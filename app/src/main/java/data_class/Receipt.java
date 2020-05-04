@@ -11,10 +11,11 @@ public class Receipt {
     private double totalPrice;
     private String barcode;
     private Date date;
+    private String storeName;
 
     public Receipt() {}
 
-    public Receipt(List<Item> items, String address, String storeType, String image, double totalPrice, String barcode, Date date){
+    public Receipt(List<Item> items, String address, String storeType, String image, double totalPrice, String barcode, Date date, String storeName){
         this.items = items;
         this.address = address;
         this.storeType = storeType;
@@ -22,6 +23,7 @@ public class Receipt {
         this.totalPrice = totalPrice;
         this.barcode = barcode;
         this.date = date;
+        this.storeName = storeName;
     }
 
 
@@ -79,5 +81,13 @@ public class Receipt {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }

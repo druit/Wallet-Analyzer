@@ -205,11 +205,15 @@ public class MainActivity extends AppCompatActivity {
         boolean focusable = true; // lets taps outside the popup also dismiss it
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
 
-        TextView receiptTextView = popupView.findViewById(R.id.receipt_text);
-        receiptTextView.setText(listItemReceipt.getAddress());
+        TextView storeNameTextView = popupView.findViewById(R.id.store_name_text_view);
+        storeNameTextView.setText(listItemReceipt.getStoreName());
 
         TextView textView = popupView.findViewById(R.id.price_text_view);
         textView.setText(listItemReceipt.getTotalPrice() + "€");
+
+        // set receipt location
+        TextView addressTextView = popupView.findViewById(R.id.address_text_view);
+        addressTextView.setText(listItemReceipt.getAddress());
 
         // set date of the receipt
         TextView dateTextView = popupView.findViewById(R.id.date_text_view);

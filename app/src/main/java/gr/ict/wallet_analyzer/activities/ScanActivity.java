@@ -160,7 +160,8 @@ public class ScanActivity extends AppCompatActivity {
             list.add(newItem);
             list.add(newItem);
             Date date = new Date();
-            Receipt receipt1 = new Receipt(list, "Alamanas 13", "SuperMarket", "http://test.com", 15.20, "1231321312300", date);
+            String storeName = "Masoutis";
+            Receipt receipt1 = new Receipt(list, "Alamanas 13", "SuperMarket", "http://test.com", 15.20, "1231321312300", date, storeName);
             String id = mDatabase.push().getKey();
             History history = new History(id, receipt1);
             mAuth = FirebaseAuth.getInstance();

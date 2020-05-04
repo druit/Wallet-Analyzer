@@ -34,7 +34,7 @@ public class MyListAdapter extends ArrayAdapter<String> {
         TextView titleText = rowView.findViewById(R.id.title);
         TextView subtitleText = rowView.findViewById(R.id.subtitle);
 
-        titleText.setText(history.getReceipt().getAddress());
+        titleText.setText(history.getReceipt().getStoreName());
         subtitleText.setText(history.getReceipt().getTotalPrice() + "€");
 
         return rowView;
