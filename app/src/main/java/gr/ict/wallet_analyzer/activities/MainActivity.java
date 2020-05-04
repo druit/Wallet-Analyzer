@@ -243,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         }
-
-
     }
 
     private void openSettings() {

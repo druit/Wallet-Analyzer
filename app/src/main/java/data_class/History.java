@@ -1,9 +1,5 @@
 package data_class;
 
-import android.media.Image;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 
 public class History {
@@ -32,7 +28,3 @@ public class History {
         this.id = id;
     }
 }
-//
-
-
-
