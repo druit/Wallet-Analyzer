@@ -60,7 +60,12 @@ public class MainActivity extends AppCompatActivity {
     TextView nameProfile, nameProfilePop, profileEmail;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-    private ArrayList<History> historyListView = new ArrayList<>();
+    private ArrayList<History> historyArrayList = new ArrayList<>();
+
+    private LineChart chart;
+    private LineDataSet dataSet;
+
+    private float maximumReceiptPrice = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
         nameProfile = findViewById(R.id.nameMain);
 
+        // GraphView
+        setGraphView();
+
         // set profile name and image
         setProfile("MAIN");
 
@@ -78,9 +86,6 @@ public class MainActivity extends AppCompatActivity {
 
         // list view
         setListView();
-
-        // GraphView
-        setGraphView();
 
         // spinner for the graph
         monthlyGraph();
@@ -193,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showReceiptPopup(int itemPosition) {
-        Receipt listItemReceipt = historyListView.get(itemPosition).getReceipt();
+        Receipt listItemReceipt = historyArrayList.get(itemPosition).getReceipt();
 
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -290,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         ListView list;
 
-        final MyListAdapter adapter = new MyListAdapter(this, historyListView);
+        final MyListAdapter adapter = new MyListAdapter(this, historyArrayList);
         list = findViewById(R.id.list);
         list.setAdapter(adapter);
 
@@ -300,11 +305,31 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 
-                historyListView.clear();
+                historyArrayList.clear();
+                dataSet.clear();
+                dataSet.addEntry(new Entry(1, 0));
 
                 for (DataSnapshot child : children) {
-                    historyListView.add(child.getValue(History.class));
+                    History history = child.getValue(History.class);
+                    historyArrayList.add(history);
                     adapter.notifyDataSetChanged();
+
+                    String dateString = new SimpleDateFormat("dd").format(history.getReceipt().getDate());
+                    System.out.println(dateString);
+                    float date = Float.valueOf(dateString);
+                    float price = (float) history.getReceipt().getTotalPrice();
+
+                    dataSet.addEntry(new Entry(date, price));
+
+                    // set maximum value in the graph
+                    if (maximumReceiptPrice < history.getReceipt().getTotalPrice()) {
+                        maximumReceiptPrice = (float) history.getReceipt().getTotalPrice();
+                        chart.getAxisLeft().setAxisMaximum(maximumReceiptPrice + 10);
+                    }
+
+                    dataSet.notifyDataSetChanged();
+                    chart.notifyDataSetChanged();
+                    chart.invalidate();
                 }
             }
 
@@ -323,21 +348,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setGraphView() {
-        LineChart chart = findViewById(R.id.chart);
+        chart = findViewById(R.id.chart);
 
         YourData[] dataObjects = {
-                new YourData(1, 5),
-                new YourData(2, 8),
-                new YourData(3, 3),
-                new YourData(4, 13)
+                new YourData(2, 7),
+                new YourData(3, 12),
+                new YourData(4, 3)
         };
+
         List<Entry> entries = new ArrayList<>();
+
         for (YourData data : dataObjects) {
             // turn your data into Entry objects
             entries.add(new Entry(data.getX(), data.getY()));
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "April"); // add entries to dataset
+        dataSet = new LineDataSet(entries, "April"); // add entries to dataset
 
         // make line curvy
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
@@ -374,7 +400,23 @@ public class MainActivity extends AppCompatActivity {
         chart.getXAxis().setGridColor(R.color.colorButton);
         chart.getAxisLeft().setGridColor(R.color.colorButton);
         chart.getAxisRight().setGridColor(R.color.colorButton);
+        chart.getAxisRight().setDrawGridLines(false);
 
+        // show outlines of the grid
+        chart.getAxisLeft().setDrawAxisLine(true);
+        chart.getAxisRight().setDrawAxisLine(true);
+        chart.getXAxis().setDrawAxisLine(true);
+
+        chart.getXAxis().setAxisLineColor(R.color.colorButton);
+        chart.getAxisLeft().setAxisLineColor(R.color.colorButton);
+        chart.getAxisRight().setAxisLineColor(R.color.colorButton);
+
+        // text color of labels in x axis
         chart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
+
+        chart.getAxisLeft().setAxisMinimum(0);
+        chart.getXAxis().setAxisMaximum(10);
+        chart.getXAxis().setAxisMinimum(0);
+        chart.getXAxis().setLabelCount(10);
     }
 }
