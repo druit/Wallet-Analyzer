@@ -45,8 +45,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import Adapters.ItemAdapter;
 import Adapters.MyListAdapter;
 import data_class.History;
+import data_class.Receipt;
 import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
@@ -56,9 +58,14 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView profileImage, profileImagePop;
     TextView nameProfile, nameProfilePop, profileEmail;
-    private FirebaseAuth mAuth;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-    private ArrayList<History> historyListView = new ArrayList<>();
+    private ArrayList<History> historyArrayList = new ArrayList<>();
+
+    private LineChart chart;
+    private LineDataSet dataSet;
+
+    private float maximumReceiptPrice = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,30 +75,26 @@ public class MainActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
         nameProfile = findViewById(R.id.nameMain);
 
-        mAuth = FirebaseAuth.getInstance();
+        // GraphView
+        setGraphView();
 
-        profileImage.setImageResource(R.drawable.guest);
-
+        // set profile name and image
         setProfile("MAIN");
 
-        FloatingActionButton scanButton = findViewById(R.id.scan_button);
-        scanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
-                startActivity(intent);
-            }
-        });
+        // floating button that opens the scan activity
+        setFloatingButton();
 
         // list view
         setListView();
 
-        // GraphView
-        setGraphView();
-
         // spinner for the graph
         monthlyGraph();
 
+        // open menu when clicked on the username on top right corner
+        setMenuOpener();
+    }
+
+    private void setMenuOpener() {
         LinearLayout menuOpenerLayout = findViewById(R.id.menu_opener);
         menuOpenerLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +124,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setFloatingButton() {
+        FloatingActionButton scanButton = findViewById(R.id.scan_button);
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
     private void setProfile(String type) {
+        profileImage.setImageResource(R.drawable.guest);
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             switch (type) {
@@ -182,8 +197,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void showReceiptPopup(int itemPosition) {
+        Receipt listItemReceipt = historyArrayList.get(itemPosition).getReceipt();
 
-    private void showPopUp(String receiptString, String priceString) {
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.receipt_popup, null);
@@ -194,26 +210,37 @@ public class MainActivity extends AppCompatActivity {
         boolean focusable = true; // lets taps outside the popup also dismiss it
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
 
-        TextView receiptTextView = popupView.findViewById(R.id.receipt_text);
-        receiptTextView.setText(receiptString);
+        TextView storeNameTextView = popupView.findViewById(R.id.store_name_text_view);
+        storeNameTextView.setText(listItemReceipt.getStoreName());
 
         TextView textView = popupView.findViewById(R.id.price_text_view);
-        textView.setText(priceString);
+        textView.setText(listItemReceipt.getTotalPrice() + "€");
+
+        // set receipt location
+        TextView addressTextView = popupView.findViewById(R.id.address_text_view);
+        addressTextView.setText(listItemReceipt.getAddress());
+
+        // set date of the receipt
+        TextView dateTextView = popupView.findViewById(R.id.date_text_view);
+        String date = new SimpleDateFormat("dd/MM/yyyy").format(listItemReceipt.getDate());
+        dateTextView.setText(date);
+
+        // set receipt category
+        TextView categoryTextView = popupView.findViewById(R.id.category_text_view);
+        categoryTextView.setText(listItemReceipt.getStoreType());
 
         // list view in popup
         ListView list;
 
-        // TODO: fix this
-        MyListAdapter adapter = new MyListAdapter(this, historyListView);
+        ItemAdapter itemAdapter = new ItemAdapter(this, listItemReceipt.getItems());
         list = popupView.findViewById(R.id.list_popup);
-        list.setAdapter(adapter);
+        list.setAdapter(itemAdapter);
 
         // blur effect
         BlurView blurView = popupView.findViewById(R.id.blurView);
         setBlurEffect(blurView);
 
         // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window tolken
         popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
 
         // dismiss the popup window when touched
@@ -268,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         ListView list;
 
-        final MyListAdapter adapter = new MyListAdapter(this, historyListView);
+        final MyListAdapter adapter = new MyListAdapter(this, historyArrayList);
         list = findViewById(R.id.list);
         list.setAdapter(adapter);
 
@@ -278,9 +305,16 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 
+                historyArrayList.clear();
+                dataSet.clear();
+                dataSet.addEntry(new Entry(1, 0));
+
                 for (DataSnapshot child : children) {
-                    historyListView.add(child.getValue(History.class));
+                    History history = child.getValue(History.class);
+                    historyArrayList.add(history);
                     adapter.notifyDataSetChanged();
+
+                    updateGraph(history);
                 }
             }
 
@@ -293,34 +327,28 @@ public class MainActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO: get the correct items depending on the receipt
-                TextView receiptTextView = view.findViewById(R.id.title);
-                String receiptString = receiptTextView.getText().toString();
-
-                TextView priceTextView = view.findViewById(R.id.subtitle);
-                String priceString = priceTextView.getText().toString();
-
-                showPopUp(receiptString, priceString);
+                showReceiptPopup(position);
             }
         });
     }
 
     private void setGraphView() {
-        LineChart chart = findViewById(R.id.chart);
+        chart = findViewById(R.id.chart);
 
         YourData[] dataObjects = {
-                new YourData(1, 5),
-                new YourData(2, 8),
-                new YourData(3, 3),
-                new YourData(4, 13)
+                new YourData(2, 7),
+                new YourData(3, 12),
+                new YourData(4, 3)
         };
+
         List<Entry> entries = new ArrayList<>();
+
         for (YourData data : dataObjects) {
             // turn your data into Entry objects
             entries.add(new Entry(data.getX(), data.getY()));
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "April"); // add entries to dataset
+        dataSet = new LineDataSet(entries, "April"); // add entries to dataset
 
         // make line curvy
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
@@ -357,7 +385,42 @@ public class MainActivity extends AppCompatActivity {
         chart.getXAxis().setGridColor(R.color.colorButton);
         chart.getAxisLeft().setGridColor(R.color.colorButton);
         chart.getAxisRight().setGridColor(R.color.colorButton);
+        chart.getAxisRight().setDrawGridLines(false);
 
+        // show outlines of the grid
+        chart.getAxisLeft().setDrawAxisLine(true);
+        chart.getAxisRight().setDrawAxisLine(true);
+        chart.getXAxis().setDrawAxisLine(true);
+
+        chart.getXAxis().setAxisLineColor(R.color.colorButton);
+        chart.getAxisLeft().setAxisLineColor(R.color.colorButton);
+        chart.getAxisRight().setAxisLineColor(R.color.colorButton);
+
+        // text color of labels in x axis
         chart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
+
+        chart.getAxisLeft().setAxisMinimum(0);
+        chart.getXAxis().setAxisMaximum(10);
+        chart.getXAxis().setAxisMinimum(0);
+        chart.getXAxis().setLabelCount(10);
+    }
+
+    private void updateGraph(History history) {
+        String dateString = new SimpleDateFormat("dd").format(history.getReceipt().getDate());
+        System.out.println(dateString);
+        float date = Float.valueOf(dateString);
+        float price = (float) history.getReceipt().getTotalPrice();
+
+        dataSet.addEntry(new Entry(date, price));
+
+        // set maximum value in the graph
+        if (maximumReceiptPrice < history.getReceipt().getTotalPrice()) {
+            maximumReceiptPrice = (float) history.getReceipt().getTotalPrice();
+            chart.getAxisLeft().setAxisMaximum(maximumReceiptPrice + 10);
+        }
+
+        dataSet.notifyDataSetChanged();
+        chart.notifyDataSetChanged();
+        chart.invalidate();
     }
 }
