@@ -314,22 +314,7 @@ public class MainActivity extends AppCompatActivity {
                     historyArrayList.add(history);
                     adapter.notifyDataSetChanged();
 
-                    String dateString = new SimpleDateFormat("dd").format(history.getReceipt().getDate());
-                    System.out.println(dateString);
-                    float date = Float.valueOf(dateString);
-                    float price = (float) history.getReceipt().getTotalPrice();
-
-                    dataSet.addEntry(new Entry(date, price));
-
-                    // set maximum value in the graph
-                    if (maximumReceiptPrice < history.getReceipt().getTotalPrice()) {
-                        maximumReceiptPrice = (float) history.getReceipt().getTotalPrice();
-                        chart.getAxisLeft().setAxisMaximum(maximumReceiptPrice + 10);
-                    }
-
-                    dataSet.notifyDataSetChanged();
-                    chart.notifyDataSetChanged();
-                    chart.invalidate();
+                    updateGraph(history);
                 }
             }
 
@@ -418,5 +403,24 @@ public class MainActivity extends AppCompatActivity {
         chart.getXAxis().setAxisMaximum(10);
         chart.getXAxis().setAxisMinimum(0);
         chart.getXAxis().setLabelCount(10);
+    }
+
+    private void updateGraph(History history) {
+        String dateString = new SimpleDateFormat("dd").format(history.getReceipt().getDate());
+        System.out.println(dateString);
+        float date = Float.valueOf(dateString);
+        float price = (float) history.getReceipt().getTotalPrice();
+
+        dataSet.addEntry(new Entry(date, price));
+
+        // set maximum value in the graph
+        if (maximumReceiptPrice < history.getReceipt().getTotalPrice()) {
+            maximumReceiptPrice = (float) history.getReceipt().getTotalPrice();
+            chart.getAxisLeft().setAxisMaximum(maximumReceiptPrice + 10);
+        }
+
+        dataSet.notifyDataSetChanged();
+        chart.notifyDataSetChanged();
+        chart.invalidate();
     }
 }
