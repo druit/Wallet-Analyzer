@@ -1,5 +1,9 @@
 package gr.ict.wallet_analyzer.activities;
 
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,21 +23,34 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
+import java.util.Locale;
+
 import gr.ict.wallet_analyzer.R;
+import settings.Language;
 
 public class EditProfileActivity extends AppCompatActivity {
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
-    Button saveBtn;
+    Button saveBtn,languageBtn;
     EditText firstName, lastName;
     TextView emailTextView;
     ImageView profileImage;
+    Language language = new Language();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadLocale();
         setContentView(R.layout.activity_edit_profile);
+
+        //change actionbar title, if you don't change it will be according to your systems default language
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.setTitle(getResources().getString(R.string.app_name));
+
+
         saveBtn = findViewById(R.id.saveBtn);
+        languageBtn = findViewById(R.id.changeLanguage);
 
         firstName = findViewById(R.id.firstName);
         lastName = findViewById(R.id.lastName);
@@ -57,6 +75,13 @@ public class EditProfileActivity extends AppCompatActivity {
 
         profileImage.setImageResource(R.drawable.guest);
 
+
+        languageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                 openDialogChangeLanguage();
+            }
+        });
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,9 +105,52 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-//        String test = user.getDisplayName();
-//        Log.d("TEST",test);
     }
+
+    private void openDialogChangeLanguage() {
+        final String[] listItems = {"EN","EL"};
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+        mBuilder.setTitle("Choose Language:");
+        mBuilder.setSingleChoiceItems(listItems, 0, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(which == 0){
+                    setLocale("en");
+                    language.setCurrentLanguage("en");
+                    recreate();
+                    finish();
+                }
+                else if(which == 1){
+                    setLocale("el");
+                    language.setCurrentLanguage("el");
+                    recreate();
+                    finish();
+
+                }
+                dialog.dismiss();
+            }
+        });
+        AlertDialog mDialog = mBuilder.create();
+        mDialog.show();
+
+    }
+
+    private void setLocale(String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
+        //save data to sared preferences
+        SharedPreferences.Editor editor = getSharedPreferences("Settings",MODE_PRIVATE).edit();
+        editor.putString("My_Lang",lang);
+        editor.apply();
+    }
+    // load language saved in shared preferences
+    public void loadLocale(){
+        SharedPreferences prefs = getSharedPreferences("Settings", Activity.MODE_PRIVATE);
+        String language = prefs.getString("My_Lang","");
+        setLocale(language);
+    }
+
 }

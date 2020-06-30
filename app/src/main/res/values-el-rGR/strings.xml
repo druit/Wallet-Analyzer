@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wallet-Analyzer</string>
+    <string name="gen_analyze">Analyze</string>
+    <string name="action_settings">Ρυθμίσεις</string>
+    <string name="action_logout">Έξοδος</string>
+    <string name="title_activity_login">Wallet Analyzer</string>
+    <string name="prompt_email">Διεύθυνση</string>
+    <string name="prompt_password">Κωδικός</string>
+    <string name="repeat_password">Επανάλαβε τον Κωδικό</string>
+    <string name="action_sign_in">Είσοδος</string>
+    <string name="gen_register">Δημιουργία Λογαριασμού</string>
+    <string name="sign_up">Εγγραφή</string>
+    <string name="gen_verification_send">Ξανά στείλε Verification</string>
+    <string name="action_sign_in_short">Είσοδος</string>
+    <string name="welcome">"Καλώς Ήρθες"</string>
+    <string name="invalid_username">Δεν υπάρχει αυτός ο Χρήστης</string>
+    <string name="invalid_password">Ο κωδικός πρέπει να περίεχει περίσσοτερο απο 5 χαρακτήρες</string>
+    <string name="login_failed">"Η είσοδος απέτυχε."</string>
+    <string name="title_activity_register">Είσοδος</string>
+    <string name="edit_profile">Επεξεργασία Προφίλ</string>
+    <string name="enter_your_email">yourmail@hotmail.com</string>
+    <string name="gen_version">v.1.0.0</string>
+    <string name="hint_firstname">Όνομα</string>
+    <string name="hint_lastname">Επίθετο</string>
+    <string name="gen_save">Αποθήκευση</string>
+    <string name="gen_guest">Δεν έχεις λογαριασμό;</string>
+    <string name="gen_spent_month">Spent so far this month"</string>
+    <string name="gen_month_limit">Monthly limit"</string>
+    <string name="gen_history">Ιστορικό</string>
+    <string name="gen_full_history">Όλο το ιστορικό</string>
+    <string name="gen_take_photo">Βγάλε Φωτογραφία</string>
+    <string name="gen_display_detected_image">Display Detected Text from image.</string>
+    <string name="gen_location">Περιοχή:</string>
+    <string name="gen_date">Ημερομηνία:</string>
+    <string name="gen_category">Κατηγορία:</string>
+    <string name="gen_type_category">Supermarket</string>
+    <string name="gen_change_language">Αλλαγή Γλώσσας</string>
+
+</resources>

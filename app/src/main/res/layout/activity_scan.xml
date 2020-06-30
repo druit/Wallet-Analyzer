@@ -25,7 +25,7 @@
         android:paddingStart="25dp"
         android:paddingEnd="25dp"
         android:layout_marginStart="44dp"
-        android:text="Analyze" />
+        android:text="@string/gen_analyze" />
 
     <Button
         android:id="@id/ocr_photo"
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/ocr_image"
         android:layout_marginEnd="44dp"
-        android:text="Take Photo"
+        android:text="@string/gen_take_photo"
         android:background="@drawable/button_background"
         android:textColor="#fff"
         android:layout_alignParentEnd="true" />
@@ -52,7 +52,7 @@
         android:textAlignment="center"
         android:maxLines="10"
         android:textColor="#fff"
-        android:text="Display Detected Text from image."
+        android:text="@string/gen_display_detected_image"
         android:textSize="26dp" />
 
 </RelativeLayout>

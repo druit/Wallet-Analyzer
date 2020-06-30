@@ -1,9 +1,13 @@
 package gr.ict.wallet_analyzer.activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -44,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import Adapters.ItemAdapter;
 import Adapters.MyListAdapter;
@@ -53,6 +58,7 @@ import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import gr.ict.wallet_analyzer.R;
+import io.opencensus.resource.Resource;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -74,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
         profileImage = findViewById(R.id.profileImage);
         nameProfile = findViewById(R.id.nameMain);
+        Log.d("TEST","EDWWW");
+
+//
 
         // GraphView
         setGraphView();
@@ -254,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
+
         finishAffinity();
     }
 
