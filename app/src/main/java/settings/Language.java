@@ -1,7 +1,7 @@
 package settings;
 
 public class Language {
-    private String currentLanguage;
+   static String currentLanguage;
 
 
     public Language(String currentLanguage) {

@@ -80,9 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         profileImage = findViewById(R.id.profileImage);
         nameProfile = findViewById(R.id.nameMain);
-        Log.d("TEST","EDWWW");
-
-//
 
         // GraphView
         setGraphView();

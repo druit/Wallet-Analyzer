@@ -111,7 +111,17 @@ public class EditProfileActivity extends AppCompatActivity {
         final String[] listItems = {"EN","EL"};
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
         mBuilder.setTitle("Choose Language:");
-        mBuilder.setSingleChoiceItems(listItems, 0, new DialogInterface.OnClickListener() {
+
+        int lang;
+
+        if (language.getCurrentLanguage() == "el"){
+            lang = 1;
+        }else{
+            lang = 0;
+        }
+
+
+        mBuilder.setSingleChoiceItems(listItems,lang, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(which == 0){
