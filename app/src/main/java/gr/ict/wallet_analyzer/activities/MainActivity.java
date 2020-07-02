@@ -63,7 +63,7 @@ import io.opencensus.resource.Resource;
 public class MainActivity extends AppCompatActivity {
 
     ImageView profileImage, profileImagePop;
-    TextView nameProfile, nameProfilePop, profileEmail;
+    TextView nameProfile, nameProfilePop, profileEmail,totalPriceMonth;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     private ArrayList<History> historyArrayList = new ArrayList<>();
@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         profileImage = findViewById(R.id.profileImage);
         nameProfile = findViewById(R.id.nameMain);
+        totalPriceMonth = findViewById(R.id.sum_text_view);
 
         // GraphView
         setGraphView();
@@ -301,6 +302,7 @@ public class MainActivity extends AppCompatActivity {
     private void setListView() {
         FirebaseUser user = mAuth.getCurrentUser();
         ListView list;
+        final double[] totalPrice = new double[1];
 
         final MyListAdapter adapter = new MyListAdapter(this, historyArrayList);
         list = findViewById(R.id.list);
@@ -317,7 +319,10 @@ public class MainActivity extends AppCompatActivity {
                 dataSet.addEntry(new Entry(1, 0));
 
                 for (DataSnapshot child : children) {
+
                     History history = child.getValue(History.class);
+                    totalPrice[0] += history.getReceipt().getTotalPrice();
+                    totalPriceMonth.setText( totalPrice[0] + "€");
                     historyArrayList.add(history);
                     adapter.notifyDataSetChanged();
 
