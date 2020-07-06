@@ -1,12 +1,17 @@
 package gr.ict.wallet_analyzer.activities;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.LocaleList;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -42,6 +47,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -60,7 +66,7 @@ import eightbitlab.com.blurview.RenderScriptBlur;
 import gr.ict.wallet_analyzer.R;
 import io.opencensus.resource.Resource;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     ImageView profileImage, profileImagePop;
     TextView nameProfile, nameProfilePop, profileEmail,totalPriceMonth;
