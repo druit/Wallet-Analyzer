@@ -141,21 +141,21 @@ public class EditProfileActivity extends BaseActivity {
                     //setLocale("en");
                     Prefs.putString("My_Lang","en");
 //                    language.setCurrentLanguage("en");
-                    recreate();
-                    /*Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    //recreate();
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
-                    finish();*/
+                    finish();
                 }
                 else if(which == 1){
                     //setLocale("el");
                     Prefs.putString("My_Lang","el");
 //                    language.setCurrentLanguage("el");
-                    recreate();
-                    /*Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    //recreate();
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
-                    finish();*/
+                    finish();
                 }
                 dialog.dismiss();
             }
@@ -171,8 +171,8 @@ public class EditProfileActivity extends BaseActivity {
         Configuration config = new Configuration();
         config.locale = locale;
         getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
-        //save data to sared preferences
-//        SharedPreferences.Editor editor = getSharedPreferences("Settings",MODE_PRIVATE).edit();
+        //save data to shared preferences
+        //SharedPreferences.Editor editor = getSharedPreferences("Settings",MODE_PRIVATE).edit();
         Prefs.putString("My_Lang",lang);
     }
     // load language saved in shared preferences

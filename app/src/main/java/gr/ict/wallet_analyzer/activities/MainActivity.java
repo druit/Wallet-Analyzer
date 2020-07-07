@@ -297,7 +297,16 @@ public class MainActivity extends BaseActivity {
 
         // Spinner above the graph
         Spinner spinner = findViewById(R.id.month_spinner);
-        String[] items = new String[]{"January", "February", "March", "April"};
+        String[] items = new String[]{
+                getString(R.string.gen_month_1),getString(R.string.gen_month_2),
+                getString(R.string.gen_month_3),getString(R.string.gen_month_4),
+                getString(R.string.gen_month_5),getString(R.string.gen_month_6),
+                getString(R.string.gen_month_7),getString(R.string.gen_month_8),
+                getString(R.string.gen_month_9),getString(R.string.gen_month_10),
+                getString(R.string.gen_month_11),getString(R.string.gen_month_12)
+        };
+
+
         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
         //There are multiple variations of this, but this is the basic variant.
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, items);

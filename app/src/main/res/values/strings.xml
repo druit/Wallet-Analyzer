@@ -35,5 +35,17 @@
     <string name="gen_category">Category:</string>
     <string name="gen_type_category">Supermarket</string>
     <string name="gen_change_language">Change Language</string>
+    <string name="gen_month_1">January</string>
+    <string name="gen_month_2">February</string>
+    <string name="gen_month_3">March</string>
+    <string name="gen_month_4">April</string>
+    <string name="gen_month_5">May</string>
+    <string name="gen_month_6">June</string>
+    <string name="gen_month_7">July</string>
+    <string name="gen_month_8">August</string>
+    <string name="gen_month_9">September</string>
+    <string name="gen_month_10">October</string>
+    <string name="gen_month_11">November</string>
+    <string name="gen_month_12">December</string>
 
 </resources>
