@@ -14,13 +14,23 @@
         app:blurOverlayColor="#3E2F5E95">
         <!--Any child View here, TabLayout for example-->
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/trash_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/trash"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:backgroundTint="#A5FFFFFF" />
     </eightbitlab.com.blurview.BlurView>
 
     <TextView
         android:id="@+id/store_name_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="36dp"
         android:text="Test Pop-Up"
         android:textColor="#E1E1E1"

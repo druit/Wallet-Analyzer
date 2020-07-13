@@ -209,9 +209,9 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
-
     private void showReceiptPopup(int itemPosition) {
         Receipt listItemReceipt = historyArrayList.get(itemPosition).getReceipt();
+
 
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -256,14 +256,22 @@ public class MainActivity extends BaseActivity {
         // show the popup window
         popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
 
-        // dismiss the popup window when touched
-        popupView.setOnTouchListener(new View.OnTouchListener() {
+        FloatingActionButton floatingActionButton = popupView.findViewById(R.id.trash_button);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                popupWindow.dismiss();
-                return true;
+            public void onClick(View v) {
+                Log.d("TEST","YES");
             }
         });
+        // dismiss the popup window when touched
+
+//        popupView.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                popupWindow.dismiss();
+//                return true;
+//            }
+//        });
     }
 
     public void onBackPressed() {
@@ -337,7 +345,7 @@ public class MainActivity extends BaseActivity {
 
                     History history = child.getValue(History.class);
                     totalPrice[0] += history.getReceipt().getTotalPrice();
-                    totalPriceMonth.setText( totalPrice[0] + "€");
+                    totalPriceMonth.setText( totalPrice[0] + " €");
                     historyArrayList.add(history);
                     adapter.notifyDataSetChanged();
 
