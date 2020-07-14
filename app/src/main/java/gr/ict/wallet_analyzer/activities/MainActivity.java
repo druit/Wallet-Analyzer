@@ -23,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -256,7 +258,7 @@ public class MainActivity extends BaseActivity {
         // show the popup window
         popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
 
-        FloatingActionButton floatingActionButton = popupView.findViewById(R.id.trash_button);
+        Button floatingActionButton = popupView.findViewById(R.id.trash_button);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

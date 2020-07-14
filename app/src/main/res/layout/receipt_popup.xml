@@ -14,16 +14,6 @@
         app:blurOverlayColor="#3E2F5E95">
         <!--Any child View here, TabLayout for example-->
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/trash_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/trash"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:backgroundTint="#A5FFFFFF" />
     </eightbitlab.com.blurview.BlurView>
 
     <TextView
@@ -38,6 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <TextView
         android:id="@+id/price_text_view"
         android:layout_width="wrap_content"
@@ -51,6 +42,17 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/store_name_text_view"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/trash_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="260dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/trash"
+        android:backgroundTint="#FF0000"
+        app:layout_constraintStart_toStartOf="@+id/location_text"
+        app:layout_constraintTop_toTopOf="@+id/location_text" />
 
     <TextView
         android:id="@+id/location_text"
