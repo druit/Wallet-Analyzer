@@ -1,30 +1,22 @@
 package gr.ict.wallet_analyzer.activities;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.ContextWrapper;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.LocaleList;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -34,7 +26,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -49,14 +40,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.pixplicity.easyprefs.library.Prefs;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import Adapters.ItemAdapter;
 import Adapters.MyListAdapter;
@@ -66,7 +55,6 @@ import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import gr.ict.wallet_analyzer.R;
-import io.opencensus.resource.Resource;
 
 public class MainActivity extends BaseActivity {
 
@@ -211,7 +199,7 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
-    private void showReceiptPopup(int itemPosition) {
+    private void showReceiptPopup(final int itemPosition) {
         Receipt listItemReceipt = historyArrayList.get(itemPosition).getReceipt();
 
 
@@ -258,11 +246,33 @@ public class MainActivity extends BaseActivity {
         // show the popup window
         popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
 
-        Button floatingActionButton = popupView.findViewById(R.id.trash_button);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        Button trashBtn = popupView.findViewById(R.id.trash_button);
+        trashBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("TEST","YES");
+
+                AlertDialog.Builder alertDeclare = new AlertDialog.Builder(MainActivity.this);
+                alertDeclare.setMessage( getString(R.string.alert_delete_receipt)).setCancelable(false)
+                        .setPositiveButton( getString(R.string.gen_yes), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("history").child(historyArrayList.get(itemPosition).getId());
+                                declare.removeValue();
+                                finish();
+                                popupWindow.dismiss();
+                            }
+                        })
+                        .setNegativeButton( getString(R.string.gen_no), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert = alertDeclare.create();
+                alert.setTitle( getString(R.string.gen_warning));
+                alert.show();
             }
         });
         // dismiss the popup window when touched

@@ -47,5 +47,9 @@
     <string name="gen_month_10">October</string>
     <string name="gen_month_11">November</string>
     <string name="gen_month_12">December</string>
+    <string name="gen_yes">Yes</string>
+    <string name="gen_no">No</string>
+    <string name="alert_delete_receipt">Do you want to remove the receipt?</string>
+    <string name="gen_warning">Warning</string>
 
 </resources>

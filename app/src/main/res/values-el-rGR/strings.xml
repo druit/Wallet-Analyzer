@@ -29,7 +29,7 @@
     <string name="gen_month_limit">Monthly limit"</string>
     <string name="gen_history">Ιστορικό</string>
     <string name="gen_full_history">Όλο το ιστορικό</string>
-    <string name="gen_take_photo">Βγάλε Φωτογραφία</string>
+    <string name="gen_take_photo">Κάμερα</string>
     <string name="gen_display_detected_image">Display Detected Text from image.</string>
     <string name="gen_location">Περιοχή:</string>
     <string name="gen_date">Ημερομηνία:</string>
@@ -48,5 +48,9 @@
     <string name="gen_month_10">Οκτώβριος</string>
     <string name="gen_month_11">Νοέμβριος</string>
     <string name="gen_month_12">Δεκέμβριος</string>
+    <string name="gen_yes">Ναι</string>
+    <string name="gen_no">Όχι</string>
+    <string name="alert_delete_receipt">Θέλεις να διαγράψεις την απόδειξη;</string>
+    <string name="gen_warning">Προσοχή</string>
 
 </resources>
