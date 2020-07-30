@@ -1,8 +1,11 @@
 package gr.ict.wallet_analyzer.activities;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,6 +14,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,6 +26,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -55,15 +61,17 @@ import settings.Language;
 public class EditProfileActivity extends BaseActivity {
 
     private static final int GALLERY_REQUEST_CODE = 123;
+    private static final int CAMERA_REQUEST_CODE = 101;
 
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
 
-    FirebaseStorage storage = FirebaseStorage.getInstance();
-    StorageReference storageRef = storage.getReference();
-//    StorageReference Folder;
+//    FirebaseStorage storage = FirebaseStorage.getInstance();
+//    StorageReference storageRef = storage.getReference();
+    StorageReference Folder;
+
     Button saveBtn,languageBtn;
-    ImageButton editAvatar;
+    ImageButton editAvatar,openCamera;
     EditText firstName, lastName;
     TextView emailTextView;
     ImageView profileImage;
@@ -79,9 +87,9 @@ public class EditProfileActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         loadLocale();
         setContentView(R.layout.activity_edit_profile);
+        Folder = FirebaseStorage.getInstance().getReference("Avatars");
 
-
-        //change actionbar title, if you don't change it will be according to your systems default language
+                //change actionbar title, if you don't change it will be according to your systems default language
 //        ActionBar actionBar = getSupportActionBar();
 //        actionBar.setTitle(getResources().getString(R.string.app_name));
 
@@ -89,6 +97,7 @@ public class EditProfileActivity extends BaseActivity {
         saveBtn = findViewById(R.id.saveBtn);
         languageBtn = findViewById(R.id.changeLanguage);
         editAvatar = findViewById(R.id.edit_image);
+        openCamera = findViewById(R.id.edit_image_camera);
 
         firstName = findViewById(R.id.firstName);
         lastName = findViewById(R.id.lastName);
@@ -122,7 +131,7 @@ public class EditProfileActivity extends BaseActivity {
         languageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 openDialogChangeLanguage();
+                openDialogChangeLanguage();
             }
         });
         saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -148,7 +157,7 @@ public class EditProfileActivity extends BaseActivity {
 //                        UploadTask uploadTask = storageRef.putBytes(data);
 
                         Uri file = imageDAta;
-                        final StorageReference riversRef = storageRef.child("avatars/"+file.getLastPathSegment());
+                        final StorageReference riversRef = Folder.child(System.currentTimeMillis()+"."+getExtension(imageDAta));
                         UploadTask uploadTask = riversRef.putFile(file);
 
                         // Register observers to listen for when the download is done or if it fails
@@ -211,6 +220,26 @@ public class EditProfileActivity extends BaseActivity {
                 startActivityForResult(Intent.createChooser(intent,"Pick an image"),GALLERY_REQUEST_CODE);
             }
         });
+
+        openCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                askCameraPermissions();
+            }
+        });
+    }
+
+    private void askCameraPermissions() {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.CAMERA},CAMERA_REQUEST_CODE);
+        }else{
+            openCamera();
+        }
+    }
+
+    private void openCamera() {
+        Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(camera,CAMERA_REQUEST_CODE);
     }
 
     private void updateProfileChanges() {
@@ -232,12 +261,21 @@ public class EditProfileActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && data != null){
             setProfileImage(data.getData());
+        }else if(requestCode == CAMERA_REQUEST_CODE  ){
+
+            Bitmap image = (Bitmap) data.getExtras().get("data");
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            Glide.with(this)
+                    .load(stream.toByteArray())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(profileImage);
         }
     }
 
     private void setProfileImage(Uri data) {
         Picasso.get().load(data).transform(new CircleTransform()).into(profileImage);
-//        imageDAta = data;
+        imageDAta = data;
 //        try {
 //            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageDAta);
 //            ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -323,6 +361,12 @@ public class EditProfileActivity extends BaseActivity {
     public void loadLocale(){
         String language = Prefs.getString("My_Lang","");
         setLocale(language);
+    }
+
+    private String getExtension(Uri uri){
+        ContentResolver cr = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(cr.getType(uri));
     }
 
 }

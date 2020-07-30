@@ -33,13 +33,25 @@
 
     <ImageButton
         android:id="@+id/edit_image"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="250dp"
         android:layout_marginTop="100dp"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
-        android:src="@drawable/edit_pencil"
+        android:src="@drawable/gallery"
+        android:elevation="4dp"
+        android:tint="#FFFCFC" />
+
+    <ImageButton
+        android:id="@+id/edit_image_camera"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="105dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/camera"
         android:elevation="4dp"
         android:tint="#FFFCFC" />
 
