@@ -31,6 +31,18 @@
         app:srcCompat="@drawable/circle" />
 
 
+    <ImageButton
+        android:id="@+id/edit_image"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="250dp"
+        android:layout_marginTop="100dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/edit_pencil"
+        android:elevation="4dp"
+        android:tint="#FFFCFC" />
+
     <TextView
         android:id="@+id/profileEmail"
         android:layout_width="match_parent"

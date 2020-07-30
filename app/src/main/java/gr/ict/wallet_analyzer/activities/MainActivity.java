@@ -40,6 +40,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -49,6 +50,7 @@ import java.util.List;
 
 import Adapters.ItemAdapter;
 import Adapters.MyListAdapter;
+import data_class.CircleTransform;
 import data_class.History;
 import data_class.Receipt;
 import data_class.YourData;
@@ -61,7 +63,7 @@ public class MainActivity extends BaseActivity {
     ImageView profileImage, profileImagePop;
     TextView nameProfile, nameProfilePop, profileEmail,totalPriceMonth;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
+    FirebaseUser user = mAuth.getCurrentUser();
     private ArrayList<History> historyArrayList = new ArrayList<>();
 
     private LineChart chart;
@@ -139,9 +141,15 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setProfile(String type) {
-        profileImage.setImageResource(R.drawable.guest);
-        FirebaseUser user = mAuth.getCurrentUser();
+
         if (user != null) {
+            if(user.getPhotoUrl() != null){
+                Picasso.get().load( user.getPhotoUrl()).transform(new CircleTransform()).into(profileImage);
+//            profileImage.setImageURI(user.getPhotoUrl());
+//            setProfileImage(uri);
+            }else {
+                profileImage.setImageResource(R.drawable.guest);
+            }
             switch (type) {
                 case "MAIN":
                     if (!user.getDisplayName().isEmpty()) {
@@ -185,7 +193,12 @@ public class MainActivity extends BaseActivity {
         profileEmail = popupView.findViewById(R.id.profileEmail);
 
         // TODO: add activity_settings page
-        profileImagePop.setImageResource(R.drawable.guest);
+        if(user.getPhotoUrl() != null){
+            Picasso.get().load( user.getPhotoUrl()).transform(new CircleTransform()).into(profileImagePop);
+        }else {
+            profileImagePop.setImageResource(R.drawable.guest);
+        }
+
 
         setProfile("POP");
 
@@ -447,9 +460,9 @@ public class MainActivity extends BaseActivity {
         chart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
 
         chart.getAxisLeft().setAxisMinimum(0);
-        chart.getXAxis().setAxisMaximum(10);
+        chart.getXAxis().setAxisMaximum(30);
         chart.getXAxis().setAxisMinimum(0);
-        chart.getXAxis().setLabelCount(10);
+        chart.getXAxis().setLabelCount(30);
     }
 
     private void updateGraph(History history) {

@@ -52,5 +52,9 @@
     <string name="gen_no">Όχι</string>
     <string name="alert_delete_receipt">Θέλεις να διαγράψεις την απόδειξη;</string>
     <string name="gen_warning">Προσοχή</string>
+    <string name="gen_el">Ελληνικά</string>
+    <string name="gen_en">Αγγλικά</string>
+    <string name="gen_select_language">Επέλεξε γλώσσα:</string>
+
 
 </resources>
