@@ -3,6 +3,7 @@ package gr.ict.wallet_analyzer.activities;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -49,6 +51,7 @@ import com.pixplicity.easyprefs.library.Prefs;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
@@ -61,7 +64,8 @@ import settings.Language;
 public class EditProfileActivity extends BaseActivity {
 
     private static final int GALLERY_REQUEST_CODE = 123;
-    private static final int CAMERA_REQUEST_CODE = 101;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;;
+    Uri mUri;
 
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
@@ -224,22 +228,13 @@ public class EditProfileActivity extends BaseActivity {
         openCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                askCameraPermissions();
+//                askCameraPermissions();
+                Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (camera.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(camera, REQUEST_IMAGE_CAPTURE );
+                }
             }
         });
-    }
-
-    private void askCameraPermissions() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.CAMERA},CAMERA_REQUEST_CODE);
-        }else{
-            openCamera();
-        }
-    }
-
-    private void openCamera() {
-        Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(camera,CAMERA_REQUEST_CODE);
     }
 
     private void updateProfileChanges() {
@@ -257,37 +252,44 @@ public class EditProfileActivity extends BaseActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && data != null){
-            setProfileImage(data.getData());
-        }else if(requestCode == CAMERA_REQUEST_CODE  ){
+        switch (requestCode){
+            case GALLERY_REQUEST_CODE :
+                if(resultCode == RESULT_OK){
+                    setProfileImage(data.getData());
+                }
+                break;
+            case REQUEST_IMAGE_CAPTURE :
+                if(resultCode == RESULT_OK){
+                    Bitmap image = (Bitmap) data.getExtras().get("data");
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    Glide.with(this)
+                            .load(stream.toByteArray())
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(profileImage);
 
-            Bitmap image = (Bitmap) data.getExtras().get("data");
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            Glide.with(this)
-                    .load(stream.toByteArray())
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(profileImage);
+                    // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
+                    Uri tempUri = getImageUri(getApplicationContext(), image);
+                    setProfileImage(tempUri);
+                }
+                break;
+            default:
+                break;
         }
+    }
+
+    private Uri getImageUri(Context applicationContext, Bitmap imageBitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), imageBitmap, "Title", null);
+        return Uri.parse(path);
     }
 
     private void setProfileImage(Uri data) {
         Picasso.get().load(data).transform(new CircleTransform()).into(profileImage);
         imageDAta = data;
-//        try {
-//            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageDAta);
-//            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-//            Glide.with(this)
-//                    .load(stream.toByteArray())
-//                    .apply(RequestOptions.circleCropTransform())
-//                    .into(profileImage);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
     };
 
     private void openDialogChangeLanguage() {
@@ -295,17 +297,6 @@ public class EditProfileActivity extends BaseActivity {
 
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
         mBuilder.setTitle(getString(R.string.gen_select_language));
-//        switch (language){
-//            case "el":
-//                mBuilder.setTitle("Επέλεξε γλώσσα:");
-//                break;
-//            case "en":
-//                mBuilder.setTitle("Choose Language:");
-//                break;
-//            default:
-//                break;
-//        }
-
 
         int lang;
 
