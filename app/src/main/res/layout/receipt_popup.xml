@@ -13,7 +13,6 @@
         android:layout_height="match_parent"
         app:blurOverlayColor="#3E2F5E95">
         <!--Any child View here, TabLayout for example-->
-
     </eightbitlab.com.blurview.BlurView>
 
     <TextView
@@ -44,6 +43,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/location_button"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="73dp"
+        android:background="@drawable/location"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:shadowColor="#FFFFFF"
+        android:textAlignment="textStart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/location_text"
+        app:layout_constraintTop_toTopOf="@+id/location_text" />
+
+    <Button
         android:id="@+id/trash_button"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -69,7 +82,7 @@
         android:id="@+id/address_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="25dp"
         android:layout_marginBottom="70dp"
         android:text="Alamanas 13"
         android:textAlignment="textStart"
@@ -92,7 +105,7 @@
         android:id="@+id/date_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="25dp"
         android:layout_marginBottom="45dp"
         android:text="21/3/2020"
         android:textAlignment="textStart"
@@ -115,7 +128,7 @@
         android:id="@+id/category_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="25dp"
         android:layout_marginBottom="20dp"
         android:text="@string/gen_type_category"
         android:textAlignment="textStart"

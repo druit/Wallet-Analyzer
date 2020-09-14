@@ -260,6 +260,7 @@ public class MainActivity extends BaseActivity {
         popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
 
         Button trashBtn = popupView.findViewById(R.id.trash_button);
+        Button locationBtn = popupView.findViewById(R.id.location_button);
         trashBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -286,6 +287,14 @@ public class MainActivity extends BaseActivity {
                 AlertDialog alert = alertDeclare.create();
                 alert.setTitle( getString(R.string.gen_warning));
                 alert.show();
+            }
+        });
+
+        locationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                startActivity(intent);
             }
         });
         // dismiss the popup window when touched

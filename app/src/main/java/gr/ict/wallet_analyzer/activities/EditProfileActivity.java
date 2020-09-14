@@ -138,6 +138,7 @@ public class EditProfileActivity extends BaseActivity {
                 openDialogChangeLanguage();
             }
         });
+        
         saveBtn.setOnClickListener(new View.OnClickListener() {
             Uri downloadUri = null;
             @Override
