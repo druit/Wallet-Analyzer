@@ -405,6 +405,7 @@ public class MainActivity extends AppCompatActivity {
         chart.getXAxis().setLabelCount(10);
     }
 
+    // TODO: days that have no receipts get a value of 0 and days that have more than one receipt should make a sum
     private void updateGraph(History history) {
         String dateString = new SimpleDateFormat("dd").format(history.getReceipt().getDate());
         System.out.println(dateString);
