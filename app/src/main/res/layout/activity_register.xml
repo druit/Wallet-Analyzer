@@ -18,7 +18,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="144dp"
 
-        android:text="Register"
+        android:text="@string/gen_register"
         android:textAlignment="center"
         android:textColor="#fff"
         android:textSize="26dp" />
@@ -31,7 +31,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="20dp"
-        android:text="Resend Email Verification"
+        android:text="@string/gen_verification_send"
         android:textAlignment="center"
         android:textColor="#9DF4FF" />
 
@@ -50,7 +50,7 @@
         android:paddingTop="10dp"
         android:paddingEnd="50dp"
         android:paddingBottom="10dp"
-        android:text="Sign Up"
+        android:text="@string/sign_up"
         android:textColor="#fff" />
 
     <TextView
@@ -62,7 +62,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="148dp"
-        android:text="Email"
+        android:text="@string/prompt_email"
         android:textAlignment="center"
         android:textColor="#fff" />
 
@@ -96,7 +96,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="30dp"
-        android:text="Password"
+        android:text="@string/prompt_password"
         android:textAlignment="center"
         android:textColor="#fff" />
 
@@ -131,7 +131,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="30dp"
-        android:text="Repeat Password"
+        android:text="@string/repeat_password"
         android:textAlignment="center"
         android:textColor="#fff" />
 

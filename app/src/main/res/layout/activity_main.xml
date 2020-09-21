@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="Spent so far this month" />
+            android:text="@string/gen_spent_month" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -80,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="Monthly limit" />
+            android:text="@string/gen_month_limit" />
 
         <TextView
             android:id="@+id/monthly_limit_text_view"
@@ -97,7 +97,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
         android:layout_marginTop="140dp"
-        android:text="History"
+        android:text="@string/gen_history"
         android:textColor="#fff"
         app:layout_constraintStart_toEndOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent" />
@@ -121,7 +121,7 @@
         android:background="@drawable/button_background"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:text="Full History"
+        android:text="@string/gen_full_history"
         android:textColor="#fff"
         android:textSize="12dp"
         app:layout_constraintEnd_toEndOf="parent"

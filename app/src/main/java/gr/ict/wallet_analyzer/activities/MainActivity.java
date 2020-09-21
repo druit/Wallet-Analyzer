@@ -1,5 +1,8 @@
 package gr.ict.wallet_analyzer.activities;
 
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -9,11 +12,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -23,7 +26,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -38,6 +40,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -47,6 +50,7 @@ import java.util.List;
 
 import Adapters.ItemAdapter;
 import Adapters.MyListAdapter;
+import data_class.CircleTransform;
 import data_class.History;
 import data_class.Receipt;
 import data_class.YourData;
@@ -54,12 +58,12 @@ import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import gr.ict.wallet_analyzer.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     ImageView profileImage, profileImagePop;
-    TextView nameProfile, nameProfilePop, profileEmail;
+    TextView nameProfile, nameProfilePop, profileEmail,totalPriceMonth;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
+    FirebaseUser user = mAuth.getCurrentUser();
     private ArrayList<History> historyArrayList = new ArrayList<>();
 
     private LineChart chart;
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         profileImage = findViewById(R.id.profileImage);
         nameProfile = findViewById(R.id.nameMain);
+        totalPriceMonth = findViewById(R.id.sum_text_view);
 
         // GraphView
         setGraphView();
@@ -136,9 +141,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setProfile(String type) {
-        profileImage.setImageResource(R.drawable.guest);
-        FirebaseUser user = mAuth.getCurrentUser();
+
         if (user != null) {
+            if(user.getPhotoUrl() != null){
+                Picasso.get().load( user.getPhotoUrl()).transform(new CircleTransform()).into(profileImage);
+//            profileImage.setImageURI(user.getPhotoUrl());
+//            setProfileImage(uri);
+            }else {
+                profileImage.setImageResource(R.drawable.guest);
+            }
             switch (type) {
                 case "MAIN":
                     if (!user.getDisplayName().isEmpty()) {
@@ -182,7 +193,12 @@ public class MainActivity extends AppCompatActivity {
         profileEmail = popupView.findViewById(R.id.profileEmail);
 
         // TODO: add activity_settings page
-        profileImagePop.setImageResource(R.drawable.guest);
+        if(user.getPhotoUrl() != null){
+            Picasso.get().load( user.getPhotoUrl()).transform(new CircleTransform()).into(profileImagePop);
+        }else {
+            profileImagePop.setImageResource(R.drawable.guest);
+        }
+
 
         setProfile("POP");
 
@@ -196,9 +212,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void showReceiptPopup(int itemPosition) {
+    private void showReceiptPopup(final int itemPosition) {
         Receipt listItemReceipt = historyArrayList.get(itemPosition).getReceipt();
+
 
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -243,17 +259,57 @@ public class MainActivity extends AppCompatActivity {
         // show the popup window
         popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
 
-        // dismiss the popup window when touched
-        popupView.setOnTouchListener(new View.OnTouchListener() {
+        Button trashBtn = popupView.findViewById(R.id.trash_button);
+        Button locationBtn = popupView.findViewById(R.id.location_button);
+        trashBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                popupWindow.dismiss();
-                return true;
+            public void onClick(View v) {
+
+                AlertDialog.Builder alertDeclare = new AlertDialog.Builder(MainActivity.this);
+                alertDeclare.setMessage( getString(R.string.alert_delete_receipt)).setCancelable(false)
+                        .setPositiveButton( getString(R.string.gen_yes), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("history").child(historyArrayList.get(itemPosition).getId());
+                                declare.removeValue();
+                                finish();
+                                popupWindow.dismiss();
+                            }
+                        })
+                        .setNegativeButton( getString(R.string.gen_no), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert = alertDeclare.create();
+                alert.setTitle( getString(R.string.gen_warning));
+                alert.show();
             }
         });
+
+        locationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                startActivity(intent);
+            }
+        });
+        // dismiss the popup window when touched
+
+//        popupView.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                popupWindow.dismiss();
+//                return true;
+//            }
+//        });
     }
 
     public void onBackPressed() {
+
         finishAffinity();
     }
 
@@ -283,7 +339,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Spinner above the graph
         Spinner spinner = findViewById(R.id.month_spinner);
-        String[] items = new String[]{"January", "February", "March", "April"};
+        String[] items = new String[]{
+                getString(R.string.gen_month_1),getString(R.string.gen_month_2),
+                getString(R.string.gen_month_3),getString(R.string.gen_month_4),
+                getString(R.string.gen_month_5),getString(R.string.gen_month_6),
+                getString(R.string.gen_month_7),getString(R.string.gen_month_8),
+                getString(R.string.gen_month_9),getString(R.string.gen_month_10),
+                getString(R.string.gen_month_11),getString(R.string.gen_month_12)
+        };
+
+
         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
         //There are multiple variations of this, but this is the basic variant.
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, items);
@@ -294,6 +359,7 @@ public class MainActivity extends AppCompatActivity {
     private void setListView() {
         FirebaseUser user = mAuth.getCurrentUser();
         ListView list;
+        final double[] totalPrice = new double[1];
 
         final MyListAdapter adapter = new MyListAdapter(this, historyArrayList);
         list = findViewById(R.id.list);
@@ -310,7 +376,10 @@ public class MainActivity extends AppCompatActivity {
                 dataSet.addEntry(new Entry(1, 0));
 
                 for (DataSnapshot child : children) {
+
                     History history = child.getValue(History.class);
+                    totalPrice[0] += history.getReceipt().getTotalPrice();
+                    totalPriceMonth.setText( totalPrice[0] + " €");
                     historyArrayList.add(history);
                     adapter.notifyDataSetChanged();
 
@@ -400,9 +469,9 @@ public class MainActivity extends AppCompatActivity {
         chart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
 
         chart.getAxisLeft().setAxisMinimum(0);
-        chart.getXAxis().setAxisMaximum(10);
+        chart.getXAxis().setAxisMaximum(30);
         chart.getXAxis().setAxisMinimum(0);
-        chart.getXAxis().setLabelCount(10);
+        chart.getXAxis().setLabelCount(30);
     }
 
     // TODO: days that have no receipts get a value of 0 and days that have more than one receipt should make a sum

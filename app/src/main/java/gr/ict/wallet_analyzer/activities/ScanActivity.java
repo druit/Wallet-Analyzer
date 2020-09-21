@@ -41,7 +41,7 @@ import data_class.Item;
 import data_class.Receipt;
 import gr.ict.wallet_analyzer.R;
 
-public class ScanActivity extends AppCompatActivity {
+public class ScanActivity extends BaseActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     String currentPhotoPath;

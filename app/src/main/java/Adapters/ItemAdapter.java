@@ -36,7 +36,7 @@ public class ItemAdapter extends ArrayAdapter<String> {
         TextView subtitleText = rowView.findViewById(R.id.subtitle);
 
         titleText.setText(item.getName());
-        subtitleText.setText(item.getPrice() + "€");
+        subtitleText.setText(item.getPrice() + " €");
 
         return rowView;
     }
