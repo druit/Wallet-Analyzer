@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import gr.ict.wallet_analyzer.R;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BaseActivity {
 
     private EditText emailEditText, passwordEditText, passwordVerifyEditText;
 

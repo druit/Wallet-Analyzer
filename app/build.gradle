@@ -28,12 +28,16 @@ android {
 }
 
 dependencies {
+    implementation 'io.paperdb:paperdb:2.7.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    implementation 'com.google.firebase:firebase-storage:19.1.1'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
     testImplementation 'junit:junit:4.12'
 
     androidTestImplementation 'androidx.test:runner:1.1.1'
@@ -48,8 +52,17 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
     implementation 'com.google.firebase:firebase-database:19.3.0'
 
+    // A small library containing a wrapper/helper for the shared preferences of Android
+    implementation 'com.pixplicity.easyprefs:library:1.9.0'
+
     // graph library
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     implementation 'com.eightbitlab:blurview:1.6.2'
+
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    // Glide v4 uses this new annotation processor -- see https://bumptech.github.io/glide/doc/generatedapi.html
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wallet-Analyzer</string>
+    <string name="action_settings">Ρυθμίσεις</string>
+    <string name="action_logout">Έξοδος</string>
+    <string name="title_activity_login">Wallet Analyzer</string>
+    <string name="prompt_email">Διεύθυνση</string>
+    <string name="prompt_password">Κωδικός</string>
+    <string name="repeat_password">Επανάλαβε τον Κωδικό</string>
+    <string name="action_sign_in">Είσοδος</string>
+    <string name="gen_register">Δημιουργία Λογαριασμού</string>
+    <string name="sign_up">Εγγραφή</string>
+    <string name="gen_verification_send">Ξανά στείλε Verification</string>
+    <string name="action_sign_in_short">Είσοδος</string>
+    <string name="edit_profile">Επεξεργασία Προφίλ</string>
+    <string name="enter_your_email">yourmail@hotmail.com</string>
+    <string name="gen_version">v.1.0.0</string>
+    <string name="hint_firstname">Όνομα</string>
+    <string name="hint_lastname">Επίθετο</string>
+    <string name="gen_save">Αποθήκευση</string>
+    <string name="gen_guest">Δεν έχεις λογαριασμό;</string>
+    <string name="gen_spent_month">Spent so far this month"</string>
+    <string name="gen_month_limit">Monthly limit"</string>
+    <string name="gen_history">Ιστορικό</string>
+    <string name="gen_full_history">Όλο το ιστορικό</string>
+    <string name="gen_location">Περιοχή:</string>
+    <string name="gen_date">Ημερομηνία:</string>
+    <string name="gen_category">Κατηγορία:</string>
+    <string name="gen_type_category">Supermarket</string>
+    <string name="gen_change_language">Αλλαγή Γλώσσας</string>
+    <string name="gen_month_1">Ιανουάριος</string>
+    <string name="gen_month_2">Φεβρουάριος</string>
+    <string name="gen_month_3">Μάρτιος</string>
+    <string name="gen_month_4">Απρίλιος</string>
+    <string name="gen_month_5">Μάιος</string>
+    <string name="gen_month_6">Ιούνιος</string>
+    <string name="gen_month_7">Ιούλιος</string>
+    <string name="gen_month_8">Αύγουστος</string>
+    <string name="gen_month_9">Σεπτέμβριος</string>
+    <string name="gen_month_10">Οκτώβριος</string>
+    <string name="gen_month_11">Νοέμβριος</string>
+    <string name="gen_month_12">Δεκέμβριος</string>
+    <string name="gen_yes">Ναι</string>
+    <string name="gen_no">Όχι</string>
+    <string name="alert_delete_receipt">Θέλεις να διαγράψεις την απόδειξη;</string>
+    <string name="gen_warning">Προσοχή</string>
+    <string name="gen_el">Ελληνικά</string>
+    <string name="gen_en">Αγγλικά</string>
+    <string name="gen_select_language">Επέλεξε γλώσσα:</string>
+
+
+</resources>
