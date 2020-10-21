@@ -46,5 +46,9 @@
     <string name="gen_el">Greek</string>
     <string name="gen_en">English</string>
     <string name="gen_select_language">Choose Language:</string>
+    <string name="gen_scan_with_barcode">Scan Barcode</string>
+    <string name="gen_scan_with_photo">Scan Image</string>
+    <string name="gen_select_scan_type">Choose scan mode</string>
+
 
 </resources>

@@ -43,7 +43,7 @@ import data_class.Item;
 import data_class.Receipt;
 import gr.ict.wallet_analyzer.R;
 
-public class ScanActivity extends BaseActivity {
+public class ScanPhotoActivity extends BaseActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     String currentPhotoPath;
@@ -130,7 +130,7 @@ public class ScanActivity extends BaseActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         scanButton.setEnabled(true);
-                        Toast.makeText(ScanActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ScanPhotoActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         e.printStackTrace();
                     }
                 });
@@ -139,7 +139,7 @@ public class ScanActivity extends BaseActivity {
     private void processTextDetectResult(FirebaseVisionText result) {
         List<FirebaseVisionText.TextBlock> blockList = result.getTextBlocks();
         if (blockList.size() == 0) {
-            Toast.makeText(ScanActivity.this, "No Text Found in Image, please try again", Toast.LENGTH_LONG).show();
+            Toast.makeText(ScanPhotoActivity.this, "No Text Found in Image, please try again", Toast.LENGTH_LONG).show();
         } else {
             for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
                 String blockText = block.getText();
@@ -171,7 +171,7 @@ public class ScanActivity extends BaseActivity {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
         mDatabase.child("users").child(user.getUid()).child("history").child(id).setValue(history);
-        Toast.makeText(ScanActivity.this, "Added", Toast.LENGTH_LONG).show();
+        Toast.makeText(ScanPhotoActivity.this, "Added", Toast.LENGTH_LONG).show();
     }
 
     private File createImageFile() throws IOException {

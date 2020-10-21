@@ -7,7 +7,7 @@
     android:background="@drawable/gradient_background"
     android:fillViewport="true"
     android:fitsSystemWindows="true"
-    tools:context=".activities.ScanActivity">
+    tools:context=".activities.ScanPhotoActivity">
 
     <TextView
         android:id="@+id/activity_title"
@@ -17,7 +17,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="30dp"
-        android:text="Scan your Receipt"
+        android:text="@string/gen_scan_with_photo"
         android:textAlignment="center"
         android:textColor="#fff"
         android:textSize="26sp"

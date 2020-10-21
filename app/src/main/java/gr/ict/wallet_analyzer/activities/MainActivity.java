@@ -134,7 +134,7 @@ public class MainActivity extends BaseActivity {
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                Intent intent = new Intent(MainActivity.this, ChooseScanActivity.class);
                 startActivity(intent);
             }
         });
