@@ -29,7 +29,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".activities.ScanBarcodeActivity"></activity>
         <activity android:name=".activities.ChooseScanActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -65,14 +64,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".activities.ScanPhotoActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-                android:value="ocr" />
         </activity>
         <activity android:name=".activities.CaptureActivity"
             android:screenOrientation="fullSensor"
