@@ -3,4 +3,5 @@
     <item name="ocr_photo" type="id" />
     <item name="ocr_analyze" type="id" />
     <item name="ocr_text" type="id" />
+    <item name="ocr_analyze_barcode" type="id" />
 </resources>
