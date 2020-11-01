@@ -56,12 +56,13 @@ import gr.ict.wallet_analyzer.R;
 
 public class ChooseScanActivity extends AppCompatActivity {
 
-    private Button scanBarcode,scanPhoto;
+    private Button scanBarcode, scanPhoto;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     String currentPhotoPath;
     private ImageView imageView;
     private Bitmap imageBitmap;
     private Uri photoURI;
+     ArrayList<Object> dataReceipt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,30 +114,33 @@ public class ChooseScanActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Error while capturing Image", Toast.LENGTH_LONG).show();
             }
-        }else{
+        } else {
 
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
-        if (result != null) {
-            if (result.getContents() != null) {
-                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("barcodes").child(result.getContents());
+            if (result != null) {
+                if (result.getContents() != null) {
+                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("barcodes").child(result.getContents());
 
-                int i=0;
-                mDatabase.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                        for (DataSnapshot child : children) {
-//                            dataReceipt[0] = (child.getValue().toString());
-                            System.out.println("TEST" + child.getValue());
+
+                    mDatabase.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                            int i = 0;
+                            for (DataSnapshot child : children) {
+                                dataReceipt.add(child.getValue());
+//                            System.out.println("TEST" + child.getValue());
+                            }
+
+                            System.out.println("TEST" + dataReceipt);
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.w("ERROR", "loadPost:onCancelled", databaseError.toException());
-                    }
-                });
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.w("ERROR", "loadPost:onCancelled", databaseError.toException());
+                        }
+                    });
 //                AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //                builder.setMessage(result.getContents());
 //                builder.setTitle("Scanning");
@@ -155,17 +159,17 @@ public class ChooseScanActivity extends AppCompatActivity {
 //                AlertDialog dialog = builder.create();
 //                dialog.show();
 
-            } else {
-                Toast.makeText(this, "No result", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "No result", Toast.LENGTH_LONG).show();
+                }
             }
-        }
         }
     }
 
     private void dispatchTakePictureIntent() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.CAMERA},REQUEST_IMAGE_CAPTURE);
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_IMAGE_CAPTURE);
             }
         }
 
@@ -249,7 +253,6 @@ public class ChooseScanActivity extends AppCompatActivity {
         mDatabase.child("users").child(user.getUid()).child("history").child(id).setValue(history);
         Toast.makeText(this, "Added", Toast.LENGTH_LONG).show();
     }
-
 
 
     private File createImageFile() throws IOException {
