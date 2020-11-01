@@ -127,13 +127,13 @@ public class ChooseScanActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                            int i = 0;
                             for (DataSnapshot child : children) {
                                 dataReceipt.add(child.getValue());
 //                            System.out.println("TEST" + child.getValue());
+
                             }
 
-                            System.out.println("TEST" + dataReceipt);
+                            System.out.println("TEST" + dataReceipt.get(1));
                         }
 
                         @Override
