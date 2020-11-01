@@ -1,13 +1,7 @@
 package gr.ict.wallet_analyzer.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
 import android.Manifest;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -23,7 +17,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.data.Entry;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,7 +39,6 @@ import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,13 +52,13 @@ import gr.ict.wallet_analyzer.R;
 
 public class ChooseScanActivity extends AppCompatActivity {
 
-    private Button scanBarcode, scanPhoto;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     String currentPhotoPath;
+    ArrayList<Object> dataReceipt;
+    private Button scanBarcode, scanPhoto;
     private ImageView imageView;
     private Bitmap imageBitmap;
     private Uri photoURI;
-     ArrayList<Object> dataReceipt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,18 +118,19 @@ public class ChooseScanActivity extends AppCompatActivity {
                 if (result.getContents() != null) {
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("barcodes").child(result.getContents());
 
-
                     mDatabase.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                            for (DataSnapshot child : children) {
-                                dataReceipt.add(child.getValue());
-//                            System.out.println("TEST" + child.getValue());
+                            float finalPrice = (float) dataSnapshot.child("final_price").getValue();
+                            System.out.println("final price = " + finalPrice);
+//                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+//                            dataSnapshot.getChildren();
+//                            for (DataSnapshot child : children) {
+//                                dataReceipt.add(child.getValue());
+//                                System.out.println("child = " + child.getValue());
+//                            }
 
-                            }
-
-                            System.out.println("TEST" + dataReceipt.get(1));
+//                            System.out.println("TEST" + dataReceipt.get(1));
                         }
 
                         @Override
