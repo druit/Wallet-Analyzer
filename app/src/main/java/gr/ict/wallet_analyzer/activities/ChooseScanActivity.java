@@ -17,17 +17,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.data.Entry;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
@@ -37,6 +42,7 @@ import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -113,23 +119,41 @@ public class ChooseScanActivity extends AppCompatActivity {
 
         if (result != null) {
             if (result.getContents() != null) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(result.getContents());
-                builder.setTitle("Scanning");
-                builder.setPositiveButton("Scan Again", new DialogInterface.OnClickListener() {
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("barcodes").child(result.getContents());
+
+                int i=0;
+                mDatabase.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startScanBarcode();
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                        for (DataSnapshot child : children) {
+//                            dataReceipt[0] = (child.getValue().toString());
+                            System.out.println("TEST" + child.getValue());
+                        }
                     }
-                }).setNegativeButton("finish", new DialogInterface.OnClickListener() {
+
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.w("ERROR", "loadPost:onCancelled", databaseError.toException());
                     }
                 });
-
-                AlertDialog dialog = builder.create();
-                dialog.show();
+//                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//                builder.setMessage(result.getContents());
+//                builder.setTitle("Scanning");
+//                builder.setPositiveButton("Scan Again", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        startScanBarcode();
+//                    }
+//                }).setNegativeButton("finish", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        finish();
+//                    }
+//                });
+//
+//                AlertDialog dialog = builder.create();
+//                dialog.show();
 
             } else {
                 Toast.makeText(this, "No result", Toast.LENGTH_LONG).show();
@@ -225,6 +249,8 @@ public class ChooseScanActivity extends AppCompatActivity {
         mDatabase.child("users").child(user.getUid()).child("history").child(id).setValue(history);
         Toast.makeText(this, "Added", Toast.LENGTH_LONG).show();
     }
+
+
 
     private File createImageFile() throws IOException {
         // Create an image file name
