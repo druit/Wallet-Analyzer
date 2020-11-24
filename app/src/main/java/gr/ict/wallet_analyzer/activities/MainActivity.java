@@ -68,6 +68,7 @@ public class MainActivity extends BaseActivity {
 
     private LineChart chart;
     private LineDataSet dataSet;
+    double totalPrice;
 
     private float maximumReceiptPrice = 0;
 
@@ -272,7 +273,9 @@ public class MainActivity extends BaseActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("history").child(historyArrayList.get(itemPosition).getId());
+                                totalPrice -= historyArrayList.get(itemPosition).getReceipt().getTotalPrice();
                                 declare.removeValue();
+
                                 finish();
                                 popupWindow.dismiss();
                             }
@@ -359,7 +362,8 @@ public class MainActivity extends BaseActivity {
     private void setListView() {
         FirebaseUser user = mAuth.getCurrentUser();
         ListView list;
-        final double[] totalPrice = new double[1];
+//        final double[] totalPrice = new double[1];
+
 
         final MyListAdapter adapter = new MyListAdapter(this, historyArrayList);
         list = findViewById(R.id.list);
@@ -374,12 +378,15 @@ public class MainActivity extends BaseActivity {
                 historyArrayList.clear();
                 dataSet.clear();
                 dataSet.addEntry(new Entry(1, 0));
-
+                History history;
+                totalPrice = 0.0;
                 for (DataSnapshot child : children) {
 
-                    History history = child.getValue(History.class);
-                    totalPrice[0] += history.getReceipt().getTotalPrice();
-                    totalPriceMonth.setText( totalPrice[0] + " €");
+                    history = child.getValue(History.class);
+                     totalPrice += history.getReceipt().getTotalPrice();
+//                    totalPrice[0] += history.getReceipt().getTotalPrice();
+                    System.out.println("TOTAL: " + totalPrice);
+                    totalPriceMonth.setText( totalPrice + " €");
                     historyArrayList.add(history);
                     adapter.notifyDataSetChanged();
 

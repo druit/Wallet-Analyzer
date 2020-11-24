@@ -1,5 +1,9 @@
 package gr.ict.wallet_analyzer.activities;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -17,12 +21,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -42,8 +43,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import data_class.History;
 import data_class.Item;
@@ -52,13 +55,22 @@ import gr.ict.wallet_analyzer.R;
 
 public class ChooseScanActivity extends AppCompatActivity {
 
+    private Button scanBarcode, scanPhoto;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     String currentPhotoPath;
-    ArrayList<Object> dataReceipt;
-    private Button scanBarcode, scanPhoto;
     private ImageView imageView;
     private Bitmap imageBitmap;
     private Uri photoURI;
+
+
+    HashMap<String, Object> parentKey = new HashMap<String, Object>();
+    HashMap<String, Double> itemList = new  HashMap<String, Double>();
+    HashMap<String, Object> infoList = new  HashMap<String, Object>();
+    String BARCODE ;
+
+    boolean thereIsBarcode = false;
+    ArrayList<String> barcodeList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,20 +129,32 @@ public class ChooseScanActivity extends AppCompatActivity {
             if (result != null) {
                 if (result.getContents() != null) {
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("barcodes").child(result.getContents());
+                    BARCODE = result.getContents();
 
                     mDatabase.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            float finalPrice = (float) dataSnapshot.child("final_price").getValue();
-                            System.out.println("final price = " + finalPrice);
-//                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-//                            dataSnapshot.getChildren();
-//                            for (DataSnapshot child : children) {
-//                                dataReceipt.add(child.getValue());
-//                                System.out.println("child = " + child.getValue());
-//                            }
+                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                            for (DataSnapshot child : children) {
+                                if(child.hasChildren()){
+                                    for(DataSnapshot ch : child.getChildren()){
+                                        if(child.getKey().contains("items")){
+                                            String value = ch.getValue().toString();
+                                            itemList.put(ch.getKey(), Double.valueOf(ch.getValue().toString()));
+                                        }else if(child.getKey().contains("info")){
+                                            infoList.put(ch.getKey(),ch.getValue());
+                                        }
+                                    }
+                                }else{
+//                                    System.out.println("TEST");
+//                                    System.out.println("KEY :  " + child.getKey() + "VALUE : "+child.getValue());
+                                    parentKey.put(child.getKey(),child.getValue());
+                                }
 
-//                            System.out.println("TEST" + dataReceipt.get(1));
+                            }
+
+                            mockData(parentKey, infoList, itemList, BARCODE);
+
                         }
 
                         @Override
@@ -233,22 +257,72 @@ public class ChooseScanActivity extends AppCompatActivity {
         }
     }
 
-    private void mockData() {
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        Item newItem = new Item("Kalodio", 10.05);
+    private void mockData(HashMap<String, Object> parent, HashMap<String, Object> info, HashMap<String, Double> items, final String BARCODE) {
+        final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+
+//        CUSTOM DATA
+
+//        Item newItem = new Item("Kalodio", 10.05);
+//        List<Item> list = new ArrayList<>();
+//        list.add(newItem);
+//        list.add(newItem);
+//        Date date = new Date();
+//        String storeName = "Masoutis";
+//        Receipt receipt1 = new Receipt(list, "Alamanas 13", "SuperMarket", "http://test.com", 15.20, "1231321312300", date, storeName);
+//        String id = mDatabase.push().getKey();
+//        History history = new History(id, receipt1);
+
+
         List<Item> list = new ArrayList<>();
-        list.add(newItem);
-        list.add(newItem);
+        for (Map.Entry<String, Double> item : items.entrySet()){
+            Item newItem = new Item(item.getKey(), item.getValue());
+            list.add(newItem);
+        }
+        // TO DO ***** REPLACE DATE WITH CURRENT DATE
+//        String d = info.get("date").toString();
+//        d.replace("-","/");
         Date date = new Date();
-        String storeName = "Masoutis";
-        Receipt receipt1 = new Receipt(list, "Alamanas 13", "SuperMarket", "http://test.com", 15.20, "1231321312300", date, storeName);
-        String id = mDatabase.push().getKey();
-        History history = new History(id, receipt1);
+        String storeName = parent.get("shop_name").toString();
+        Receipt receipt = new Receipt(list, info.get("address").toString(),  info.get("type").toString(), "http://test.com", Double.valueOf(parent.get("final_price").toString()), BARCODE, date, storeName);
+        final String id = mDatabase.push().getKey();
+        final History history = new History(id, receipt);
+
         //Firebase
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        mDatabase.child("users").child(user.getUid()).child("history").child(id).setValue(history);
-        Toast.makeText(this, "Added", Toast.LENGTH_LONG).show();
+        final FirebaseUser user = mAuth.getCurrentUser();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid()).child("history");
+        final String scanningBarcode = BARCODE;
+        // Check for barcode if there is in database
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                for(DataSnapshot child: children){
+                    History historyOfUser = child.getValue(History.class);
+                    barcodeList.add(historyOfUser.getReceipt().getBarcode());
+                }
+                for(String barcode: barcodeList){
+                    if(scanningBarcode.equals(barcode)){
+                        thereIsBarcode = true;
+                    }
+                }
+                canCreateHistory(thereIsBarcode,mDatabase,user, id,history);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void canCreateHistory(boolean thereIsBarcode, DatabaseReference mDatabase, FirebaseUser user, String id,History history) {
+        if(!thereIsBarcode) {
+            mDatabase.child("users").child(user.getUid()).child("history").child(id).setValue(history);
+            Toast.makeText(this, "Added", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(this, "Already have barcode: " + BARCODE, Toast.LENGTH_LONG).show();
+        }
     }
 
 
@@ -295,3 +369,4 @@ public class ChooseScanActivity extends AppCompatActivity {
         return point1[0].y - point2[0].y <= 20;
     }
 }
+
