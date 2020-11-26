@@ -1,9 +1,5 @@
 package gr.ict.wallet_analyzer.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -21,9 +17,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -40,6 +39,8 @@ import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,22 +56,18 @@ import gr.ict.wallet_analyzer.R;
 
 public class ChooseScanActivity extends AppCompatActivity {
 
-    private Button scanBarcode, scanPhoto;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     String currentPhotoPath;
+    HashMap<String, Object> parentKey = new HashMap<String, Object>();
+    HashMap<String, Double> itemList = new HashMap<String, Double>();
+    HashMap<String, Object> infoList = new HashMap<String, Object>();
+    String BARCODE;
+    boolean thereIsBarcode = false;
+    ArrayList<String> barcodeList = new ArrayList<>();
+    private Button scanBarcode, scanPhoto;
     private ImageView imageView;
     private Bitmap imageBitmap;
     private Uri photoURI;
-
-
-    HashMap<String, Object> parentKey = new HashMap<String, Object>();
-    HashMap<String, Double> itemList = new  HashMap<String, Double>();
-    HashMap<String, Object> infoList = new  HashMap<String, Object>();
-    String BARCODE ;
-
-    boolean thereIsBarcode = false;
-    ArrayList<String> barcodeList = new ArrayList<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,19 +133,19 @@ public class ChooseScanActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                             for (DataSnapshot child : children) {
-                                if(child.hasChildren()){
-                                    for(DataSnapshot ch : child.getChildren()){
-                                        if(child.getKey().contains("items")){
+                                if (child.hasChildren()) {
+                                    for (DataSnapshot ch : child.getChildren()) {
+                                        if (child.getKey().contains("items")) {
                                             String value = ch.getValue().toString();
                                             itemList.put(ch.getKey(), Double.valueOf(ch.getValue().toString()));
-                                        }else if(child.getKey().contains("info")){
-                                            infoList.put(ch.getKey(),ch.getValue());
+                                        } else if (child.getKey().contains("info")) {
+                                            infoList.put(ch.getKey(), ch.getValue());
                                         }
                                     }
-                                }else{
+                                } else {
 //                                    System.out.println("TEST");
 //                                    System.out.println("KEY :  " + child.getKey() + "VALUE : "+child.getValue());
-                                    parentKey.put(child.getKey(),child.getValue());
+                                    parentKey.put(child.getKey(), child.getValue());
                                 }
 
                             }
@@ -274,16 +271,22 @@ public class ChooseScanActivity extends AppCompatActivity {
 
 
         List<Item> list = new ArrayList<>();
-        for (Map.Entry<String, Double> item : items.entrySet()){
+        for (Map.Entry<String, Double> item : items.entrySet()) {
             Item newItem = new Item(item.getKey(), item.getValue());
             list.add(newItem);
         }
         // TO DO ***** REPLACE DATE WITH CURRENT DATE
-//        String d = info.get("date").toString();
-//        d.replace("-","/");
-        Date date = new Date();
+        String d = info.get("date").toString();
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        Date date = null;
+        try {
+            date = format.parse(d);
+        } catch (ParseException e) {
+            date = new Date();
+            e.printStackTrace();
+        }
         String storeName = parent.get("shop_name").toString();
-        Receipt receipt = new Receipt(list, info.get("address").toString(),  info.get("type").toString(), "http://test.com", Double.valueOf(parent.get("final_price").toString()), BARCODE, date, storeName);
+        Receipt receipt = new Receipt(list, info.get("address").toString(), info.get("type").toString(), "http://test.com", Double.valueOf(parent.get("final_price").toString()), BARCODE, date, storeName);
         final String id = mDatabase.push().getKey();
         final History history = new History(id, receipt);
 
@@ -297,16 +300,16 @@ public class ChooseScanActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                for(DataSnapshot child: children){
+                for (DataSnapshot child : children) {
                     History historyOfUser = child.getValue(History.class);
                     barcodeList.add(historyOfUser.getReceipt().getBarcode());
                 }
-                for(String barcode: barcodeList){
-                    if(scanningBarcode.equals(barcode)){
+                for (String barcode : barcodeList) {
+                    if (scanningBarcode.equals(barcode)) {
                         thereIsBarcode = true;
                     }
                 }
-                canCreateHistory(thereIsBarcode,mDatabase,user, id,history);
+                canCreateHistory(thereIsBarcode, mDatabase, user, id, history);
             }
 
             @Override
@@ -316,11 +319,11 @@ public class ChooseScanActivity extends AppCompatActivity {
         });
     }
 
-    private void canCreateHistory(boolean thereIsBarcode, DatabaseReference mDatabase, FirebaseUser user, String id,History history) {
-        if(!thereIsBarcode) {
+    private void canCreateHistory(boolean thereIsBarcode, DatabaseReference mDatabase, FirebaseUser user, String id, History history) {
+        if (!thereIsBarcode) {
             mDatabase.child("users").child(user.getUid()).child("history").child(id).setValue(history);
             Toast.makeText(this, "Added", Toast.LENGTH_LONG).show();
-        }else{
+        } else {
             Toast.makeText(this, "Already have barcode: " + BARCODE, Toast.LENGTH_LONG).show();
         }
     }
