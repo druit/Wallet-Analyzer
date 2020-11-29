@@ -58,16 +58,15 @@ public class ChooseScanActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     String currentPhotoPath;
-    HashMap<String, Object> parentKey = new HashMap<String, Object>();
-    HashMap<String, Double> itemList = new HashMap<String, Double>();
-    HashMap<String, Object> infoList = new HashMap<String, Object>();
-    String BARCODE;
-    boolean thereIsBarcode = false;
+    HashMap<String, Object> parentKey = new HashMap<>();
+    HashMap<String, Double> itemList = new HashMap<>();
+    HashMap<String, Object> infoList = new HashMap<>();
     ArrayList<String> barcodeList = new ArrayList<>();
     private Button scanBarcode, scanPhoto;
     private ImageView imageView;
     private Bitmap imageBitmap;
     private Uri photoURI;
+    private String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +88,27 @@ public class ChooseScanActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 dispatchTakePictureIntent();
+            }
+        });
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        final FirebaseUser user = mAuth.getCurrentUser();
+        uid = user.getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid()).child("history");
+
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                for (DataSnapshot child : children) {
+                    History historyOfUser = child.getValue(History.class);
+                    barcodeList.add(historyOfUser.getReceipt().getBarcode());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
@@ -120,38 +140,34 @@ public class ChooseScanActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error while capturing Image", Toast.LENGTH_LONG).show();
             }
         } else {
-
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
             if (result != null) {
                 if (result.getContents() != null) {
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("barcodes").child(result.getContents());
-                    BARCODE = result.getContents();
+                    final String barcode = result.getContents();
 
                     mDatabase.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+
                             for (DataSnapshot child : children) {
                                 if (child.hasChildren()) {
                                     for (DataSnapshot ch : child.getChildren()) {
                                         if (child.getKey().contains("items")) {
                                             String value = ch.getValue().toString();
-                                            itemList.put(ch.getKey(), Double.valueOf(ch.getValue().toString()));
+                                            itemList.put(ch.getKey(), Double.valueOf(value));
                                         } else if (child.getKey().contains("info")) {
                                             infoList.put(ch.getKey(), ch.getValue());
                                         }
                                     }
                                 } else {
-//                                    System.out.println("TEST");
-//                                    System.out.println("KEY :  " + child.getKey() + "VALUE : "+child.getValue());
                                     parentKey.put(child.getKey(), child.getValue());
                                 }
-
                             }
 
-                            mockData(parentKey, infoList, itemList, BARCODE);
-
+                            mockData(parentKey, infoList, itemList, barcode);
                         }
 
                         @Override
@@ -159,24 +175,6 @@ public class ChooseScanActivity extends AppCompatActivity {
                             Log.w("ERROR", "loadPost:onCancelled", databaseError.toException());
                         }
                     });
-//                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//                builder.setMessage(result.getContents());
-//                builder.setTitle("Scanning");
-//                builder.setPositiveButton("Scan Again", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        startScanBarcode();
-//                    }
-//                }).setNegativeButton("finish", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        finish();
-//                    }
-//                });
-//
-//                AlertDialog dialog = builder.create();
-//                dialog.show();
-
                 } else {
                     Toast.makeText(this, "No result", Toast.LENGTH_LONG).show();
                 }
@@ -249,12 +247,10 @@ public class ChooseScanActivity extends AppCompatActivity {
                 System.out.println("height = " + imageBitmap.getHeight() + ", width = " + imageBitmap.getWidth());
                 System.out.println("x = " + block.getCornerPoints()[0].x + ", y = " + block.getCornerPoints()[0].y + " = " + blockText);
             }
-
-//            mockData();
         }
     }
 
-    private void mockData(HashMap<String, Object> parent, HashMap<String, Object> info, HashMap<String, Double> items, final String BARCODE) {
+    private void mockData(HashMap<String, Object> parent, HashMap<String, Object> info, HashMap<String, Double> items, String barcode) {
         final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
 //        CUSTOM DATA
@@ -269,65 +265,46 @@ public class ChooseScanActivity extends AppCompatActivity {
 //        String id = mDatabase.push().getKey();
 //        History history = new History(id, receipt1);
 
+        boolean barcodeExists = false;
 
-        List<Item> list = new ArrayList<>();
-        for (Map.Entry<String, Double> item : items.entrySet()) {
-            Item newItem = new Item(item.getKey(), item.getValue());
-            list.add(newItem);
-        }
-        // TO DO ***** REPLACE DATE WITH CURRENT DATE
-        String d = info.get("date").toString();
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        Date date = null;
-        try {
-            date = format.parse(d);
-        } catch (ParseException e) {
-            date = new Date();
-            e.printStackTrace();
-        }
-        String storeName = parent.get("shop_name").toString();
-        Receipt receipt = new Receipt(list, info.get("address").toString(), info.get("type").toString(), "http://test.com", Double.valueOf(parent.get("final_price").toString()), BARCODE, date, storeName);
-        final String id = mDatabase.push().getKey();
-        final History history = new History(id, receipt);
-
-        //Firebase
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        final FirebaseUser user = mAuth.getCurrentUser();
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid()).child("history");
-        final String scanningBarcode = BARCODE;
-        // Check for barcode if there is in database
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                for (DataSnapshot child : children) {
-                    History historyOfUser = child.getValue(History.class);
-                    barcodeList.add(historyOfUser.getReceipt().getBarcode());
-                }
-                for (String barcode : barcodeList) {
-                    if (scanningBarcode.equals(barcode)) {
-                        thereIsBarcode = true;
-                    }
-                }
-                canCreateHistory(thereIsBarcode, mDatabase, user, id, history);
+        for (String barcodeFromList : barcodeList) {
+            if (barcode.equals(barcodeFromList)) {
+                barcodeExists = true;
+                break;
             }
+        }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void canCreateHistory(boolean thereIsBarcode, DatabaseReference mDatabase, FirebaseUser user, String id, History history) {
-        if (!thereIsBarcode) {
-            mDatabase.child("users").child(user.getUid()).child("history").child(id).setValue(history);
-            Toast.makeText(this, "Added", Toast.LENGTH_LONG).show();
+        if (barcodeExists) {
+            Toast.makeText(this, "Already have barcode: " + barcode, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(this, "Already have barcode: " + BARCODE, Toast.LENGTH_LONG).show();
+            // print message
+            Toast.makeText(this, "Added", Toast.LENGTH_LONG).show();
+
+            // create the object and send it to firebase
+            List<Item> list = new ArrayList<>();
+            for (Map.Entry<String, Double> item : items.entrySet()) {
+                Item newItem = new Item(item.getKey(), item.getValue());
+                list.add(newItem);
+            }
+
+            Date date;
+            try {
+                String d = info.get("date").toString();
+                DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                date = format.parse(d);
+            } catch (ParseException e) {
+                date = new Date();
+                e.printStackTrace();
+            }
+            String storeName = parent.get("shop_name").toString();
+            Receipt receipt = new Receipt(list, info.get("address").toString(), info.get("type").toString(),
+                    "http://test.com", Double.valueOf(parent.get("final_price").toString()), barcode, date, storeName);
+            final String id = mDatabase.push().getKey();
+            final History history = new History(id, receipt);
+
+            mDatabase.child("users").child(uid).child("history").child(id).setValue(history);
         }
     }
-
 
     private File createImageFile() throws IOException {
         // Create an image file name
