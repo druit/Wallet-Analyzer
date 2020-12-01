@@ -1,9 +1,10 @@
 package data_class;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Receipt {
+public class Receipt implements Serializable {
     private List<Item> items;
     private String address;
     private String storeType;

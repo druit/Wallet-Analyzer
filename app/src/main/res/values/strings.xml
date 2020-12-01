@@ -49,6 +49,9 @@
     <string name="gen_scan_with_barcode">Scan Barcode</string>
     <string name="gen_scan_with_photo">Scan Image</string>
     <string name="gen_select_scan_type">Choose scan mode</string>
+    <string name="location_permission_denied">location</string>
+    <string name="permission_required_toast">Location Permission</string>
+    <string name="permission_rationale_location">Location</string>
 
 
 </resources>

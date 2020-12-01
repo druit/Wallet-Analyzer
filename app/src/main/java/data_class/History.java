@@ -1,6 +1,8 @@
 package data_class;
 
-public class History {
+import java.io.Serializable;
+
+public class History implements Serializable {
 
     private Receipt receipt;
     private String id;
