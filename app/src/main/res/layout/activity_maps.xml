@@ -13,14 +13,14 @@
         android:layout_height="match_parent"
         tools:context=".activities.MapsActivity" />
 
-    <ImageView
-        android:id="@+id/ic_location"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:src="@drawable/ic_baseline_my_location_24"
-        android:background="@drawable/background_location"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="18dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"/>
+<!--    <ImageView-->
+<!--        android:id="@+id/ic_location"-->
+<!--        android:layout_width="18dp"-->
+<!--        android:layout_height="18dp"-->
+<!--        android:src="@drawable/ic_baseline_my_location_24"-->
+<!--        android:background="@drawable/background_location"-->
+<!--        android:layout_marginRight="8dp"-->
+<!--        android:layout_marginBottom="18dp"-->
+<!--        android:layout_alignParentRight="true"-->
+<!--        android:layout_alignParentBottom="true"/>-->
 </RelativeLayout>
