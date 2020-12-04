@@ -47,6 +47,7 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -63,16 +64,15 @@ import gr.ict.wallet_analyzer.R;
 public class MainActivity extends BaseActivity {
 
     ImageView profileImage, profileImagePop;
-    TextView nameProfile, nameProfilePop, profileEmail,totalPriceMonth;
+    TextView nameProfile, nameProfilePop, profileEmail, totalPriceMonth;
+    double totalPrice;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
-    private ArrayList<History> historyArrayList = new ArrayList<>();
-
+    public ArrayList<History> historyArrayList = new ArrayList<>();
     private LineChart chart;
     private LineDataSet dataSet;
-    double totalPrice;
-
     private float maximumReceiptPrice = 0;
+    private String monthString = new SimpleDateFormat("MM").format(new Date());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,11 +146,11 @@ public class MainActivity extends BaseActivity {
     private void setProfile(String type) {
 
         if (user != null) {
-            if(user.getPhotoUrl() != null){
-                Picasso.get().load( user.getPhotoUrl()).transform(new CircleTransform()).into(profileImage);
+            if (user.getPhotoUrl() != null) {
+                Picasso.get().load(user.getPhotoUrl()).transform(new CircleTransform()).into(profileImage);
 //            profileImage.setImageURI(user.getPhotoUrl());
 //            setProfileImage(uri);
-            }else {
+            } else {
                 profileImage.setImageResource(R.drawable.guest);
             }
             switch (type) {
@@ -196,9 +196,9 @@ public class MainActivity extends BaseActivity {
         profileEmail = popupView.findViewById(R.id.profileEmail);
 
         // TODO: add activity_settings page
-        if(user.getPhotoUrl() != null){
-            Picasso.get().load( user.getPhotoUrl()).transform(new CircleTransform()).into(profileImagePop);
-        }else {
+        if (user.getPhotoUrl() != null) {
+            Picasso.get().load(user.getPhotoUrl()).transform(new CircleTransform()).into(profileImagePop);
+        } else {
             profileImagePop.setImageResource(R.drawable.guest);
         }
 
@@ -215,9 +215,9 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
+
     private void showReceiptPopup(final int itemPosition) {
         Receipt listItemReceipt = historyArrayList.get(itemPosition).getReceipt();
-
 
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -269,12 +269,13 @@ public class MainActivity extends BaseActivity {
             public void onClick(View v) {
 
                 AlertDialog.Builder alertDeclare = new AlertDialog.Builder(MainActivity.this);
-                alertDeclare.setMessage( getString(R.string.alert_delete_receipt)).setCancelable(false)
-                        .setPositiveButton( getString(R.string.gen_yes), new DialogInterface.OnClickListener() {
+                alertDeclare.setMessage(getString(R.string.alert_delete_receipt)).setCancelable(false)
+                        .setPositiveButton(getString(R.string.gen_yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("history").child(historyArrayList.get(itemPosition).getId());
+                                DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users")
+                                        .child(user.getUid()).child("history").child(historyArrayList.get(itemPosition).getId());
                                 totalPrice -= historyArrayList.get(itemPosition).getReceipt().getTotalPrice();
                                 declare.removeValue();
 
@@ -282,7 +283,7 @@ public class MainActivity extends BaseActivity {
                                 popupWindow.dismiss();
                             }
                         })
-                        .setNegativeButton( getString(R.string.gen_no), new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getString(R.string.gen_no), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
@@ -290,7 +291,7 @@ public class MainActivity extends BaseActivity {
                         });
 
                 AlertDialog alert = alertDeclare.create();
-                alert.setTitle( getString(R.string.gen_warning));
+                alert.setTitle(getString(R.string.gen_warning));
                 alert.show();
             }
         });
@@ -299,10 +300,12 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+              
                 Bundle args = new Bundle();
                 args.putSerializable("history",(Serializable)historyArrayList);
                 intent.putExtra("BUNDLE",args);
                 intent.putExtra("position",itemPosition);
+              
                 startActivity(intent);
             }
         });
@@ -349,20 +352,43 @@ public class MainActivity extends BaseActivity {
         // Spinner above the graph
         Spinner spinner = findViewById(R.id.month_spinner);
         String[] items = new String[]{
-                getString(R.string.gen_month_1),getString(R.string.gen_month_2),
-                getString(R.string.gen_month_3),getString(R.string.gen_month_4),
-                getString(R.string.gen_month_5),getString(R.string.gen_month_6),
-                getString(R.string.gen_month_7),getString(R.string.gen_month_8),
-                getString(R.string.gen_month_9),getString(R.string.gen_month_10),
-                getString(R.string.gen_month_11),getString(R.string.gen_month_12)
+                getString(R.string.gen_month_1), getString(R.string.gen_month_2),
+                getString(R.string.gen_month_3), getString(R.string.gen_month_4),
+                getString(R.string.gen_month_5), getString(R.string.gen_month_6),
+                getString(R.string.gen_month_7), getString(R.string.gen_month_8),
+                getString(R.string.gen_month_9), getString(R.string.gen_month_10),
+                getString(R.string.gen_month_11), getString(R.string.gen_month_12)
         };
 
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("position: " + position);
+                ArrayList<History> historyMonthList = getHistoryListByMonth(position + 1);
+
+                // clear graph first
+                clearGraph();
+
+                // add graph values
+                for (History history : historyMonthList) {
+                    updateGraph(history);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
         //There are multiple variations of this, but this is the basic variant.
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, items);
         //set the spinners adapter to the previously created one.
         spinner.setAdapter(spinnerAdapter);
+        spinner.setSelection(Integer.parseInt(dateFormat.format(date)) - 1);
+
+        // TODO: set current month
     }
 
     private void setListView() {
@@ -386,17 +412,18 @@ public class MainActivity extends BaseActivity {
                 dataSet.addEntry(new Entry(1, 0));
                 History history;
                 totalPrice = 0.0;
-                for (DataSnapshot child : children) {
 
+                for (DataSnapshot child : children) {
                     history = child.getValue(History.class);
-                     totalPrice += history.getReceipt().getTotalPrice();
-//                    totalPrice[0] += history.getReceipt().getTotalPrice();
-                    System.out.println("TOTAL: " + totalPrice);
-                    totalPriceMonth.setText( totalPrice + " €");
+                    totalPrice += history.getReceipt().getTotalPrice();
+                    totalPriceMonth.setText(String.format("%.2f", totalPrice) + " €");
                     historyArrayList.add(history);
+                    // sort the array every time, any better ideas would be greatly valued
+                    Collections.sort(historyArrayList);
                     adapter.notifyDataSetChanged();
 
-                    updateGraph(history);
+                    // show receipts for current month
+                    fillGraphFromCurrentMonth();
                 }
             }
 
@@ -414,6 +441,7 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    // TODO: Show 10 latest records or 15
     private void setGraphView() {
         chart = findViewById(R.id.chart);
 
@@ -433,7 +461,7 @@ public class MainActivity extends BaseActivity {
         dataSet = new LineDataSet(entries, "April"); // add entries to dataset
 
         // make line curvy
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        dataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 
         // circles color
         dataSet.setCircleColor(Color.rgb(95, 115, 193));
@@ -458,7 +486,7 @@ public class MainActivity extends BaseActivity {
 
         // hide values in left and right side
         chart.getAxisRight().setDrawLabels(false);
-        chart.getAxisLeft().setDrawLabels(false);
+//        chart.getAxisLeft().setDrawLabels(false);
 
         // no zoom
         chart.setScaleEnabled(false);
@@ -480,11 +508,14 @@ public class MainActivity extends BaseActivity {
 
         // text color of labels in x axis
         chart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
+        chart.getAxisLeft().setTextColor(Color.argb(50, 255, 255, 255));
 
         chart.getAxisLeft().setAxisMinimum(0);
         chart.getXAxis().setAxisMaximum(30);
         chart.getXAxis().setAxisMinimum(0);
-        chart.getXAxis().setLabelCount(30);
+        chart.getXAxis().setLabelCount(30, true);
+
+//        chart.setVisibleXRangeMaximum(10);
     }
 
     // TODO: days that have no receipts get a value of 0 and days that have more than one receipt should make a sum
@@ -499,11 +530,49 @@ public class MainActivity extends BaseActivity {
         // set maximum value in the graph
         if (maximumReceiptPrice < history.getReceipt().getTotalPrice()) {
             maximumReceiptPrice = (float) history.getReceipt().getTotalPrice();
-            chart.getAxisLeft().setAxisMaximum(maximumReceiptPrice + 10);
+            chart.getAxisLeft().setAxisMaximum(maximumReceiptPrice + (maximumReceiptPrice * 0.1f));
         }
 
         dataSet.notifyDataSetChanged();
         chart.notifyDataSetChanged();
         chart.invalidate();
+    }
+
+    private ArrayList<History> getHistoryListByMonth(int month) {
+        ArrayList<History> historyMonthList = new ArrayList<>();
+        for (History history : historyArrayList) {
+            if (isHistoryInGivenMonth(history, month)) {
+                historyMonthList.add(history);
+            }
+        }
+        return historyMonthList;
+    }
+
+    private void clearGraph() {
+        dataSet.clear();
+
+        dataSet.notifyDataSetChanged();
+        chart.notifyDataSetChanged();
+        chart.invalidate();
+    }
+
+    private boolean isHistoryInGivenMonth(History history, int month) {
+        String monthString = new SimpleDateFormat("MM").format(history.getReceipt().getDate());
+        int historyMonth = Integer.parseInt(monthString);
+        return month == historyMonth;
+    }
+
+    // it reverses the historyArrayList because the History with the older date is at the end of the Array
+    // and the newer ones at the start of the Array, then it loops every History Object in the Array
+    // and checks if it's in the current month
+    public void fillGraphFromCurrentMonth() {
+        ArrayList<History> reversedHistoryList = historyArrayList;
+        Collections.reverse(reversedHistoryList);
+        clearGraph();
+        for (History history: reversedHistoryList) {
+            if (isHistoryInGivenMonth(history, Integer.parseInt(monthString))) {
+                updateGraph(history);
+            }
+        }
     }
 }
