@@ -46,6 +46,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     int position;
     private boolean permissionDenied = false;
     private GoogleMap mMap;
+    LatLng zoomlatLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         Intent intent = getIntent();
         Bundle args = intent.getBundleExtra("BUNDLE");
         historyArrayList = (ArrayList<History>) args.getSerializable("history");
-        System.out.println("HISTORY " + historyArrayList);
         position = intent.getIntExtra("itemPosition", 0);
 
         setContentView(R.layout.activity_maps);
@@ -86,9 +86,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     private void geoLocate() {
         Geocoder geocoder = new Geocoder((MapsActivity.this));
         List<Address> addressList;
+
         int pos = 0;
         for (History history : historyArrayList) {
-            System.out.println("HISTORY " + history.getReceipt().getAddress());
             try {
                 addressList = geocoder.getFromLocationName(history.getReceipt().getAddress(), 1);
                 if (addressList.size() > 0) {
@@ -97,9 +97,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                     mMap.addMarker(new MarkerOptions().position(latLng).title(history.getReceipt()
                             .getStoreName()).icon(bitmapDescriptor(getApplicationContext(), R.drawable.ic_baseline_store_24)));
                     if (pos == position) {
-                        System.out.println("DOES THIS FUCKING WORK");
-                        float zoomLevel = 50.0f; //This goes up to 21
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
+                        zoomlatLng = new LatLng(currentAddress.getLatitude(), currentAddress.getLongitude());
                     } else {
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
@@ -109,6 +107,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             }
             pos++;
         }
+        float zoomLevel = 50.0f; //This goes up to 21
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(zoomlatLng, zoomLevel));
     }
 
     private BitmapDescriptor bitmapDescriptor(Context context, int vendorResId) {
