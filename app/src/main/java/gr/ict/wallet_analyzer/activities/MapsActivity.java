@@ -1,26 +1,24 @@
 package gr.ict.wallet_analyzer.activities;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.PermissionInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,14 +26,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
-import android.location.Location;
-
-import androidx.annotation.NonNull;
 
 import java.io.IOException;
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +41,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private boolean permissionDenied = false;
-    private GoogleMap mMap;
     String address;
     ArrayList<History> historyArrayList;
     int position;
+    private boolean permissionDenied = false;
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +54,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         Bundle args = intent.getBundleExtra("BUNDLE");
         historyArrayList = (ArrayList<History>) args.getSerializable("history");
         System.out.println("HISTORY " + historyArrayList);
-        position = intent.getIntExtra("itemPosition",0);
+        position = intent.getIntExtra("itemPosition", 0);
 
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -83,12 +76,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng thess = new LatLng(40.638446, 22.938550);
-        mMap.addMarker(new MarkerOptions().position(thess).title("Marker in Greece / Thessaloniki"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(thess));
-        mMap.setOnMyLocationButtonClickListener((GoogleMap.OnMyLocationButtonClickListener) this);
-        mMap.setOnMyLocationClickListener((GoogleMap.OnMyLocationClickListener) this);
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
         geoLocate();
     }
@@ -96,34 +85,36 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     private void geoLocate() {
         Geocoder geocoder = new Geocoder((MapsActivity.this));
-        List<Address> addressList = new ArrayList<>();
+        List<Address> addressList;
         int pos = 0;
         for (History history : historyArrayList) {
             System.out.println("HISTORY " + history.getReceipt().getAddress());
             try {
-                addressList = geocoder.getFromLocationName(history.getReceipt().getAddress(),1);
-                if(addressList.size()>0) {
+                addressList = geocoder.getFromLocationName(history.getReceipt().getAddress(), 1);
+                if (addressList.size() > 0) {
                     Address currentAddress = addressList.get(0);
                     LatLng latLng = new LatLng(currentAddress.getLatitude(), currentAddress.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(latLng).title(history.getReceipt().getStoreName()).icon(bitmapDescriptor(getApplicationContext(),R.drawable.ic_baseline_store_24)));
-                    if(pos == position){
+                    mMap.addMarker(new MarkerOptions().position(latLng).title(history.getReceipt()
+                            .getStoreName()).icon(bitmapDescriptor(getApplicationContext(), R.drawable.ic_baseline_store_24)));
+                    if (pos == position) {
+                        System.out.println("DOES THIS FUCKING WORK");
                         float zoomLevel = 50.0f; //This goes up to 21
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoomLevel));
-                    }else {
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
+                    } else {
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
                 }
-            }catch (IOException e){
-                Log.d("ERROR", "geoLocate: IOException: " + e.getMessage() );
+            } catch (IOException e) {
+                Log.d("ERROR", "geoLocate: IOException: " + e.getMessage());
             }
             pos++;
         }
     }
 
-    private BitmapDescriptor bitmapDescriptor(Context context,int vendorResId){
-        Drawable vectorDrawable = ContextCompat.getDrawable(context,vendorResId);
-        vectorDrawable.setBounds(0,0,vectorDrawable.getIntrinsicWidth(),vectorDrawable.getIntrinsicHeight());
-        Bitmap bitmap  = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),vectorDrawable.getIntrinsicHeight(),Bitmap.Config.ARGB_8888);
+    private BitmapDescriptor bitmapDescriptor(Context context, int vendorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vendorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);

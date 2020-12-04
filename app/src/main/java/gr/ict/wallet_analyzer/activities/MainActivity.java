@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -63,12 +62,12 @@ import gr.ict.wallet_analyzer.R;
 
 public class MainActivity extends BaseActivity {
 
+    public ArrayList<History> historyArrayList = new ArrayList<>();
     ImageView profileImage, profileImagePop;
     TextView nameProfile, nameProfilePop, profileEmail, totalPriceMonth;
     double totalPrice;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
-    public ArrayList<History> historyArrayList = new ArrayList<>();
     private LineChart chart;
     private LineDataSet dataSet;
     private float maximumReceiptPrice = 0;
@@ -300,12 +299,12 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-              
+
                 Bundle args = new Bundle();
-                args.putSerializable("history",(Serializable)historyArrayList);
-                intent.putExtra("BUNDLE",args);
-                intent.putExtra("position",itemPosition);
-              
+                args.putSerializable("history", (Serializable) historyArrayList);
+                intent.putExtra("BUNDLE", args);
+                intent.putExtra("itemPosition", itemPosition);
+
                 startActivity(intent);
             }
         });
@@ -569,7 +568,7 @@ public class MainActivity extends BaseActivity {
         ArrayList<History> reversedHistoryList = historyArrayList;
         Collections.reverse(reversedHistoryList);
         clearGraph();
-        for (History history: reversedHistoryList) {
+        for (History history : reversedHistoryList) {
             if (isHistoryInGivenMonth(history, Integer.parseInt(monthString))) {
                 updateGraph(history);
             }
