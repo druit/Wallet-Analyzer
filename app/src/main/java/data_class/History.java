@@ -1,6 +1,6 @@
 package data_class;
 
-public class History {
+public class History implements Comparable {
 
     private Receipt receipt;
     private String id;
@@ -26,5 +26,17 @@ public class History {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Receipt receiptArg = ((History) o).getReceipt();
+
+        // this way the older receipts are added to the end of the ArrayList and the newer on the front of the ArrayList
+        if (this.getReceipt().getDate().before(receiptArg.getDate())) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
 }
