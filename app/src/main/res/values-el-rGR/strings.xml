@@ -50,7 +50,9 @@
     <string name="gen_scan_with_barcode">Σάρωση Barcode</string>
     <string name="gen_scan_with_photo">Σάρωση Φωτογραφίας</string>
     <string name="gen_select_scan_type">Επιλέξτε τρόπο σάρωσης</string>
-
+    <string name="location_permission_denied">Η τοποθεσία ακυρώθηκε</string>
+    <string name="permission_required_toast">Δικαιώματα τοποθεσίας</string>
+    <string name="permission_rationale_location">Τοποθεσία</string>
 
 
 </resources>
