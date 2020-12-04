@@ -1,6 +1,8 @@
 package data_class;
 
-public class History implements Comparable {
+import java.io.Serializable;
+
+public class History implements Serializable, Comparable {
 
     private Receipt receipt;
     private String id;
