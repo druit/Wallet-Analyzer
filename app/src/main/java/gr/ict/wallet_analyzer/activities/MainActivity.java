@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -24,6 +27,7 @@ import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -65,6 +69,7 @@ public class MainActivity extends BaseActivity {
     public ArrayList<History> historyArrayList = new ArrayList<>();
     ImageView profileImage, profileImagePop;
     TextView nameProfile, nameProfilePop, profileEmail, totalPriceMonth;
+    EditText monthlyLimitTextView;
     double totalPrice;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
@@ -99,6 +104,8 @@ public class MainActivity extends BaseActivity {
 
         // open menu when clicked on the username on top right corner
         setMenuOpener();
+
+        setGoal();
     }
 
     private void setMenuOpener() {
@@ -262,7 +269,6 @@ public class MainActivity extends BaseActivity {
         popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
 
         Button trashBtn = popupView.findViewById(R.id.trash_button);
-        Button locationBtn = popupView.findViewById(R.id.location_button);
         trashBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -295,7 +301,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        locationBtn.setOnClickListener(new View.OnClickListener() {
+        addressTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
@@ -362,7 +368,6 @@ public class MainActivity extends BaseActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("position: " + position);
                 ArrayList<History> historyMonthList = getHistoryListByMonth(position + 1);
 
                 // clear graph first
@@ -393,8 +398,6 @@ public class MainActivity extends BaseActivity {
     private void setListView() {
         FirebaseUser user = mAuth.getCurrentUser();
         ListView list;
-//        final double[] totalPrice = new double[1];
-
 
         final MyListAdapter adapter = new MyListAdapter(this, historyArrayList);
         list = findViewById(R.id.list);
@@ -415,7 +418,7 @@ public class MainActivity extends BaseActivity {
                 for (DataSnapshot child : children) {
                     history = child.getValue(History.class);
                     totalPrice += history.getReceipt().getTotalPrice();
-                    totalPriceMonth.setText(String.format("%.2f", totalPrice) + " €");
+                    totalPriceMonth.setText(String.format("%.2f", totalPrice) + "€");
                     historyArrayList.add(history);
                     // sort the array every time, any better ideas would be greatly valued
                     Collections.sort(historyArrayList);
@@ -520,7 +523,6 @@ public class MainActivity extends BaseActivity {
     // TODO: days that have no receipts get a value of 0 and days that have more than one receipt should make a sum
     private void updateGraph(History history) {
         String dateString = new SimpleDateFormat("dd").format(history.getReceipt().getDate());
-        System.out.println(dateString);
         float date = Float.valueOf(dateString);
         float price = (float) history.getReceipt().getTotalPrice();
 
@@ -573,5 +575,48 @@ public class MainActivity extends BaseActivity {
                 updateGraph(history);
             }
         }
+    }
+
+    private void setGoal() {
+        monthlyLimitTextView = findViewById(R.id.monthly_limit_text_view);
+
+        // check if there is already a goal set on the user
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("goal");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    Integer goal = dataSnapshot.getValue(Integer.class);
+                    monthlyLimitTextView.setText("" + goal);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        // on text change warn the users that only numbers are allowed and on finish save to firebase
+        monthlyLimitTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!s.toString().matches("[0-9][^.]*")) {
+                    Toast.makeText(MainActivity.this, "Only numbers are allowed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                databaseReference.setValue(Integer.valueOf(s.toString()));
+            }
+        });
     }
 }

@@ -167,7 +167,7 @@ public class ChooseScanActivity extends AppCompatActivity {
                                 }
                             }
 
-                            mockData(parentKey, infoList, itemList, barcode);
+                            getBarcodeData(parentKey, infoList, itemList, barcode);
                         }
 
                         @Override
@@ -250,7 +250,7 @@ public class ChooseScanActivity extends AppCompatActivity {
         }
     }
 
-    private void mockData(HashMap<String, Object> parent, HashMap<String, Object> info, HashMap<String, Double> items, String barcode) {
+    private void getBarcodeData(HashMap<String, Object> parent, HashMap<String, Object> info, HashMap<String, Double> items, String barcode) {
         final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
 //        CUSTOM DATA
@@ -278,7 +278,7 @@ public class ChooseScanActivity extends AppCompatActivity {
             Toast.makeText(this, "Already have barcode: " + barcode, Toast.LENGTH_LONG).show();
         } else {
             // print message
-            Toast.makeText(this, "Added", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Receipt Added", Toast.LENGTH_LONG).show();
 
             // create the object and send it to firebase
             List<Item> list = new ArrayList<>();
@@ -303,6 +303,9 @@ public class ChooseScanActivity extends AppCompatActivity {
             final History history = new History(id, receipt);
 
             mDatabase.child("users").child(uid).child("history").child(id).setValue(history);
+
+            // finish activity if successfully scanned barcode
+            finish();
         }
     }
 
