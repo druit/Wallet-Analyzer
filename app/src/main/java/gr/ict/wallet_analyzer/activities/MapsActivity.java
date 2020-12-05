@@ -1,6 +1,7 @@
 package gr.ict.wallet_analyzer.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,6 +13,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +22,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Services.GPSTracker;
 import data_class.History;
 import gr.ict.wallet_analyzer.R;
 
@@ -41,26 +46,52 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    String address;
     ArrayList<History> historyArrayList;
     int position;
     private boolean permissionDenied = false;
     private GoogleMap mMap;
     LatLng zoomlatLng;
+    ImageView imgMyLocation;
+    GPSTracker gpsTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+        imgMyLocation = findViewById(R.id.imgMyLocation) ;
+
         Intent intent = getIntent();
+
         Bundle args = intent.getBundleExtra("BUNDLE");
         historyArrayList = (ArrayList<History>) args.getSerializable("history");
         position = intent.getIntExtra("itemPosition", 0);
 
-        setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        imgMyLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getMyLocation();
+            }
+        });
+    }
+
+
+    private void getMyLocation() {
+        try {
+            gpsTracker.getLocation();
+            LatLng latLng = new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, (float) 16.29));
+            System.out.println("GPSTRACKER "+ gpsTracker.getLatitude());
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "GPS disabled", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -75,11 +106,15 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        mMap.setOnMyLocationButtonClickListener(this);
-        mMap.setOnMyLocationClickListener(this);
-        enableMyLocation();
-        geoLocate();
+        gpsTracker = new GPSTracker(getApplicationContext());
+        try {
+            mMap.setOnMyLocationButtonClickListener(this);
+            mMap.setOnMyLocationClickListener(this);
+            enableMyLocation();
+            geoLocate();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
 
