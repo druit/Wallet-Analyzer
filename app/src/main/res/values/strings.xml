@@ -18,8 +18,8 @@
     <string name="hint_lastname">LastName</string>
     <string name="gen_save">Save</string>
     <string name="gen_guest">Not a user?</string>
-    <string name="gen_spent_month">Spent so far this month"</string>
-    <string name="gen_month_limit">Monthly limit"</string>
+    <string name="gen_spent_month">Expenses</string>
+    <string name="gen_month_limit">Goal</string>
     <string name="gen_history">History</string>
     <string name="gen_full_history">Full History</string>
     <string name="gen_location">Location:</string>

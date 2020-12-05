@@ -97,7 +97,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                     mMap.addMarker(new MarkerOptions().position(latLng).title(history.getReceipt()
                             .getStoreName()).icon(bitmapDescriptor(getApplicationContext(), R.drawable.ic_baseline_store_24)));
                     if (pos == position) {
-                        System.out.println("DOES THIS FUCKING WORK");
                         float zoomLevel = 50.0f; //This goes up to 21
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
                     } else {
