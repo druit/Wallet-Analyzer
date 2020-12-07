@@ -67,8 +67,8 @@ import gr.ict.wallet_analyzer.R;
 public class MainActivity extends BaseActivity {
 
     public ArrayList<History> historyArrayList = new ArrayList<>();
-    ImageView profileImage, profileImagePop;
-    TextView nameProfile, nameProfilePop, profileEmail, totalPriceMonth;
+    ImageView profileImage;
+    TextView nameProfile, totalPriceMonth;
     EditText monthlyLimitTextView;
     double totalPrice;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -91,7 +91,7 @@ public class MainActivity extends BaseActivity {
         setGraphView();
 
         // set profile name and image
-        setProfile("MAIN");
+        setProfile();
 
         // floating button that opens the scan activity
         setFloatingButton();
@@ -120,7 +120,6 @@ public class MainActivity extends BaseActivity {
                         switch (item.getItemId()) {
                             case R.id.action_settings:
                                 openSettings();
-                                // TODO: add activity_settings page
                                 return true;
                             case R.id.action_logout:
                                 FirebaseAuth.getInstance().signOut();
@@ -149,77 +148,29 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private void setProfile(String type) {
-
+    private void setProfile() {
         if (user != null) {
             if (user.getPhotoUrl() != null) {
                 Picasso.get().load(user.getPhotoUrl()).transform(new CircleTransform()).into(profileImage);
-//            profileImage.setImageURI(user.getPhotoUrl());
-//            setProfileImage(uri);
             } else {
                 profileImage.setImageResource(R.drawable.guest);
             }
-            switch (type) {
-                case "MAIN":
-                    if (!user.getDisplayName().isEmpty()) {
-                        nameProfile.setText(user.getDisplayName());
-                    }
-                    break;
-                case "POP":
-                    if (!user.getDisplayName().isEmpty()) {
-                        nameProfilePop.setText(user.getDisplayName());
-                        profileEmail.setText(user.getEmail());
-                    }
-                    break;
-                default:
-                    break;
+            if (!user.getDisplayName().isEmpty()) {
+                nameProfile.setText(user.getDisplayName());
             }
         }
     }
 
     private void openSettings() {
-        // inflate the layout of the popup window
-        LayoutInflater inflater = (LayoutInflater)
-                getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = inflater.inflate(R.layout.activity_settings, null);
-
-        // create the popup window
-        int width = 1000;
-        int height = 1000;
-        boolean focusable = true; // lets taps outside the popup also dismiss it
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-
-        // blur effect
-        BlurView settingsBlur = popupView.findViewById(R.id.settings_blur);
-        setBlurEffect(settingsBlur);
-
-        // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window token
-        popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, -300);
-
-        profileImagePop = popupView.findViewById(R.id.profileImagePop);
-        nameProfilePop = popupView.findViewById(R.id.profileName);
-        profileEmail = popupView.findViewById(R.id.profileEmail);
-
-        // TODO: add activity_settings page
-        if (user.getPhotoUrl() != null) {
-            Picasso.get().load(user.getPhotoUrl()).transform(new CircleTransform()).into(profileImagePop);
-        } else {
-            profileImagePop.setImageResource(R.drawable.guest);
-        }
-
-
-        setProfile("POP");
+//        if (user.getPhotoUrl() != null) {
+//            Picasso.get().load(user.getPhotoUrl()).transform(new CircleTransform()).into(profileImagePop);
+//        } else {
+//            profileImagePop.setImageResource(R.drawable.guest);
+//        }
 
         // open Edit Profile
-        FloatingActionButton floatingActionButton = popupView.findViewById(R.id.edit_button);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
-                startActivity(intent);
-            }
-        });
+        Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
+        startActivity(intent);
     }
 
     private void showReceiptPopup(final int itemPosition) {
