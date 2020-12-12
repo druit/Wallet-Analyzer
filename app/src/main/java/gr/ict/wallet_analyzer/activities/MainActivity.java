@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -533,7 +534,7 @@ public class MainActivity extends BaseActivity {
 
         // check if there is already a goal set on the user
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("goal");
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
@@ -566,7 +567,10 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                databaseReference.setValue(Integer.valueOf(s.toString()));
+                if (!s.toString().equals("")) {
+                    databaseReference.setValue(Integer.valueOf(s.toString()));
+                }
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             }
         });
     }
