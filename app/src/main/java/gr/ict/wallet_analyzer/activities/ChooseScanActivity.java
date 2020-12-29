@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -36,6 +36,8 @@ import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.scanlibrary.ScanActivity;
+import com.scanlibrary.ScanConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +58,7 @@ import gr.ict.wallet_analyzer.R;
 
 public class ChooseScanActivity extends AppCompatActivity {
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 99;
     String currentPhotoPath;
     HashMap<String, Object> parentKey = new HashMap<>();
     HashMap<String, Double> itemList = new HashMap<>();
@@ -127,18 +129,30 @@ public class ChooseScanActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            if (photoURI != null) {
-                try {
-                    imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                    imageView.setImageBitmap(imageBitmap);
-                    detectTextFromImage();
-                } catch (IOException e) {
-                    Toast.makeText(this, "Error while capturing Image", Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-                }
-            } else {
-                Toast.makeText(this, "Error while capturing Image", Toast.LENGTH_LONG).show();
+
+            Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                getContentResolver().delete(uri, null, null);
+                imageView.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
+
+//            if (photoURI != null) {
+//                try {
+//                    imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
+//                    imageView.setImageBitmap(imageBitmap);
+//                    detectTextFromImage();
+//                } catch (IOException e) {
+//                    Toast.makeText(this, "Error while capturing Image", Toast.LENGTH_LONG).show();
+//                    e.printStackTrace();
+//                }
+//            } else {
+//                Toast.makeText(this, "Error while capturing Image", Toast.LENGTH_LONG).show();
+//            }
         } else {
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
@@ -189,25 +203,34 @@ public class ChooseScanActivity extends AppCompatActivity {
             }
         }
 
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                photoURI = FileProvider.getUriForFile(this,
-                        "gr.ict.wallet_analyzer.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                64);
+
+        int preference = ScanConstants.OPEN_CAMERA;
+        Intent intent = new Intent(this, ScanActivity.class);
+        intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, preference);
+        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        // Ensure that there's a camera activity to handle the intent
+//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+//            // Create the File where the photo should go
+//            File photoFile = null;
+//            try {
+//                photoFile = createImageFile();
+//            } catch (IOException ex) {
+//                // Error occurred while creating the File
+//            }
+//            // Continue only if the File was successfully created
+//            if (photoFile != null) {
+//                photoURI = FileProvider.getUriForFile(this,
+//                        "gr.ict.wallet_analyzer.fileprovider",
+//                        photoFile);
+//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+//                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//            }
+//        }
     }
 
 

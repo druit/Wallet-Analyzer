@@ -1,6 +1,7 @@
 package gr.ict.wallet_analyzer.activities;
 
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -107,6 +109,8 @@ public class MainActivity extends BaseActivity {
         setMenuOpener();
 
         setGoal();
+
+        askWritePermission();
     }
 
     private void setMenuOpener() {
@@ -573,5 +577,11 @@ public class MainActivity extends BaseActivity {
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             }
         });
+    }
+
+    private void askWritePermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                56);
     }
 }
