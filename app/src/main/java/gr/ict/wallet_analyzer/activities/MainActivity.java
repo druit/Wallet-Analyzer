@@ -59,6 +59,7 @@ import Adapters.ItemAdapter;
 import Adapters.MyListAdapter;
 import data_class.CircleTransform;
 import data_class.History;
+import data_class.Item;
 import data_class.Receipt;
 import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
@@ -78,6 +79,8 @@ public class MainActivity extends BaseActivity {
     private LineDataSet dataSet;
     private float maximumReceiptPrice = 0;
     private String monthString = new SimpleDateFormat("MM").format(new Date());
+    private boolean isReceiptEditOn = false;
+    private MyListAdapter mainAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +178,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void showReceiptPopup(final int itemPosition) {
-        Receipt listItemReceipt = historyArrayList.get(itemPosition).getReceipt();
+        final Receipt listItemReceipt = historyArrayList.get(itemPosition).getReceipt();
 
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -190,8 +193,8 @@ public class MainActivity extends BaseActivity {
         TextView storeNameTextView = popupView.findViewById(R.id.store_name_text_view);
         storeNameTextView.setText(listItemReceipt.getStoreName());
 
-        TextView textView = popupView.findViewById(R.id.price_text_view);
-        textView.setText(listItemReceipt.getTotalPrice() + "€");
+        final TextView receiptPriceTextView = popupView.findViewById(R.id.price_text_view);
+        receiptPriceTextView.setText(listItemReceipt.getTotalPrice() + "€");
 
         // set receipt location
         TextView addressTextView = popupView.findViewById(R.id.address_text_view);
@@ -206,12 +209,12 @@ public class MainActivity extends BaseActivity {
         TextView categoryTextView = popupView.findViewById(R.id.category_text_view);
         categoryTextView.setText(listItemReceipt.getStoreType());
 
-        // list view in popup
-        ListView list;
+        // popupListView view in popup
+        final ListView popupListView;
 
-        ItemAdapter itemAdapter = new ItemAdapter(this, listItemReceipt.getItems());
-        list = popupView.findViewById(R.id.list_popup);
-        list.setAdapter(itemAdapter);
+        final ItemAdapter popupAdapter = new ItemAdapter(this, listItemReceipt.getItems());
+        popupListView = popupView.findViewById(R.id.list_popup);
+        popupListView.setAdapter(popupAdapter);
 
         // blur effect
         BlurView blurView = popupView.findViewById(R.id.blurView);
@@ -224,13 +227,11 @@ public class MainActivity extends BaseActivity {
         trashBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 AlertDialog.Builder alertDeclare = new AlertDialog.Builder(MainActivity.this);
                 alertDeclare.setMessage(getString(R.string.alert_delete_receipt)).setCancelable(false)
                         .setPositiveButton(getString(R.string.gen_yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                FirebaseUser user = mAuth.getCurrentUser();
                                 DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users")
                                         .child(user.getUid()).child("history").child(historyArrayList.get(itemPosition).getId());
                                 totalPrice -= historyArrayList.get(itemPosition).getReceipt().getTotalPrice();
@@ -266,8 +267,86 @@ public class MainActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
-        // dismiss the popup window when touched
 
+        // Edit
+        Button editReceiptButton = popupView.findViewById(R.id.edit_button);
+        editReceiptButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isReceiptEditOn) {
+                    Toast.makeText(MainActivity.this, "Edit Mode Off", Toast.LENGTH_SHORT).show();
+                    isReceiptEditOn = false;
+                } else {
+                    isReceiptEditOn = true;
+                    Toast.makeText(MainActivity.this, "Edit Mode On", Toast.LENGTH_SHORT).show();
+
+                    popupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                            if (isReceiptEditOn) {
+                                // inflate the layout of the popup window
+                                LayoutInflater editInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                                View editView = editInflater.inflate(R.layout.edit_receipt_popup, null);
+
+                                // create the popup window
+                                int width = LinearLayout.LayoutParams.MATCH_PARENT;
+                                int height = LinearLayout.LayoutParams.MATCH_PARENT;
+                                boolean focusable = true; // lets taps outside the popup also dismiss it
+                                final PopupWindow editWindow = new PopupWindow(editView, width, height, focusable);
+
+                                final Item currentlyEditItem = listItemReceipt.getItems().get(position);
+                                String currentProductTitle = currentlyEditItem.getName();
+                                String currentProductPrice = String.valueOf(currentlyEditItem.getPrice());
+
+                                final EditText titleEditText = editView.findViewById(R.id.product_name_edit_text);
+                                final EditText priceEditText = editView.findViewById(R.id.product_price_edit_text);
+                                Button finishEditButton = editView.findViewById(R.id.finish_edit_button);
+
+                                titleEditText.setText(currentProductTitle);
+                                priceEditText.setText(currentProductPrice);
+
+                                // show the popup window
+                                editWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
+
+                                finishEditButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String changedTitle = String.valueOf(titleEditText.getText());
+                                        String changedPrice = String.valueOf(priceEditText.getText());
+
+                                        currentlyEditItem.setName(changedTitle);
+                                        currentlyEditItem.setPrice(Double.parseDouble(changedPrice));
+
+                                        DatabaseReference receiptReference = FirebaseDatabase.getInstance().getReference().child("users")
+                                                .child(user.getUid()).child("history").child(historyArrayList.get(itemPosition).getId())
+                                                .child("receipt/");
+                                        DatabaseReference editedItemReference = receiptReference.child("items").child(String.valueOf(position));
+                                        editedItemReference.setValue(currentlyEditItem);
+
+                                        double editedTotalPrice = listItemReceipt.updateTotalPrice();
+                                        mainAdapter.notifyDataSetChanged();
+                                        popupAdapter.notifyDataSetChanged();
+                                        receiptPriceTextView.setText(editedTotalPrice + "€");
+
+                                        receiptReference.child("totalPrice").setValue(editedTotalPrice);
+
+                                        editWindow.dismiss();
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        // dismiss the popup window when touched
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                isReceiptEditOn = false;
+            }
+        });
 //        popupView.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View v, MotionEvent event) {
@@ -349,11 +428,11 @@ public class MainActivity extends BaseActivity {
 
     private void setListView() {
         FirebaseUser user = mAuth.getCurrentUser();
-        ListView list;
+        ListView mainListView;
 
-        final MyListAdapter adapter = new MyListAdapter(this, historyArrayList);
-        list = findViewById(R.id.list);
-        list.setAdapter(adapter);
+        mainAdapter = new MyListAdapter(this, historyArrayList);
+        mainListView = findViewById(R.id.list);
+        mainListView.setAdapter(mainAdapter);
 
         DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("history");
         declare.addValueEventListener(new ValueEventListener() {
@@ -374,7 +453,7 @@ public class MainActivity extends BaseActivity {
                     historyArrayList.add(history);
                     // sort the array every time, any better ideas would be greatly valued
                     Collections.sort(historyArrayList);
-                    adapter.notifyDataSetChanged();
+                    mainAdapter.notifyDataSetChanged();
 
                     // show receipts for current month
                     fillGraphFromCurrentMonth();
@@ -387,7 +466,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 showReceiptPopup(position);

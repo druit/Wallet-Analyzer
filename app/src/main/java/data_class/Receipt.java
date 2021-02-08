@@ -91,4 +91,13 @@ public class Receipt implements Serializable {
     public void setStoreName(String storeName) {
         this.storeName = storeName;
     }
+
+    public double updateTotalPrice() {
+        double tempTotalPrice = 0;
+        for (Item tempItem: items) {
+            tempTotalPrice += tempItem.getPrice();
+        }
+        this.totalPrice = tempTotalPrice;
+        return tempTotalPrice;
+    }
 }
