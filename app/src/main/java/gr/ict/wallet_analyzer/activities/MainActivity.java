@@ -126,6 +126,9 @@ public class MainActivity extends BaseActivity {
                                 FirebaseAuth.getInstance().signOut();
                                 MainActivity.this.finish();
                                 return true;
+                            case R.id.action_portfolio:
+                                openPortfolio();
+                                return true;
                             default:
                                 return false;
                         }
@@ -136,6 +139,11 @@ public class MainActivity extends BaseActivity {
                 popup.show();
             }
         });
+    }
+
+    private void openPortfolio() {
+        Intent intent = new Intent(getApplicationContext(), Portfolio.class);
+        startActivity(intent);
     }
 
     private void setFloatingButton() {

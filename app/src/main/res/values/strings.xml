@@ -52,6 +52,10 @@
     <string name="location_permission_denied">location</string>
     <string name="permission_required_toast">Location Permission</string>
     <string name="permission_rationale_location">Location</string>
+    <string name="action_portfolio">Portfolio</string>
+    <string name="title_activity_portfolio">Portfolio</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 
 
 </resources>
