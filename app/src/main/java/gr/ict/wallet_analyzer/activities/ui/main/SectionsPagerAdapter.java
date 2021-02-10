@@ -9,6 +9,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import gr.ict.wallet_analyzer.R;
+import gr.ict.wallet_analyzer.activities.fragments.Statistics;
+import gr.ict.wallet_analyzer.activities.fragments.Statistics2;
 
 
 /**
@@ -28,9 +30,20 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        Fragment fragment = null;
+
+        switch (position){
+            case 0:
+                fragment = new Statistics();
+                break;
+            case 1:
+                fragment = new Statistics2();
+                break;
+        }
+        return fragment;
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
-        return PlaceholderFragment.newInstance(position + 1);
+//        return PlaceholderFragment.newInstance(position + 1);
     }
 
     @Nullable
