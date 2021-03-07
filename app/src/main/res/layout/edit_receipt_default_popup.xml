@@ -15,54 +15,31 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/product_name_text_view"
+            android:id="@+id/receipt_property_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="20dp"
-            android:text="Product Name"
+            android:text="Receipt Property"
             android:textAlignment="textStart"
             android:textColor="#E1E1E1"
             android:textSize="20sp" />
 
         <EditText
-            android:id="@+id/product_name_edit_text"
+            android:id="@+id/receipt_property_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginEnd="20dp"
             android:autofillHints="Product Name"
             android:inputType="text"
             android:textColor="@color/colorWhite" />
 
-        <TextView
-            android:id="@+id/product_price_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="20dp"
-            android:text="Product Price"
-            android:textAlignment="textStart"
-            android:textColor="#E1E1E1"
-            android:textSize="20sp" />
-
-        <EditText
-            android:id="@+id/product_price_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:autofillHints="Product Price"
-            android:inputType="numberDecimal"
-            android:textColor="@color/colorWhite" />
-
         <Button
-            android:id="@+id/finish_edit_button"
+            android:id="@+id/finish_property_edit_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"

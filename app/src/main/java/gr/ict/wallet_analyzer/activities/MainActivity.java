@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -53,6 +54,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import Adapters.ItemAdapter;
@@ -73,14 +75,20 @@ public class MainActivity extends BaseActivity {
     TextView nameProfile, totalPriceMonth;
     EditText monthlyLimitTextView;
     double totalPrice;
+
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
+    private String uid = user.getUid();
+    DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference()
+            .child("users").child(uid);
+
     private LineChart chart;
     private LineDataSet dataSet;
     private float maximumReceiptPrice = 0;
     private String monthString = new SimpleDateFormat("MM").format(new Date());
-    private boolean isReceiptEditOn = false;
+    private boolean isReceiptEditPressed = false;
     private MyListAdapter mainAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,7 +186,9 @@ public class MainActivity extends BaseActivity {
     }
 
     private void showReceiptPopup(final int itemPosition) {
-        final Receipt listItemReceipt = historyArrayList.get(itemPosition).getReceipt();
+        final History showingHistory = historyArrayList.get(itemPosition);
+        final Receipt listItemReceipt = showingHistory.getReceipt();
+        final String currentReceiptId = showingHistory.getId();
 
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -190,23 +200,23 @@ public class MainActivity extends BaseActivity {
         boolean focusable = true; // lets taps outside the popup also dismiss it
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
 
-        TextView storeNameTextView = popupView.findViewById(R.id.store_name_text_view);
+        final TextView storeNameTextView = popupView.findViewById(R.id.store_name_text_view);
         storeNameTextView.setText(listItemReceipt.getStoreName());
 
         final TextView receiptPriceTextView = popupView.findViewById(R.id.price_text_view);
         receiptPriceTextView.setText(listItemReceipt.getTotalPrice() + "€");
 
         // set receipt location
-        TextView addressTextView = popupView.findViewById(R.id.address_text_view);
+        final TextView addressTextView = popupView.findViewById(R.id.address_text_view);
         addressTextView.setText(listItemReceipt.getAddress());
 
         // set date of the receipt
-        TextView dateTextView = popupView.findViewById(R.id.date_text_view);
+        final TextView dateTextView = popupView.findViewById(R.id.date_text_view);
         String date = new SimpleDateFormat("dd/MM/yyyy").format(listItemReceipt.getDate());
         dateTextView.setText(date);
 
         // set receipt category
-        TextView categoryTextView = popupView.findViewById(R.id.category_text_view);
+        final TextView categoryTextView = popupView.findViewById(R.id.category_text_view);
         categoryTextView.setText(listItemReceipt.getStoreType());
 
         // popupListView view in popup
@@ -232,8 +242,7 @@ public class MainActivity extends BaseActivity {
                         .setPositiveButton(getString(R.string.gen_yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users")
-                                        .child(user.getUid()).child("history").child(historyArrayList.get(itemPosition).getId());
+                                DatabaseReference declare = baseReference.child("history").child(currentReceiptId);
                                 totalPrice -= historyArrayList.get(itemPosition).getReceipt().getTotalPrice();
                                 declare.removeValue();
 
@@ -257,14 +266,20 @@ public class MainActivity extends BaseActivity {
         addressTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                if (isReceiptEditPressed) {
+                    String label = "Shop Address";
+                    String firebaseUrl = "/history/" + currentReceiptId + "/receipt/address/";
+                    showGenericPopup(label, addressTextView, findViewById(R.id.list), firebaseUrl);
+                } else {
+                    Intent intent = new Intent(MainActivity.this, MapsActivity.class);
 
-                Bundle args = new Bundle();
-                args.putSerializable("history", (Serializable) historyArrayList);
-                intent.putExtra("BUNDLE", args);
-                intent.putExtra("itemPosition", itemPosition);
+                    Bundle args = new Bundle();
+                    args.putSerializable("history", (Serializable) historyArrayList);
+                    intent.putExtra("BUNDLE", args);
+                    intent.putExtra("itemPosition", itemPosition);
 
-                startActivity(intent);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -273,17 +288,15 @@ public class MainActivity extends BaseActivity {
         editReceiptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isReceiptEditOn) {
-                    Toast.makeText(MainActivity.this, "Edit Mode Off", Toast.LENGTH_SHORT).show();
-                    isReceiptEditOn = false;
-                } else {
-                    isReceiptEditOn = true;
+                isReceiptEditPressed = !isReceiptEditPressed;
+
+                if (isReceiptEditPressed) {
                     Toast.makeText(MainActivity.this, "Edit Mode On", Toast.LENGTH_SHORT).show();
 
                     popupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                            if (isReceiptEditOn) {
+                            if (isReceiptEditPressed) {
                                 // inflate the layout of the popup window
                                 LayoutInflater editInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                                 View editView = editInflater.inflate(R.layout.edit_receipt_popup, null);
@@ -317,8 +330,7 @@ public class MainActivity extends BaseActivity {
                                         currentlyEditItem.setName(changedTitle);
                                         currentlyEditItem.setPrice(Double.parseDouble(changedPrice));
 
-                                        DatabaseReference receiptReference = FirebaseDatabase.getInstance().getReference().child("users")
-                                                .child(user.getUid()).child("history").child(historyArrayList.get(itemPosition).getId())
+                                        DatabaseReference receiptReference = baseReference.child("history").child(currentReceiptId)
                                                 .child("receipt/");
                                         DatabaseReference editedItemReference = receiptReference.child("items").child(String.valueOf(position));
                                         editedItemReference.setValue(currentlyEditItem);
@@ -336,6 +348,40 @@ public class MainActivity extends BaseActivity {
                             }
                         }
                     });
+
+                    storeNameTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (isReceiptEditPressed) {
+                                String label = "Shop Name";
+                                String firebaseUrl = "/history/" + currentReceiptId + "/receipt/storeName/";
+                                showGenericPopup(label, storeNameTextView, findViewById(R.id.list), firebaseUrl);
+                            }
+                        }
+                    });
+
+                    categoryTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (isReceiptEditPressed) {
+                                String label = "Category";
+                                String firebaseUrl = "/history/" + currentReceiptId + "/receipt/storeType/";
+                                showGenericPopup(label, categoryTextView, findViewById(R.id.list), firebaseUrl);
+                            }
+                        }
+                    });
+
+                    dateTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (isReceiptEditPressed) {
+                                String firebaseUrl = "/history/" + currentReceiptId + "/receipt/date/";
+                                showDatePickerPopup(listItemReceipt, dateTextView, findViewById(R.id.list), firebaseUrl);
+                            }
+                        }
+                    });
+                } else {
+                    Toast.makeText(MainActivity.this, "Edit Mode Off", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -344,20 +390,12 @@ public class MainActivity extends BaseActivity {
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                isReceiptEditOn = false;
+                isReceiptEditPressed = false;
             }
         });
-//        popupView.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                popupWindow.dismiss();
-//                return true;
-//            }
-//        });
     }
 
     public void onBackPressed() {
-
         finishAffinity();
     }
 
@@ -427,14 +465,13 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setListView() {
-        FirebaseUser user = mAuth.getCurrentUser();
         ListView mainListView;
 
         mainAdapter = new MyListAdapter(this, historyArrayList);
         mainListView = findViewById(R.id.list);
         mainListView.setAdapter(mainAdapter);
 
-        DatabaseReference declare = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("history");
+        DatabaseReference declare = baseReference.child("history");
         declare.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -612,7 +649,7 @@ public class MainActivity extends BaseActivity {
         monthlyLimitTextView = findViewById(R.id.monthly_limit_text_view);
 
         // check if there is already a goal set on the user
-        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("goal");
+        final DatabaseReference databaseReference = baseReference.child("goal");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -650,6 +687,86 @@ public class MainActivity extends BaseActivity {
                     databaseReference.setValue(Integer.valueOf(s.toString()));
                 }
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            }
+        });
+    }
+
+    private void showGenericPopup(String label, final TextView textViewClicked, View viewToShowAt, final String firebaseUrl) {
+        String editTextValue = String.valueOf(textViewClicked.getText());
+        // inflate the layout of the popup window`
+        LayoutInflater genericInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View genericView = genericInflater.inflate(R.layout.edit_receipt_default_popup, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+        final PopupWindow genericPopup = new PopupWindow(genericView, width, height, true);
+
+        TextView textView = genericView.findViewById(R.id.receipt_property_text_view);
+        final EditText editText = genericView.findViewById(R.id.receipt_property_edit_text);
+        Button finishButton = genericView.findViewById(R.id.finish_property_edit_button);
+
+        textView.setText(label);
+        editText.setText(editTextValue);
+
+        // show the popup window
+        genericPopup.showAtLocation(viewToShowAt, Gravity.CENTER, 0, 0);
+
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String receiptEditedLabel = String.valueOf(editText.getText());
+
+                DatabaseReference receiptReference = baseReference.child(firebaseUrl);
+                receiptReference.setValue(receiptEditedLabel);
+
+                textViewClicked.setText(receiptEditedLabel);
+
+                genericPopup.dismiss();
+            }
+        });
+    }
+
+    private void showDatePickerPopup(final Receipt listItemReceipt, final TextView dateTextView, View viewToShowAt, final String firebaseUrl) {
+        Date receiptDate = listItemReceipt.getDate();
+
+        // inflate the layout of the popup window`
+        LayoutInflater genericInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View datePickerView = genericInflater.inflate(R.layout.datepicker_popup, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+        final PopupWindow datePickerPopup = new PopupWindow(datePickerView, width, height, true);
+
+        final DatePicker datePicker = datePickerView.findViewById(R.id.date_picker_widget);
+        Button finishButton = datePickerView.findViewById(R.id.finish_property_edit_button);
+
+        // show the popup window
+        datePickerPopup.showAtLocation(viewToShowAt, Gravity.CENTER, 0, 0);
+
+        int day = Integer.parseInt(new SimpleDateFormat("dd").format(receiptDate));
+        int month = Integer.parseInt(new SimpleDateFormat("MM").format(receiptDate));
+        int year = Integer.parseInt(new SimpleDateFormat("yyyy").format(receiptDate));
+        datePicker.updateDate(year, month - 1, day);
+
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int day = datePicker.getDayOfMonth();
+                int month = datePicker.getMonth();
+                int year = datePicker.getYear();
+                Date date = new GregorianCalendar(year, month, day).getTime();
+
+                DatabaseReference dateReference = baseReference.child(firebaseUrl);
+                dateReference.setValue(date);
+
+                listItemReceipt.setDate(date);
+
+                String dateStr = day + "/" + (month + 1) + "/" + year;
+                dateTextView.setText(dateStr);
+
+                datePickerPopup.dismiss();
             }
         });
     }
