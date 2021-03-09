@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -65,8 +64,11 @@ import data_class.Item;
 import data_class.Receipt;
 import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
-import eightbitlab.com.blurview.RenderScriptBlur;
 import gr.ict.wallet_analyzer.R;
+import gr.ict.wallet_analyzer.helpers.BlurEffect;
+import gr.ict.wallet_analyzer.helpers.HistoryListView;
+import gr.ict.wallet_analyzer.helpers.ListeningVariable;
+import gr.ict.wallet_analyzer.helpers.ReceiptPopup;
 
 public class MainActivity extends BaseActivity {
 
@@ -74,7 +76,8 @@ public class MainActivity extends BaseActivity {
     ImageView profileImage;
     TextView nameProfile, totalPriceMonth;
     EditText monthlyLimitTextView;
-    double totalPrice;
+    //    double totalPrice;
+    private ListeningVariable<Double> totalPrice = new ListeningVariable<>(Double.class);
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
@@ -109,7 +112,16 @@ public class MainActivity extends BaseActivity {
         setFloatingButton();
 
         // list view
-        setListView();
+        // setListView();
+        HistoryListView historyListView = new HistoryListView(this, baseReference, totalPrice);
+        historyListView.setListView();
+
+        totalPrice.setListener(new ListeningVariable.ChangeListener<Double>() {
+            @Override
+            public void onChange(Double object) {
+                totalPriceMonth.setText(String.format("%.2f", object) + "€");
+            }
+        });
 
         // spinner for the graph
         monthlyGraph();
@@ -118,6 +130,8 @@ public class MainActivity extends BaseActivity {
         setMenuOpener();
 
         setGoal();
+
+        setFullHistory();
     }
 
     private void setMenuOpener() {
@@ -228,7 +242,7 @@ public class MainActivity extends BaseActivity {
 
         // blur effect
         BlurView blurView = popupView.findViewById(R.id.blurView);
-        setBlurEffect(blurView);
+        new BlurEffect().setBlurEffect(this, blurView);
 
         // show the popup window
         popupWindow.showAtLocation(findViewById(R.id.list), Gravity.CENTER, 0, 0);
@@ -243,7 +257,7 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 DatabaseReference declare = baseReference.child("history").child(currentReceiptId);
-                                totalPrice -= historyArrayList.get(itemPosition).getReceipt().getTotalPrice();
+                                totalPrice.setObject(totalPrice.getObject() - historyArrayList.get(itemPosition).getReceipt().getTotalPrice());
                                 declare.removeValue();
 
                                 finish();
@@ -399,25 +413,6 @@ public class MainActivity extends BaseActivity {
         finishAffinity();
     }
 
-    private void setBlurEffect(BlurView blurView) {
-        // blur effect
-        float radius = 10f;
-
-        View decorView = getWindow().getDecorView();
-        //ViewGroup you want to start blur from. Choose root as close to BlurView in hierarchy as possible.
-        ViewGroup rootView = decorView.findViewById(android.R.id.content);
-        //Set drawable to draw in the beginning of each blurred frame (Optional).
-        //Can be used in case your layout has a lot of transparent space and your content
-        //gets kinda lost after after blur is applied.
-        Drawable windowBackground = decorView.getBackground();
-
-        blurView.setupWith(rootView)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurAlgorithm(new RenderScriptBlur(this))
-                .setBlurRadius(radius)
-                .setHasFixedTransformationMatrix(true);
-    }
-
     private void monthlyGraph() {
         DateFormat dateFormat = new SimpleDateFormat("MM");
         Date date = new Date();
@@ -481,11 +476,11 @@ public class MainActivity extends BaseActivity {
                 dataSet.clear();
                 dataSet.addEntry(new Entry(1, 0));
                 History history;
-                totalPrice = 0.0;
+                totalPrice.setObject(0.0);
 
                 for (DataSnapshot child : children) {
                     history = child.getValue(History.class);
-                    totalPrice += history.getReceipt().getTotalPrice();
+                    totalPrice.setObject(totalPrice.getObject() + history.getReceipt().getTotalPrice());
                     totalPriceMonth.setText(String.format("%.2f", totalPrice) + "€");
                     historyArrayList.add(history);
                     // sort the array every time, any better ideas would be greatly valued
@@ -506,7 +501,9 @@ public class MainActivity extends BaseActivity {
         mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                showReceiptPopup(position);
+//                showReceiptPopup(position);
+                ReceiptPopup receiptPopup = new ReceiptPopup(position, MainActivity.this, historyArrayList, baseReference);
+                receiptPopup.showReceiptPopup();
             }
         });
     }
@@ -767,6 +764,17 @@ public class MainActivity extends BaseActivity {
                 dateTextView.setText(dateStr);
 
                 datePickerPopup.dismiss();
+            }
+        });
+    }
+
+    private void setFullHistory() {
+        Button fullHistoryButton = findViewById(R.id.full_history_button);
+        fullHistoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, FullHistoryActivity.class);
+                startActivity(intent);
             }
         });
     }

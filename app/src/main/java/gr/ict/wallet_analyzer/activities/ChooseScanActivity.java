@@ -113,7 +113,6 @@ public class ChooseScanActivity extends AppCompatActivity {
         });
     }
 
-
     private void startScanBarcode() {
         IntentIntegrator intent = new IntentIntegrator(this);
         intent.setCaptureActivity(CaptureActivity.class);
