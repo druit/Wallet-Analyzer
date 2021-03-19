@@ -32,7 +32,7 @@ import data_class.YourData;
 import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.activities.ui.main.SectionsPagerAdapter;
 
-public class Portfolio extends AppCompatActivity {
+public class Portfolio extends BaseActivity {
     private PieChart chart;
     private PieDataSet dataSet;
     @Override

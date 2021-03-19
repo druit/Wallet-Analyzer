@@ -55,7 +55,10 @@
     <string name="permission_rationale_location">Τοποθεσία</string>
     <string name="action_portfolio">Χαρτοφύλακας</string>
     <string name="title_activity_portfolio">Χαρτοφύλακας</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_1">Διαγράμματα</string>
+    <string name="tab_text_2">My Account</string>
+    <string name="filter_obj_1">Όλο το χρόνο</string>
+    <string name="filter_obj_2">Μηνιαίο</string>
+    <string name="filter_obj_3">Εβδομαδιαίο</string>
 
 </resources>

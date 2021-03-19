@@ -15,13 +15,10 @@
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:minHeight="?actionBarSize"
             android:background="@drawable/gradient_background"
-            android:padding="@dimen/appbar_padding"
-            android:text="@string/app_name"
-            android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
+             />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
