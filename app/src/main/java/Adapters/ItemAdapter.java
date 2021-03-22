@@ -26,6 +26,7 @@ public class ItemAdapter extends ArrayAdapter<String> {
         this.itemArrayList = itemArrayList;
     }
 
+    @Override
     public View getView(int position, View view, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
         @SuppressLint("ViewHolder") View rowView = inflater.inflate(R.layout.mylist, null, true);
@@ -41,6 +42,7 @@ public class ItemAdapter extends ArrayAdapter<String> {
         return rowView;
     }
 
+    @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
     }
