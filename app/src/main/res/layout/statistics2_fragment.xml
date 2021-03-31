@@ -1,12 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center">
+    android:gravity="center_vertical"
+    android:id="@+id/fragment2"
+    android:baselineAligned="false"
+    android:descendantFocusability="blocksDescendants"
+    >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="status"
-        android:textSize="30sp"/>
+    <AbsoluteLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="#4B4E6A"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="Accounts"
+                android:textAlignment="center"
+                android:textSize="25dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="25dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginRight="2dp"
+                    android:text="Total:"
+                    android:textSize="18dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="15dp"
+                    android:text="12000 €"
+                    android:textSize="15dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_y="0dp"></LinearLayout>
+
+        <ImageButton
+            android:id="@+id/addItem"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="150dp"
+            android:layout_x="323dp"
+            android:layout_y="124dp"
+            android:src="@drawable/ic_add"
+            android:background="@drawable/button_unfocused_2"
+            android:translationZ="2dp"/>
+
+
+
+        <ListView
+            android:id="@+id/listViewAccount"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_x="1dp"
+            android:layout_y="0dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="15dp"
+            android:paddingLeft="10dp"
+            android:layout_margin="50dp"
+            android:paddingTop="160dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="65dp"/>
+    </AbsoluteLayout>
 </LinearLayout>

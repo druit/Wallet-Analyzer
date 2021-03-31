@@ -13,7 +13,7 @@ import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.helpers.HistoryListView;
 import gr.ict.wallet_analyzer.helpers.ListeningVariable;
 
-public class FullHistoryActivity extends AppCompatActivity {
+public class FullHistoryActivity extends BaseActivity {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
