@@ -9,4 +9,5 @@
     <color name="color3">#6EAFFF</color>
     <color name="colorWhite">#E4E4E4</color>
     <color name="colorBlackTransparent1">#A1000000</color>
+    <color name="colorButtonLight">#17B7FF</color>
 </resources>

@@ -53,6 +53,13 @@
     <string name="location_permission_denied">Η τοποθεσία ακυρώθηκε</string>
     <string name="permission_required_toast">Δικαιώματα τοποθεσίας</string>
     <string name="permission_rationale_location">Τοποθεσία</string>
-
+    <string name="action_portfolio">Χαρτοφύλακας</string>
+    <string name="title_activity_portfolio">Χαρτοφύλακας</string>
+    <string name="tab_text_1">Εξοδολόγιο</string>
+    <string name="tab_text_2">My Account</string>
+    <string name="filter_obj_1">Κατηγορία</string>
+    <string name="filter_obj_2">Μηνιαίο</string>
+    <string name="filter_obj_3">Εβδομαδιαίο</string>
+    <string name="filter_obj_4">Χρόνου</string>
 
 </resources>

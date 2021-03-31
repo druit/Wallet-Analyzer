@@ -1,6 +1,18 @@
 package gr.ict.wallet_analyzer.helpers;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 
 import data_class.History;
 
@@ -44,5 +56,33 @@ public class HistoryArrayList {
         void onChange(ArrayList<History> historyArrayList);
 
         void onChange(History history);
+    }
+
+    public void callBackHistoryArrayList(DatabaseReference baseReference, final FirebaseResultInterface firebaseResultInterface) {
+
+        DatabaseReference declare = baseReference.child("history");
+
+        declare.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+
+                historyArrayList.clear();
+                History history;
+
+                for (DataSnapshot child : children) {
+                    history = child.getValue(History.class);
+                    historyArrayList.add(history);
+                    Collections.sort(historyArrayList);
+                }
+                firebaseResultInterface.onSuccess(historyArrayList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                firebaseResultInterface.onFailed(databaseError.toException());
+            }
+        });
+
     }
 }
