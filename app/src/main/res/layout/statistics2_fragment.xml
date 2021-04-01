@@ -40,15 +40,19 @@
                     android:layout_marginTop="15dp"
                     android:layout_marginRight="2dp"
                     android:text="Total:"
+                    android:textStyle="italic"
                     android:textSize="18dp" />
 
                 <TextView
+                    android:id="@+id/totalBankAccount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="15dp"
-                    android:text="12000 €"
-                    android:textSize="15dp" />
+                    android:text="45.32€"
+                    android:textStyle="italic"
+                    android:textColor="@color/color3"
+                    android:textSize="20sp" />
             </LinearLayout>
 
         </LinearLayout>

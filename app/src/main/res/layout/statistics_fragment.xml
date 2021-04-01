@@ -35,6 +35,16 @@
             android:background="@drawable/button_focus"
             android:gravity="center"
             android:popupBackground="@drawable/spinner_background" />
+
+        <Spinner
+            android:id="@+id/filterChart3"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:visibility="invisible"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/button_focus"
+            android:gravity="center"
+            android:popupBackground="@drawable/spinner_background" />
     </LinearLayout>
 
 

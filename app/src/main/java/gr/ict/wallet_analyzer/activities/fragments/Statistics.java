@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -79,50 +80,20 @@ public class Statistics extends Fragment {
         setOptionsChart();
 
         // Create PieEntry ArrayList
+
         FirebaseResultInterface firebaseResultInterface = new FirebaseResultInterface<ArrayList<History>>() {
             @Override
             public void onSuccess(ArrayList<History> historyArrayList) {
-                for (History history : historyArrayList) {
-                    boolean thereIsCategory = false;
-                    if(categories.size()> 0) {
-                        for (String category : categories) {
-                            if (category.equals(history.getReceipt().getStoreType())) {
-                                thereIsCategory = true;
-                            }
-                        }
-                    }
-                    if(thereIsCategory) {
-                        historyHashMap.put(history.getReceipt().getStoreType(), historyHashMap.get(history.getReceipt().getStoreType()) + history.getReceipt().getTotalPrice());
-                    }else{
-                        historyHashMap.put(history.getReceipt().getStoreType(),history.getReceipt().getTotalPrice());
-                        categories.add(history.getReceipt().getStoreType());
-                    }
 
-                }
+                filterArrayBySelectedSpinner(historyArrayList,"category",null);
+
                 createPieEntries(historyHashMap);
 
                 // PieDataSet
                 createPieDataSet();
 
+                setPieData();
 
-                PieData pieData = new PieData(dataSet);
-                chart.setData(pieData);
-                chart.invalidate(); // refresh
-
-                chart.setCenterText( categories.get(0)+ ": " + historyHashMap.get(categories.get(0)) + "€");
-
-                chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-                    @Override
-                    public void onValueSelected(Entry e, Highlight h) {
-                        PieEntry pe = (PieEntry) e;
-                        chart.setCenterText(pe.getLabel()+": " + e.getY() + "€");
-                    }
-
-                    @Override
-                    public void onNothingSelected() {
-
-                    }
-                });
             }
 
             @Override
@@ -139,9 +110,100 @@ public class Statistics extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
+    private void setPieData() {
+        PieData pieData = new PieData(dataSet);
+        chart.setData(pieData);
+        chart.invalidate(); // refresh
+
+        if(!categories.isEmpty()) {
+            chart.setCenterText(categories.get(0) + ": " + historyHashMap.get(categories.get(0)) + "€");
+        }else{
+            chart.setCenterText("Category: " + "0.0 €");
+        }
+
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                PieEntry pe = (PieEntry) e;
+                chart.setCenterText(pe.getLabel()+": " + e.getY() + "€");
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
+    }
+
+    private void filterArrayBySelectedSpinner(ArrayList<History> historyArrayList, String type,String selected) {
+        for (History history : historyArrayList) {
+            boolean thereIsCategory = false;
+            boolean filterFind = false;
+            switch (type){
+                case "category":
+                    thereIsCategory = checkThereIsCategorie(history);
+                    break;
+                case "year":
+                    if(history.getReceipt().getDate().toString().contains(selected)){
+                        thereIsCategory = checkThereIsCategorie(history);
+                        filterFind = true;
+                    }
+                    break;
+                case "week":
+                    int currentDate = new Date().getYear();
+                    String d1 = String.valueOf(history.getReceipt().getDate().getDate());
+                    String d2 = String.valueOf(history.getReceipt().getDate().getMonth()+1);
+                    String receiptDate;
+                    if(currentDate == history.getReceipt().getDate().getYear()){
+                        if(d1.length() == 1){
+                            d1 = "0"+ d1;
+                        }
+                        if(d2.length() == 1){
+                            d2 = "0"+ d2;
+                        }
+                        receiptDate = d1 + "/" + d2;
+
+                        if(receiptDate.contains(selected)){
+                            thereIsCategory = checkThereIsCategorie(history);
+                            filterFind = true;
+                        }
+                    }
+                    break;
+                case "month":
+
+                    break;
+                default:
+                    break;
+            }
+
+            if(thereIsCategory) {
+                historyHashMap.put(history.getReceipt().getStoreType(), historyHashMap.get(history.getReceipt().getStoreType()) + history.getReceipt().getTotalPrice());
+            }else if (type.equals("category") || filterFind){
+                historyHashMap.put(history.getReceipt().getStoreType(),history.getReceipt().getTotalPrice());
+                categories.add(history.getReceipt().getStoreType());
+            }
+
+        }
+
+
+    }
+
+    private boolean checkThereIsCategorie(History history) {
+        if(categories.size()> 0) {
+            for (String category : categories) {
+                if (category.equals(history.getReceipt().getStoreType())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void createFilterCategory() {
         Spinner spinner1 =  getActivity().findViewById(R.id.filterChart1);
         final Spinner spinner2 =  getActivity().findViewById(R.id.filterChart2);
+        final Spinner spinner3 =  getActivity().findViewById(R.id.filterChart3);
+
         DateFormat dateFormat = new SimpleDateFormat("MM");
         Date date = new Date();
         String items[] = {
@@ -154,18 +216,20 @@ public class Statistics extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 spinner2.setVisibility(View.INVISIBLE);
+                spinner3.setVisibility(View.INVISIBLE);
 
                 switch(position){
                     case 0 :
                         setFilter("month");
                         spinner2.setVisibility(View.VISIBLE);
+                        spinner3.setVisibility(View.VISIBLE);
                         break;
                     case 1 :
                         setFilter("week");
                         spinner2.setVisibility(View.VISIBLE);
                         break;
                     case 2 :
-
+                        setFilter("category");
                         break;
                     case 3 :
                         setFilter("year");
@@ -196,13 +260,15 @@ public class Statistics extends Fragment {
         ArrayAdapter spinnerAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, items);
         //set the spinners adapter to the previously created one.
         spinner1.setAdapter(spinnerAdapter);
-        spinner1.setSelection(Integer.parseInt(dateFormat.format(date)) - 1);
+//        spinner1.setSelection(Integer.parseInt(dateFormat.format(date)) - 1);
+        spinner1.setSelection(2,true);
     }
 
-    private void setFilter(String type) {
+    private void setFilter(final String type) {
         String[] items={};
         String[] yearsOrDates = {};
         Spinner spinner2 =  getActivity().findViewById(R.id.filterChart2);
+        Spinner spinner3 = getActivity().findViewById(R.id.filterChart3);
         DateFormat dateFormat = new SimpleDateFormat("MM");
         Date date = new Date();
         switch (type){
@@ -225,22 +291,18 @@ public class Statistics extends Fragment {
                 items = yearsOrDates;
                 break;
             default:
+                callBackPieDataChart(type,null);
                 break;
         }
 
 
+        final String[] finalItems = items;
         spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
 //                ArrayList<History> historyMonthList = getHistoryListByMonth(position + 1);
 
-                // clear graph first
-//                clearChart();
-
-                // add graph values
-//                for (History history : historyMonthList) {
-//                    updateGraph(history);
-//                }
+                callBackPieDataChart(type,finalItems[position]);
             }
 
             @Override
@@ -249,12 +311,71 @@ public class Statistics extends Fragment {
             }
         });
 
+        final String[] finalItems2 = yearsOrDates;
+        spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        yearsOrDates = new String[]{getPreviousYearOrDay(0,"year"),getPreviousYearOrDay(-1,"year"),getPreviousYearOrDay(-2,"year"),getPreviousYearOrDay(-3,"year"),getPreviousYearOrDay(-4,"year"),getPreviousYearOrDay(-5,"year"),getPreviousYearOrDay(-6,"year"),getPreviousYearOrDay(-7,"year"),getPreviousYearOrDay(-8,"year"), getPreviousYearOrDay(-9,"year"), getPreviousYearOrDay(-10,"year")};
+
+        ArrayAdapter spinnerAdapter2 = new ArrayAdapter<>(getContext(), R.layout.spinner_item, yearsOrDates);
+        //set the spinners adapter to the previously created one.
+        spinner3.setAdapter(spinnerAdapter2);
+        spinner3.setSelection(0,true);
+
         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
         //There are multiple variations of this, but this is the basic variant.
         ArrayAdapter spinnerAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, items);
         //set the spinners adapter to the previously created one.
         spinner2.setAdapter(spinnerAdapter);
-        spinner2.setSelection(Integer.parseInt(dateFormat.format(date)) - 1);
+        if(type.equals("month")){
+            spinner2.setSelection(Integer.parseInt(dateFormat.format(date)) - 1,true);
+        }else{
+            spinner2.setSelection(0,true);
+        }
+
+    }
+
+    private void callBackPieDataChart(final String type, final String item) {
+        FirebaseResultInterface firebaseResultInterface = new FirebaseResultInterface<ArrayList<History>>() {
+
+            @Override
+            public void onSuccess(ArrayList<History> historyArrayList) {
+                clearChart();
+                categories.clear();
+                filterArrayBySelectedSpinner(historyArrayList,type,item);
+                //createEntries
+                createPieEntries(historyHashMap);
+                // PieDataSet
+                createPieDataSet();
+                //setData on Pie
+                setPieData();
+                dataSet.notifyDataSetChanged();
+                chart.notifyDataSetChanged();
+                chart.invalidate();
+            }
+
+            @Override
+            public void onFailed(Throwable error) {
+
+            }
+        };
+
+        // clear graph first
+//                clearChart();
+
+        // add graph values
+//                for (History history : historyMonthList) {
+//                    updateGraph(history);
+//                }
+        historyArrayList.callBackHistoryArrayList(baseReference,firebaseResultInterface);
     }
 
     private String getPreviousYearOrDay(int i, String type) {
@@ -278,6 +399,7 @@ public class Statistics extends Fragment {
 
     private void clearChart() {
         dataSet.clear();
+        entries.clear();
 
         dataSet.notifyDataSetChanged();
         chart.notifyDataSetChanged();
@@ -298,8 +420,15 @@ public class Statistics extends Fragment {
     }
 
     private void createPieEntries(HashMap<String, Double> historyHashMap) {
-        for (String category : categories) {
-            entries.add(new PieEntry(historyHashMap.get(category).floatValue(),category));
+        System.out.println("CATEGORIES: "+ categories);
+        if(categories.size()>0) {
+            for (String category : categories) {
+                entries.add(new PieEntry(historyHashMap.get(category).floatValue(), category));
+            }
+            chart.getLegend().setEnabled(true);
+        }else{
+            entries.add(new PieEntry(0f, ""));
+            chart.getLegend().setEnabled(false);
         }
 
 //        entries.add(new PieEntry(18,"Green"));
