@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import data_class.History;
@@ -35,7 +36,9 @@ public class MyListAdapter extends ArrayAdapter<String> {
         TextView subtitleText = rowView.findViewById(R.id.subtitle);
 
         titleText.setText(history.getReceipt().getStoreName());
-        subtitleText.setText(history.getReceipt().getTotalPrice() + "€");
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
+        subtitleText.setText( Float.valueOf(decimalFormat.format(history.getReceipt().getTotalPrice())) + " €");
 
         return rowView;
     }

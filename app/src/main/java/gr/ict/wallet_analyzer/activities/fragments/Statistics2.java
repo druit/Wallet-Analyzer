@@ -67,6 +67,7 @@ public class Statistics2 extends Fragment {
 
 
                 bankEditPopup.ShowBankPopup(false,null,baseReference);
+                bankEditPopup.setText("SAVE");
 //                openPopup();
             }
         });
