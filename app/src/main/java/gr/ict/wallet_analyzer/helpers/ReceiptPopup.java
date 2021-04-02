@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -86,7 +87,8 @@ public class ReceiptPopup {
         storeNameTextView.setText(receipt.getStoreName());
 
         receiptPriceTextView = popupView.findViewById(R.id.price_text_view);
-        receiptPriceTextView.setText(receipt.getTotalPrice() + "€");
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        receiptPriceTextView.setText(Float.valueOf(decimalFormat.format(receipt.getTotalPrice())) + " €");
 
         // set receipt location
         addressTextView = popupView.findViewById(R.id.address_text_view);

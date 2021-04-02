@@ -117,6 +117,12 @@ public class BankEditPopup {
         }
     }
 
+    public void setText(String choice){
+        if(choice.contains("SAVE")){
+            actionBtn.setText("ADD");
+        }
+    }
+
 
     public void callBackMyAccount(DatabaseReference baseReference, final FirebaseResultInterface firebaseResultInterface) {
 

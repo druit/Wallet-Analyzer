@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,8 +21,11 @@ import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -62,6 +67,7 @@ public class Statistics2 extends Fragment {
 
 
                 bankEditPopup.ShowBankPopup(false,null,baseReference);
+                bankEditPopup.setText("SAVE");
 //                openPopup();
             }
         });
@@ -69,6 +75,7 @@ public class Statistics2 extends Fragment {
         Switch mSwitch = getActivity().findViewById(R.id.switch1);
         ImageButton edit = getActivity().findViewById(R.id.bank_editBtn);
         ImageButton delete = getActivity().findViewById(R.id.bank_deleteBtn);
+        final TextView totalBankAccount = getActivity().findViewById(R.id.totalBankAccount);
 
 
 //        BankAccount bankAccount1 = new BankAccount("MyBank1","Credit Card",800,0);
@@ -80,6 +87,26 @@ public class Statistics2 extends Fragment {
 //        final String id = baseReference.push().getKey();
         DatabaseReference declare = baseReference.child("bankAccounts");
 //
+        declare.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                BankAccount bankAccount;
+                double totalSalary = 0;
+                for (DataSnapshot child : children) {
+                    bankAccount = child.getValue(BankAccount.class);
+                    if(bankAccount.isActive() == 1){
+                        totalSalary += bankAccount.getSalary();
+                    }
+                }
+                totalBankAccount.setText(String.valueOf(totalSalary) + " €");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 //        declare.setValue(bankAccount1);
 //        declare.addValueEventListener(new ValueEventListener() {
 //            @Override
@@ -111,7 +138,14 @@ public class Statistics2 extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-//                Toast.makeText(getActivity(),mTitle[i],Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Toast.makeText(getActivity(),"LONG",Toast.LENGTH_SHORT).show();
+                        return false;
                     }
                 });
             }

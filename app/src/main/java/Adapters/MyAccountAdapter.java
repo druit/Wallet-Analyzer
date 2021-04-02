@@ -81,6 +81,7 @@ public class MyAccountAdapter extends ArrayAdapter<BankAccount> {
 
         // set Buttons edit/delete
         holder.edit = row.findViewById(R.id.bank_editBtn);
+
         holder.delete = row.findViewById(R.id.bank_deleteBtn);
 
         holder.delete.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +97,7 @@ public class MyAccountAdapter extends ArrayAdapter<BankAccount> {
             @Override
             public void onClick(View view) {
                 bankEditPopup.ShowBankPopup(true,myAccount.get(position),baseReference);
-                Toast.makeText(activity,mySalary.getText().toString(),Toast.LENGTH_SHORT).show();
+//                Toast.makeText(activity,mySalary.getText().toString(),Toast.LENGTH_SHORT).show();
                 bankEditPopup.setItemBankPopup((String) myTitle.getText(), (String) myDescription.getText(), (String) mySalary.getText(),"EDIT");
             }
         });
