@@ -132,22 +132,24 @@ public class Statistics2 extends Fragment {
             @Override
             public void onSuccess(ArrayList<BankAccount> data) {
                 myAccount = data;
-                final MyAccountAdapter adapter = new MyAccountAdapter(getContext(),myAccount, getActivity());
-                listView.setAdapter(adapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(getActivity() != null) {
+                    MyAccountAdapter adapter = new MyAccountAdapter(getContext(), myAccount, getActivity());
+                    listView.setAdapter(adapter);
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
 
-                    }
-                });
-                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        Toast.makeText(getActivity(),"LONG",Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-                });
+                        }
+                    });
+                    listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            Toast.makeText(getActivity(), "LONG", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                    });
+                }
             }
 
             @Override

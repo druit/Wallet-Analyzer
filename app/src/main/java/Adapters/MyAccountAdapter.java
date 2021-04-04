@@ -40,8 +40,9 @@ public class MyAccountAdapter extends ArrayAdapter<BankAccount> {
     private String uid = user.getUid();
     DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference().child("users").child(uid);
 
-    public MyAccountAdapter(Context c, List<BankAccount> myAccount, Activity activity){
-        super(c, R.layout.my_account_row,R.id.mTitleView,myAccount);
+    public MyAccountAdapter(@NonNull Context c,@NonNull List<BankAccount> myAccount,@NonNull Activity activity){
+
+        super(c, R.layout.my_account_row, myAccount);
         this.context = c;
         this.myAccount = myAccount;
         this.activity = activity;
@@ -55,7 +56,7 @@ public class MyAccountAdapter extends ArrayAdapter<BankAccount> {
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = inflater.inflate(R.layout.my_account_row,parent,false);
         final BankEditPopup bankEditPopup = new BankEditPopup(activity.getBaseContext(), activity);
 

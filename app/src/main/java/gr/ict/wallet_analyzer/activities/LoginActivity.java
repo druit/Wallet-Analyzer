@@ -83,30 +83,33 @@ public class LoginActivity extends BaseActivity {
 
     private void showLoginFailed() {
         Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+        loadingProgressBar.setVisibility(View.INVISIBLE);
     }
 
     private void signIn(String email, String password) {
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty((password))) {
             Toast.makeText(LoginActivity.this, "Field are empty.", Toast.LENGTH_LONG).show();
-        }
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (!task.isSuccessful()) {
-                    showLoginFailed();
-                } else {
-                    FirebaseUser user = mAuth.getCurrentUser();
-
-                    if (user != null && user.isEmailVerified()) {
-                        Log.d("MY_USER:", user.getUid());
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        updateUiWithUser(user);
+            loadingProgressBar.setVisibility(View.INVISIBLE);
+        }else {
+            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (!task.isSuccessful()) {
+                        showLoginFailed();
                     } else {
-                        Toast.makeText(LoginActivity.this, "Please verify your email.", Toast.LENGTH_LONG).show();
+                        FirebaseUser user = mAuth.getCurrentUser();
+
+                        if (user != null && user.isEmailVerified()) {
+                            Log.d("MY_USER:", user.getUid());
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            updateUiWithUser(user);
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Please verify your email.", Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
