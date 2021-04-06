@@ -65,6 +65,7 @@ import data_class.Receipt;
 import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
 import gr.ict.wallet_analyzer.R;
+import gr.ict.wallet_analyzer.helpers.BankEditPopup;
 import gr.ict.wallet_analyzer.helpers.BlurEffect;
 import gr.ict.wallet_analyzer.helpers.HistoryListView;
 import gr.ict.wallet_analyzer.helpers.ListeningVariable;
@@ -91,6 +92,7 @@ public class MainActivity extends BaseActivity {
     private String monthString = new SimpleDateFormat("MM").format(new Date());
     private boolean isReceiptEditPressed = false;
     private MyListAdapter mainAdapter;
+    private BankEditPopup bankEditPopup = new BankEditPopup();
 
 
     @Override
@@ -132,6 +134,8 @@ public class MainActivity extends BaseActivity {
         setGoal();
 
         setFullHistory();
+
+        bankEditPopup.checkSalary(baseReference);
     }
 
     private void setMenuOpener() {

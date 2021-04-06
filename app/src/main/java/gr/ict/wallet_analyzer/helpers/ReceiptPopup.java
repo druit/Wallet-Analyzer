@@ -67,6 +67,7 @@ public class ReceiptPopup {
 
         this.itemPosition = itemPosition;
     }
+    public ReceiptPopup() {}
 
     public void showReceiptPopup() {
         final History showingHistory = historyArrayList.get(itemPosition);

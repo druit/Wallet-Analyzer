@@ -19,12 +19,16 @@ import androidx.fragment.app.Fragment;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
@@ -37,6 +41,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.json.JSONException;
+
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -58,7 +65,7 @@ import static com.github.mikephil.charting.animation.Easing.Linear;
 public class Statistics extends Fragment {
 
     LineChart lineChart;
-    private LineDataSet lineDataSet1,lineDataSet2;
+    private LineDataSet lineDataSet1,lineDataSet2,lineDataSetFormat;
 
     private PieChart chart;
     private PieDataSet dataSet;
@@ -164,6 +171,7 @@ public class Statistics extends Fragment {
         List<ILineDataSet> lineDataSet = new ArrayList<ILineDataSet>();
 
         lineDataSet1 = new LineDataSet(entries, "Income"); // add entries to dataset
+
         lineDataSet2 = new LineDataSet(entries2, "Expenses");
 
 
@@ -209,8 +217,8 @@ public class Statistics extends Fragment {
         lineChart.setData(lineData);
         lineChart.invalidate(); // refresh
 
-        lineChart.getDescription().setEnabled(false);
-        lineChart.getLegend().setEnabled(false);
+        lineChart.getDescription().setEnabled(true);
+        lineChart.getLegend().setEnabled(true);
 
         // hide values in left and right side
         lineChart.getAxisRight().setDrawLabels(false);
@@ -238,10 +246,11 @@ public class Statistics extends Fragment {
         lineChart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
         lineChart.getAxisLeft().setTextColor(Color.argb(50, 255, 255, 255));
 
-        lineChart.getAxisLeft().setAxisMinimum(0);
-        lineChart.getXAxis().setAxisMaximum(5);
-        lineChart.getXAxis().setAxisMinimum(0);
-        lineChart.getXAxis().setLabelCount(30, true);
+//        lineChart.getAxisLeft().setAxisMinimum(0);
+//        lineChart.getXAxis().setAxisMaximum(5);
+//        lineChart.getXAxis().setAxisMinimum(0);
+
+//        lineChart.getXAxis().setLabelCount(5, true);
         lineChart.animateXY(800,1000, Linear );
 
     }
