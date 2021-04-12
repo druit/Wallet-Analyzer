@@ -361,8 +361,8 @@ public class Statistics extends Fragment {
                 }
                 if(Integer.valueOf(pos) == previousReceiptMonth){
                     int index = Integer.valueOf(entries.size()-1);
-                    entries1.get(previousReceiptMonth).setY((float)localSalary);
-                    entries2.get(previousReceiptMonth).setY((float) totalExpenses);
+                    entries1.get(entries.size()-index).setY((float)localSalary);
+                    entries2.get(entries.size()-index).setY((float) totalExpenses);
                 } else {
                     entries1.add(new Entry(Integer.valueOf(pos), (float)localSalary));
                     entries2.add(new Entry(Integer.valueOf(pos),  (float) totalExpenses));
