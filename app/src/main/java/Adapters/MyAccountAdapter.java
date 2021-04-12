@@ -22,9 +22,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import data_class.BankAccount;
+import data_class.Salary;
 import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.activities.fragments.Statistics2;
 import gr.ict.wallet_analyzer.helpers.BankEditPopup;
@@ -97,9 +99,10 @@ public class MyAccountAdapter extends ArrayAdapter<BankAccount> {
         holder.edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bankEditPopup.ShowBankPopup(true,myAccount.get(position),baseReference);
+                bankEditPopup.ShowBankPopup(true,myAccount.get(position),baseReference,myAccount);
 //                Toast.makeText(activity,mySalary.getText().toString(),Toast.LENGTH_SHORT).show();
-                bankEditPopup.setItemBankPopup((String) myTitle.getText(), (String) myDescription.getText(), (String) mySalary.getText(),"EDIT");
+                ArrayList<Salary> salary = myAccount.get(position).getSalaryArrayList();
+                bankEditPopup.setItemBankPopup(myAccount.get(position).isSalaryBank() ,(String) myTitle.getText(), (String) myDescription.getText(),(String) mySalary.getText(),"EDIT",salary.get(salary.size()-1).getLastUpdate());
             }
         });
 

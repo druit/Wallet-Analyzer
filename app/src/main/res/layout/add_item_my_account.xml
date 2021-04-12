@@ -7,7 +7,7 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/listview_background"
@@ -30,7 +30,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="20dp"
-            android:text="Bank Account"
+            android:text="@string/gen_bank_account"
             android:textAlignment="textStart"
             android:textColor="#E1E1E1"
             android:textSize="20sp" />
@@ -53,7 +53,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="20dp"
-            android:text="Description"
+            android:text="@string/gen_description"
             android:textAlignment="textStart"
             android:textColor="#E1E1E1"
             android:textSize="20sp" />
@@ -76,7 +76,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:text="Salary"
+            android:text="@string/gen_salary"
             android:textAlignment="textStart"
             android:textColor="#E1E1E1"
             android:textSize="20sp" />
@@ -88,10 +88,53 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
             android:autofillHints="Give your salary"
             android:inputType="numberDecimal"
             android:textColor="@color/colorWhite" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAlignment="center"
+            android:padding="10dp"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/date_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gen_date"
+                    android:textColor="#E1E1E1"/>
+
+                <TextView
+                    android:id="@+id/date_text_bank_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="21/3/2020"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/color2" />
+            </LinearLayout>
+            <CheckBox
+                android:id="@+id/mainBankCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="55dp"
+                android:layout_weight="1"
+                android:textColor="@color/color2"
+                android:text="@string/gen_main_bank"
+                android:buttonTint="@color/colorPrimary"/>
+
+
+        </LinearLayout>
+
+
 
 
         <Button

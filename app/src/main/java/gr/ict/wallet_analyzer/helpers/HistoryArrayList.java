@@ -73,7 +73,7 @@ public class HistoryArrayList {
                 for (DataSnapshot child : children) {
                     history = child.getValue(History.class);
                     historyArrayList.add(history);
-                    Collections.sort(historyArrayList);
+                    Collections.sort(historyArrayList,Collections.<History>reverseOrder());
                 }
                 firebaseResultInterface.onSuccess(historyArrayList);
             }

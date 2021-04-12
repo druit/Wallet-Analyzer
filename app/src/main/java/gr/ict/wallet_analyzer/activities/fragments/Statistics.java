@@ -3,6 +3,7 @@ package gr.ict.wallet_analyzer.activities.fragments;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,21 +11,28 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
@@ -32,24 +40,40 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.google.android.gms.common.util.ArrayUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+
+import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import Adapters.MyAccountAdapter;
+import data_class.BankAccount;
 import data_class.History;
+import data_class.Receipt;
+import data_class.Salary;
 import data_class.YourData;
 import gr.ict.wallet_analyzer.R;
+import gr.ict.wallet_analyzer.helpers.BankEditPopup;
 import gr.ict.wallet_analyzer.helpers.FirebaseResultInterface;
 import gr.ict.wallet_analyzer.helpers.HistoryArrayList;
 
@@ -57,25 +81,44 @@ import static com.github.mikephil.charting.animation.Easing.Linear;
 
 public class Statistics extends Fragment {
 
-    LineChart lineChart;
-    private LineDataSet lineDataSet1,lineDataSet2;
+    //Line Chart Values
+    private LineChart lineChart;
+    private LineDataSet lineDataSet1,lineDataSet2,lineDataSetFormat;
+    private  List<ILineDataSet> lineDataSet = new ArrayList<>();
+    final List<Entry> entries1 = new ArrayList<>();
+    final List<Entry> entries2 = new ArrayList<>();
+    private ArrayList<String> xEntrys = new ArrayList<>();
+    private String[] xData = {};
+    private String lastType = "category";
 
+    //Pie Chart Values
     private PieChart chart;
     private PieDataSet dataSet;
     final List<PieEntry> entries = new ArrayList<>();
-    private HistoryArrayList historyArrayList = new HistoryArrayList();
-    private HashMap<String, Double> historyHashMap = new HashMap();
-    private List<String> categories = new ArrayList<>();
-
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    FirebaseUser user = mAuth.getCurrentUser();
-    private String uid = user.getUid();
-    DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference()
-            .child("users").child(uid);
+    //DATE format
     DateFormat dateFormatMonths = new SimpleDateFormat("MM");
     Date currentDate = new Date();
     String positionMonths = String.valueOf(Integer.parseInt(dateFormatMonths.format(currentDate)) - 1);
     int lastYearSelectedInMonths =  new Date().getYear();
+
+    Calendar c = Calendar.getInstance();
+    int currentYear =  c.get(Calendar.YEAR);
+    int lastMonthSelected = Integer.valueOf(c.get(Calendar.MONTH)+1);
+
+    //HISTORY Values
+    private HistoryArrayList historyArrayList = new HistoryArrayList();
+    private HashMap<String, Double> historyHashMap = new HashMap();
+    private List<String> categories = new ArrayList<>();
+    private ArrayList<Receipt>  receiptArrayList = new ArrayList<>();
+
+    //FIREBASE Connections
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseUser user = mAuth.getCurrentUser();
+    private String uid = user.getUid();
+    DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference().child("users").child(uid);
+    BankAccount selectedBankAccount = new BankAccount();
+    ArrayList<Salary> salaryArrayList = new ArrayList<>();
+    private BankEditPopup bankEditPopup = new BankEditPopup();
 
     @SuppressLint("ResourceType")
     @Override
@@ -91,81 +134,150 @@ public class Statistics extends Fragment {
         // setFilter per category
         createFilterCategory();
 
-        // filter for months
-//        setFilterMonths();
-        setLineChart();
-        // set Chart options
+        // set Pie Chart options
         setOptionsChart();
+        //set Line Chart options
+        setXDatas();
+        setOptionLineChart();
 
-        // Create PieEntry ArrayList
-
+        // START CREATE CHARTS
         FirebaseResultInterface firebaseResultInterface = new FirebaseResultInterface<ArrayList<History>>() {
             @Override
             public void onSuccess(ArrayList<History> historyArrayList) {
+
+                //get bank account with salary
+                FirebaseResultInterface firebaseResultInterface2 = new FirebaseResultInterface<ArrayList<Salary>>() {
+
+                    @Override
+                    public void onSuccess(ArrayList<Salary> data) {
+                        salaryArrayList = data;
+                    }
+
+                    @Override
+                    public void onFailed(Throwable error) {
+
+                    }
+                };
+
+                bankEditPopup.getSalaryList(baseReference,firebaseResultInterface2);
 
                 filterArrayBySelectedSpinner(historyArrayList,"category",null);
 
                 createPieEntries(historyHashMap);
 
+                // set Line Graph
+                setLineChart(salaryArrayList);
+
+
                 // PieDataSet
                 createPieDataSet();
 
                 setPieData();
-
             }
 
             @Override
-            public void onFailed(Throwable error) {
-
-            }
+            public void onFailed(Throwable error) { }
         };
         historyArrayList.callBackHistoryArrayList(baseReference,firebaseResultInterface);
-
-
-
-
-
         super.onViewCreated(view, savedInstanceState);
     }
 
-    private void setLineChart() {
-        lineChart = getActivity().findViewById(R.id.lineChart);
 
 
-        YourData[] dataObjects = {
-                new YourData(0, 0),
-                new YourData(1, 1500),
-                new YourData(2, 1300),
-                new YourData(3, 1100),
-                new YourData(4, 1000),
-                new YourData(5, 800)
-        };
-        YourData[] dataObjects2 = {
-                new YourData(0, 0),
-                new YourData(1, 0),
-                new YourData(2, 200),
-                new YourData(3, 400),
-                new YourData(4, 500),
-                new YourData(5, 700)
-        };
+    private void setLineChart(ArrayList<Salary> salaryList) {
+//        ArrayList<Salary> salaryList = new ArrayList<>();
+//        salaryList = account.getSalaryArrayList();
+        double totalIncome = 50;
+        double totalExpenses = 0;
 
-        List<Entry> entries = new ArrayList<>();
-        List<Entry> entries2 = new ArrayList<>();
-
-        for (YourData data : dataObjects) {
-            // turn your data into Entry objects
-            entries.add(new Entry(data.getX(), data.getY()));
-        }
-        for (YourData data : dataObjects2) {
-            // turn your data into Entry objects
-            entries2.add(new Entry(data.getX(), data.getY()));
+        for (Salary salary: salaryList) {
+            if (salary.getLastUpdate().getYear() == lastYearSelectedInMonths &&  Integer.valueOf(salary.getLastUpdate().getMonth()+1) == lastMonthSelected){
+                totalIncome = salary.getCurrentSalary();
+            }
         }
 
-        List<ILineDataSet> lineDataSet = new ArrayList<ILineDataSet>();
 
-        lineDataSet1 = new LineDataSet(entries, "Income"); // add entries to dataset
-        lineDataSet2 = new LineDataSet(entries2, "Expenses");
 
+
+
+
+        int previousReceiptMonth = 0;
+
+
+        if(!receiptArrayList.isEmpty()){
+            entries1.add(new Entry(0, (float) totalIncome));
+            entries2.add(new Entry(0, (float) totalExpenses));
+        }
+        for (Receipt receipt :receiptArrayList) {
+            totalIncome -= receipt.getTotalPrice();
+            totalExpenses += receipt.getTotalPrice();
+
+            previousReceiptMonth = createLineEntries(receipt,previousReceiptMonth,totalIncome,totalExpenses,lastType);
+        }
+
+
+//        for (YourData data : dataObjects2) {
+//            // turn your data into Entry objects
+//            entries2.add(new Entry(data.getX(), data.getY()));
+//        }
+
+        String incomes = getContext().getResources().getString(R.string.gen_income);
+        String expenses = getContext().getResources().getString(R.string.gen_expenses);
+
+        lineDataSet1 = new LineDataSet(entries1, incomes); // add entries to dataset
+
+        lineDataSet2 = new LineDataSet(entries2, expenses);
+
+        setLineDataSetValueFormat();
+
+        lineDataSet.add(lineDataSet1);
+        lineDataSet.add(lineDataSet2);
+
+        LineData lineData = new LineData(lineDataSet);
+        if(!categories.isEmpty()) {
+            lineData.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                    if (value > 0) {
+                        return super.getFormattedValue(Float.parseFloat(value + " €"));
+                    } else {
+                        return "";
+                    }
+                }
+            });
+
+            XAxis xAxis = lineChart.getXAxis();
+//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setGranularity(1f);
+            xAxis.setGranularityEnabled(true);
+            xAxis.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getAxisLabel(float value, AxisBase axis) {
+                    if(value> 0 && xData.length > value) return xData[(int) value]; // xVal is a string array
+                    else return "";
+                }
+            });
+        }
+        lineChart.setData(lineData);
+//        lineChart.invalidate(); // refresh
+    }
+
+    // FORMAT VALUES IN LINE CHART
+    private void setLineDataSetValueFormat() {
+
+        lineDataSet1.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return super.getFormattedValue(Float.parseFloat(value + " €"));
+            }
+        });
+
+        lineDataSet2.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return super.getFormattedValue(Float.parseFloat(value + " €"));
+            }
+        });
 
 
         // make line curvy
@@ -201,20 +313,94 @@ public class Statistics extends Fragment {
         lineDataSet2.setColor(Color.RED);
         // values text color
         lineDataSet2.setValueTextColor(Color.rgb(255, 255, 255));
+    }
 
-        lineDataSet.add(lineDataSet1);
-        lineDataSet.add(lineDataSet2);
+    // X data in graph (labels) LINE CHART
+    private void setXDatas() {
+        xEntrys.clear();
+        for(int i = 1; i < xData.length; i++){
+            xEntrys.add(xData[i]);
+        }
+    }
 
-        LineData lineData = new LineData(lineDataSet);
-        lineChart.setData(lineData);
-        lineChart.invalidate(); // refresh
+    //ENTRIES LINE CHART
+    private int createLineEntries(Receipt receipt,int previousReceiptMonth,double localSalary,double totalExpenses,String type) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        switch (type){
+            case "category" :
+            case "year" :
+                if(Integer.valueOf(receipt.getDate().getMonth()+1) == previousReceiptMonth){
+                    int index = Integer.valueOf(entries.size()-1);
+                    String value = decimalFormat.format(localSalary);
+                    entries1.get(entries.size()-index).setY((float)localSalary);
 
-        lineChart.getDescription().setEnabled(false);
-        lineChart.getLegend().setEnabled(false);
+                    entries2.get(entries.size()-index).setY((float)totalExpenses);
+                } else {
+                    entries1.add(new Entry(Integer.valueOf(receipt.getDate().getMonth() + 1), (float) localSalary));
+                    entries2.add(new Entry(Integer.valueOf(receipt.getDate().getMonth() + 1), (float) totalExpenses));
+                    previousReceiptMonth = Integer.valueOf(receipt.getDate().getMonth()+1);
+                }
+                break;
+            case "month" :
+                if(Integer.valueOf(receipt.getDate().getDate()) == previousReceiptMonth){
+                    int index = Integer.valueOf(entries.size()-1);
+                    entries1.get(entries.size()-index).setY((float)localSalary);
+                    entries2.get(entries.size()-index).setY((float) totalExpenses);
+                } else {
+                    entries1.add(new Entry(Integer.valueOf(receipt.getDate().getDate()), (float)localSalary));
+                    entries2.add(new Entry(Integer.valueOf(receipt.getDate().getDate()),  (float) totalExpenses));
+                    previousReceiptMonth = Integer.valueOf(receipt.getDate().getDate());
+                }
+                break;
+            case "week" :
+                int pos = 0;
+                for(int i = 0; i< xData.length; i++){
+                    if( xData[i].contains(String.valueOf(receipt.getDate().getDate()))){
+                        pos = i;
+                    }
+                }
+                if(Integer.valueOf(pos) == previousReceiptMonth){
+                    int index = Integer.valueOf(entries.size()-1);
+                    entries1.get(entries.size()-index).setY((float)localSalary);
+                    entries2.get(entries.size()-index).setY((float) totalExpenses);
+                } else {
+                    entries1.add(new Entry(Integer.valueOf(pos), (float)localSalary));
+                    entries2.add(new Entry(Integer.valueOf(pos),  (float) totalExpenses));
+                    previousReceiptMonth = Integer.valueOf(pos);
+                }
+                break;
+            default:
+                break;
+
+        }
+
+        return previousReceiptMonth;
+    }
+
+    //OPTIONS LINE CHART
+    private void setOptionLineChart() {
+        lineChart = getActivity().findViewById(R.id.lineChart);
+        lineChart.getDescription().setEnabled(true);
+        String contextString;
+        Description description = new Description();
+        switch(lastType){
+            case "year":
+                contextString = getContext().getResources().getString(R.string.filter_obj_4);
+                break;
+            case "week":
+                contextString = getContext().getResources().getString(R.string.filter_obj_3);
+                break;
+            default:
+                contextString = getContext().getResources().getString(R.string.filter_obj_2);
+                break;
+        }
+        description.setText(contextString);
+        lineChart.setDescription(description);
+        lineChart.getLegend().setEnabled(true);
 
         // hide values in left and right side
         lineChart.getAxisRight().setDrawLabels(false);
-//        chart.getAxisLeft().setDrawLabels(false);
+        lineChart.getAxisLeft().setDrawLabels(false);
 
         // no zoom
         lineChart.setScaleEnabled(false);
@@ -234,16 +420,17 @@ public class Statistics extends Fragment {
         lineChart.getAxisLeft().setAxisLineColor(R.color.colorButton);
         lineChart.getAxisRight().setAxisLineColor(R.color.colorButton);
 
+
         // text color of labels in x axis
         lineChart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
         lineChart.getAxisLeft().setTextColor(Color.argb(50, 255, 255, 255));
 
-        lineChart.getAxisLeft().setAxisMinimum(0);
-        lineChart.getXAxis().setAxisMaximum(5);
-        lineChart.getXAxis().setAxisMinimum(0);
-        lineChart.getXAxis().setLabelCount(30, true);
-        lineChart.animateXY(800,1000, Linear );
+//        lineChart.getAxisLeft().setAxisMinimum(0);
+//        lineChart.getXAxis().setAxisMaximum(5);
+//        lineChart.getXAxis().setAxisMinimum(0);
 
+//        lineChart.getXAxis().setLabelCount(5, true);
+        lineChart.animateXY(300,300 );
     }
 
     private void setPieData() {
@@ -254,7 +441,7 @@ public class Statistics extends Fragment {
         if(!categories.isEmpty()) {
             DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-            chart.setCenterText(categories.get(0) + ": " + Float.valueOf(decimalFormat.format(historyHashMap.get(categories.get(0)))) + "€");
+            chart.setCenterText(categories.get(0) + ": " + decimalFormat.format(historyHashMap.get(categories.get(0))) + "€");
         }else{
             chart.setCenterText("Category: " + "0.0 €");
         }
@@ -277,6 +464,7 @@ public class Statistics extends Fragment {
         for (History history : historyArrayList) {
             boolean thereIsCategory = false;
             boolean filterFind = false;
+            boolean filterFindForLine = false;
             switch (type){
                 case "category":
                     thereIsCategory = checkThereIsCategorie(history);
@@ -293,11 +481,19 @@ public class Statistics extends Fragment {
                     String d2 = String.valueOf(history.getReceipt().getDate().getMonth()+1);
                     String receiptDate;
 
+                    int firstDay = Integer.valueOf(getPreviousYearOrDay(-6,"week").split("/")[0]);
+                    int lastDay = Integer.valueOf(getPreviousYearOrDay(0,"week").split("/")[0]);
+//                    System.out.println("FIRST: " + firstDay);
+
+                    if(Integer.valueOf(d1) >= firstDay &&  Integer.valueOf(d1) <= lastDay){
+                        filterFindForLine = true;
+                    }
+
 
                     if(currentDate == history.getReceipt().getDate().getYear()){
-                        System.out.println("DATE1 : "+ currentDate);
-                        System.out.println("HISTORY1 : "+ history.getReceipt().getDate().getYear());
-                        System.out.println("FULL : "+ d1 + "/" + d2);
+//                        System.out.println("DATE1 : "+ currentDate);
+//                        System.out.println("HISTORY1 : "+ history.getReceipt().getDate().getYear());
+//                        System.out.println("FULL : "+ d1 + "/" + d2);
                         if(d1.length() == 1){
                             d1 = "0"+ d1;
                         }
@@ -305,7 +501,7 @@ public class Statistics extends Fragment {
                             d2 = "0"+ d2;
                         }
                         receiptDate = d1 + "/" + d2;
-                        System.out.println("SELECTED: " + receiptDate + "   -    " + selected);
+//                        System.out.println("SELECTED: " + receiptDate + "   -    " + selected);
                         if(receiptDate.contains(selected)){
                             thereIsCategory = checkThereIsCategorie(history);
                             filterFind = true;
@@ -330,12 +526,20 @@ public class Statistics extends Fragment {
                 default:
                     break;
             }
+            lastType = type;
 
             if(thereIsCategory) {
                 historyHashMap.put(history.getReceipt().getStoreType(), historyHashMap.get(history.getReceipt().getStoreType()) + history.getReceipt().getTotalPrice());
+//                receiptArrayList.add(history.getReceipt());
             }else if (type.equals("category") || filterFind){
                 historyHashMap.put(history.getReceipt().getStoreType(),history.getReceipt().getTotalPrice());
                 categories.add(history.getReceipt().getStoreType());
+//                receiptArrayList.add(history.getReceipt());
+            }
+            if(type.contains("category") && history.getReceipt().getDate().toString().contains(getPreviousYearOrDay(0,"year"))){
+                receiptArrayList.add(history.getReceipt());
+            }else if(!type.contains("category") && (filterFind || filterFindForLine)){
+                receiptArrayList.add(history.getReceipt());
             }
 
         }
@@ -365,6 +569,16 @@ public class Statistics extends Fragment {
                 getString(R.string.filter_obj_2),
                 getString(R.string.filter_obj_3),  getString(R.string.filter_obj_1), getString(R.string.filter_obj_4)
         };
+        xData = new String[]{
+                "",
+                getString(R.string.gen_month_fast_1), getString(R.string.gen_month_fast_2),
+                getString(R.string.gen_month_fast_3), getString(R.string.gen_month_fast_4),
+                getString(R.string.gen_month_fast_5), getString(R.string.gen_month_fast_6),
+                getString(R.string.gen_month_fast_7), getString(R.string.gen_month_fast_8),
+                getString(R.string.gen_month_fast_9), getString(R.string.gen_month_fast_10),
+                getString(R.string.gen_month_fast_11), getString(R.string.gen_month_fast_12)
+        };
+
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -436,16 +650,46 @@ public class Statistics extends Fragment {
                         getString(R.string.gen_month_9), getString(R.string.gen_month_10),
                         getString(R.string.gen_month_11), getString(R.string.gen_month_12)
                 };
+
+                // Get the number of days in that month
+                @SuppressLint({"NewApi", "LocalSuppress"}) YearMonth yearMonthObject = YearMonth.of(currentYear, lastMonthSelected);
+                @SuppressLint({"NewApi", "LocalSuppress"}) int daysInMonth = yearMonthObject.lengthOfMonth();
+//                for(int i = 0; i > daysInMonth ; i++) {
+//                    xData[i] = getPreviousYearOrDay(i,"week");
+//                }
+                xData = getDatesOfMonth(daysInMonth);
+//                xData = yearsOrDates;
                 break;
             case "week":
                 yearsOrDates = new String[]{getPreviousYearOrDay(0,"week"), getPreviousYearOrDay(-1,"week"), getPreviousYearOrDay(-2,"week"), getPreviousYearOrDay(-3,"week"), getPreviousYearOrDay(-4,"week"), getPreviousYearOrDay(-5,"week"), getPreviousYearOrDay(-6,"week")};
-                items = yearsOrDates;
+                items  =  yearsOrDates;
+                xData = new String[]{"", getPreviousYearOrDay(-6,"week"), getPreviousYearOrDay(-5,"week"),getPreviousYearOrDay(-4,"week"),getPreviousYearOrDay(-3,"week"), getPreviousYearOrDay(-2,"week"), getPreviousYearOrDay(-1,"week"),getPreviousYearOrDay(0,"week")};
+
                 break;
             case "year":
+
                 yearsOrDates = new String[]{getPreviousYearOrDay(0,"year"),getPreviousYearOrDay(-1,"year"),getPreviousYearOrDay(-2,"year"),getPreviousYearOrDay(-3,"year"),getPreviousYearOrDay(-4,"year"),getPreviousYearOrDay(-5,"year"),getPreviousYearOrDay(-6,"year"),getPreviousYearOrDay(-7,"year"),getPreviousYearOrDay(-8,"year"), getPreviousYearOrDay(-9,"year"), getPreviousYearOrDay(-10,"year")};
                 items = yearsOrDates;
+                xData = new String[]{
+                        "",
+                        getString(R.string.gen_month_fast_1), getString(R.string.gen_month_fast_2),
+                        getString(R.string.gen_month_fast_3), getString(R.string.gen_month_fast_4),
+                        getString(R.string.gen_month_fast_5), getString(R.string.gen_month_fast_6),
+                        getString(R.string.gen_month_fast_7), getString(R.string.gen_month_fast_8),
+                        getString(R.string.gen_month_fast_9), getString(R.string.gen_month_fast_10),
+                        getString(R.string.gen_month_fast_11), getString(R.string.gen_month_fast_12)
+                };
                 break;
             default:
+                xData = new String[]{
+                        "",
+                        getString(R.string.gen_month_fast_1), getString(R.string.gen_month_fast_2),
+                        getString(R.string.gen_month_fast_3), getString(R.string.gen_month_fast_4),
+                        getString(R.string.gen_month_fast_5), getString(R.string.gen_month_fast_6),
+                        getString(R.string.gen_month_fast_7), getString(R.string.gen_month_fast_8),
+                        getString(R.string.gen_month_fast_9), getString(R.string.gen_month_fast_10),
+                        getString(R.string.gen_month_fast_11), getString(R.string.gen_month_fast_12)
+                };
                 callBackPieDataChart(type,null);
                 break;
         }
@@ -457,11 +701,16 @@ public class Statistics extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
 //                ArrayList<History> historyMonthList = getHistoryListByMonth(position + 1);
                 if(type.equals("month")) {
+                    lastMonthSelected = position+1;
                     positionMonths = String.valueOf(position + 1);
 
                     if (positionMonths.length() == 1) {
                         positionMonths = "0" + positionMonths;
                     }
+                    // Get the number of days in that month
+                    @SuppressLint({"NewApi", "LocalSuppress"}) YearMonth yearMonthObject = YearMonth.of(currentYear, lastMonthSelected);
+                    @SuppressLint({"NewApi", "LocalSuppress"}) int daysInMonth = yearMonthObject.lengthOfMonth();
+                    xData = getDatesOfMonth(daysInMonth);
                     callBackPieDataChart(type, positionMonths);
                 }else{
                     callBackPieDataChart(type,finalItems[position]);
@@ -474,10 +723,19 @@ public class Statistics extends Fragment {
             }
         });
 
+        final String[] finalYearsOrDates = yearsOrDates;
         spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view,final int position, long l) {
                 lastYearSelectedInMonths = new Date().getYear() - position;
+                if( finalYearsOrDates.length>0 && type.contains("month")) {
+                    currentYear = c.get(Integer.parseInt(finalYearsOrDates[position]));
+
+                    // Get the number of days in that month
+                    @SuppressLint({"NewApi", "LocalSuppress"}) YearMonth yearMonthObject = YearMonth.of(currentYear, lastMonthSelected);
+                    @SuppressLint({"NewApi", "LocalSuppress"}) int daysInMonth = yearMonthObject.lengthOfMonth();
+                    xData = getDatesOfMonth(daysInMonth);
+                }
                 callBackPieDataChart(type, positionMonths);
             }
 
@@ -506,17 +764,196 @@ public class Statistics extends Fragment {
 
     }
 
+    private String[] getDatesOfMonth(int daysInMonth) {
+        String datesOfMonth[] = {};
+        switch (daysInMonth){
+            case 28:
+                datesOfMonth = new String[]{
+                        getCurrentDayOfSelected(-1),
+                        getCurrentDayOfSelected(0),
+                        getCurrentDayOfSelected(1),
+                        getCurrentDayOfSelected(2),
+                        getCurrentDayOfSelected(3),
+                        getCurrentDayOfSelected(4),
+                        getCurrentDayOfSelected(5),
+                        getCurrentDayOfSelected(6),
+                        getCurrentDayOfSelected(7),
+                        getCurrentDayOfSelected(8),
+                        getCurrentDayOfSelected(9),
+                        getCurrentDayOfSelected(10),
+                        getCurrentDayOfSelected(11),
+                        getCurrentDayOfSelected(12),
+                        getCurrentDayOfSelected(13),
+                        getCurrentDayOfSelected(14),
+                        getCurrentDayOfSelected(15),
+                        getCurrentDayOfSelected(16),
+                        getCurrentDayOfSelected(17),
+                        getCurrentDayOfSelected(18),
+                        getCurrentDayOfSelected(19),
+                        getCurrentDayOfSelected(20),
+                        getCurrentDayOfSelected(21),
+                        getCurrentDayOfSelected(22),
+                        getCurrentDayOfSelected(23),
+                        getCurrentDayOfSelected(24),
+                        getCurrentDayOfSelected(25),
+                        getCurrentDayOfSelected(26),
+                        getCurrentDayOfSelected(27),
+                        getCurrentDayOfSelected(28)
+                };
+                break;
+            case 29:
+                datesOfMonth = new String[]{
+                        getCurrentDayOfSelected(-1),
+                        getCurrentDayOfSelected(0),
+                        getCurrentDayOfSelected(1),
+                        getCurrentDayOfSelected(2),
+                        getCurrentDayOfSelected(3),
+                        getCurrentDayOfSelected(4),
+                        getCurrentDayOfSelected(5),
+                        getCurrentDayOfSelected(6),
+                        getCurrentDayOfSelected(7),
+                        getCurrentDayOfSelected(8),
+                        getCurrentDayOfSelected(9),
+                        getCurrentDayOfSelected(10),
+                        getCurrentDayOfSelected(11),
+                        getCurrentDayOfSelected(12),
+                        getCurrentDayOfSelected(13),
+                        getCurrentDayOfSelected(14),
+                        getCurrentDayOfSelected(15),
+                        getCurrentDayOfSelected(16),
+                        getCurrentDayOfSelected(17),
+                        getCurrentDayOfSelected(18),
+                        getCurrentDayOfSelected(19),
+                        getCurrentDayOfSelected(20),
+                        getCurrentDayOfSelected(21),
+                        getCurrentDayOfSelected(22),
+                        getCurrentDayOfSelected(23),
+                        getCurrentDayOfSelected(24),
+                        getCurrentDayOfSelected(25),
+                        getCurrentDayOfSelected(26),
+                        getCurrentDayOfSelected(27),
+                        getCurrentDayOfSelected(28),
+                        getCurrentDayOfSelected(29)
+                };
+                break;
+            case 30:
+                datesOfMonth = new String[]{
+                        getCurrentDayOfSelected(-1),
+                        getCurrentDayOfSelected(0),
+                        getCurrentDayOfSelected(1),
+                        getCurrentDayOfSelected(2),
+                        getCurrentDayOfSelected(3),
+                        getCurrentDayOfSelected(4),
+                        getCurrentDayOfSelected(5),
+                        getCurrentDayOfSelected(6),
+                        getCurrentDayOfSelected(7),
+                        getCurrentDayOfSelected(8),
+                        getCurrentDayOfSelected(9),
+                        getCurrentDayOfSelected(10),
+                        getCurrentDayOfSelected(11),
+                        getCurrentDayOfSelected(12),
+                        getCurrentDayOfSelected(13),
+                        getCurrentDayOfSelected(14),
+                        getCurrentDayOfSelected(15),
+                        getCurrentDayOfSelected(16),
+                        getCurrentDayOfSelected(17),
+                        getCurrentDayOfSelected(18),
+                        getCurrentDayOfSelected(19),
+                        getCurrentDayOfSelected(20),
+                        getCurrentDayOfSelected(21),
+                        getCurrentDayOfSelected(22),
+                        getCurrentDayOfSelected(23),
+                        getCurrentDayOfSelected(24),
+                        getCurrentDayOfSelected(25),
+                        getCurrentDayOfSelected(26),
+                        getCurrentDayOfSelected(27),
+                        getCurrentDayOfSelected(28),
+                        getCurrentDayOfSelected(29),
+                        getCurrentDayOfSelected(30)
+                };
+                break;
+            case 31:
+                datesOfMonth = new String[]{
+                        getCurrentDayOfSelected(-1),
+                        getCurrentDayOfSelected(0),
+                        getCurrentDayOfSelected(1),
+                        getCurrentDayOfSelected(2),
+                        getCurrentDayOfSelected(3),
+                        getCurrentDayOfSelected(4),
+                        getCurrentDayOfSelected(5),
+                        getCurrentDayOfSelected(6),
+                        getCurrentDayOfSelected(7),
+                        getCurrentDayOfSelected(8),
+                        getCurrentDayOfSelected(9),
+                        getCurrentDayOfSelected(10),
+                        getCurrentDayOfSelected(11),
+                        getCurrentDayOfSelected(12),
+                        getCurrentDayOfSelected(13),
+                        getCurrentDayOfSelected(14),
+                        getCurrentDayOfSelected(15),
+                        getCurrentDayOfSelected(16),
+                        getCurrentDayOfSelected(17),
+                        getCurrentDayOfSelected(18),
+                        getCurrentDayOfSelected(19),
+                        getCurrentDayOfSelected(20),
+                        getCurrentDayOfSelected(21),
+                        getCurrentDayOfSelected(22),
+                        getCurrentDayOfSelected(23),
+                        getCurrentDayOfSelected(24),
+                        getCurrentDayOfSelected(25),
+                        getCurrentDayOfSelected(26),
+                        getCurrentDayOfSelected(27),
+                        getCurrentDayOfSelected(28),
+                        getCurrentDayOfSelected(29),
+                        getCurrentDayOfSelected(30),
+                        getCurrentDayOfSelected(31)
+                };
+                break;
+            default:
+                break;
+        }
+        return datesOfMonth;
+    }
+
+    private String getCurrentDayOfSelected(int i) {
+        Calendar currentMonth = Calendar.getInstance();
+        currentMonth.set(Calendar.YEAR,lastYearSelectedInMonths);
+        currentMonth.set(Calendar.MONTH,lastMonthSelected-1);
+        currentMonth.set(Calendar.DAY_OF_MONTH,1);
+
+        SimpleDateFormat isoFormat = new SimpleDateFormat("dd/MM");
+        currentMonth.add(Calendar.DAY_OF_MONTH, i);
+        String previousYearDate = isoFormat.format(currentMonth.getTime());
+
+        return previousYearDate;
+    }
+
     private void callBackPieDataChart(final String type, final String item) {
         FirebaseResultInterface firebaseResultInterface = new FirebaseResultInterface<ArrayList<History>>() {
 
             @Override
             public void onSuccess(ArrayList<History> historyArrayList) {
+
+                // refresh PieChart
                 clearChart();
                 categories.clear();
                 setOptionsChart();
+
+                //refresh LineChart
+                clearLineChart();
+                receiptArrayList.clear();
+
+//                setXDatas();
+
+
                 filterArrayBySelectedSpinner(historyArrayList,type,item);
                 //createEntries
                 createPieEntries(historyHashMap);
+
+                setOptionLineChart();
+                // set Line Graph
+                setLineChart(salaryArrayList);
+
                 // PieDataSet
                 createPieDataSet();
                 //setData on Pie
@@ -524,6 +961,12 @@ public class Statistics extends Fragment {
                 dataSet.notifyDataSetChanged();
                 chart.notifyDataSetChanged();
                 chart.invalidate();
+
+//                lineDataSet.notifyAll();
+                lineDataSet1.notifyDataSetChanged();
+                lineDataSet2.notifyDataSetChanged();
+                lineChart.notifyDataSetChanged();
+                lineChart.invalidate();
             }
 
             @Override
@@ -570,6 +1013,21 @@ public class Statistics extends Fragment {
         chart.invalidate();
     }
 
+    private void clearLineChart() {
+        lineDataSet.clear();
+        lineDataSet1.clear();
+        lineDataSet2.clear();
+        entries1.clear();
+        entries2.clear();
+
+        lineDataSet1.notifyDataSetChanged();
+        lineDataSet2.notifyDataSetChanged();
+//        lineDataSet.notifyAll();
+        lineChart.notifyDataSetChanged();
+        lineChart.invalidate();
+
+    }
+
     private void createPieDataSet() {
         dataSet = new PieDataSet(entries, ""); // add entries to dataset
 
@@ -584,7 +1042,6 @@ public class Statistics extends Fragment {
     }
 
     private void createPieEntries(HashMap<String, Double> historyHashMap) {
-        System.out.println("CATEGORIES: "+ categories);
         if(categories.size()>0) {
             for (String category : categories) {
                 entries.add(new PieEntry(historyHashMap.get(category).floatValue(), category));

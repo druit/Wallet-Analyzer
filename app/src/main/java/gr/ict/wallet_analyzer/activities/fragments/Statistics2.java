@@ -66,7 +66,7 @@ public class Statistics2 extends Fragment {
                 //open edit or save pop up window
 
 
-                bankEditPopup.ShowBankPopup(false,null,baseReference);
+                bankEditPopup.ShowBankPopup(false,null,baseReference, myAccount);
                 bankEditPopup.setText("SAVE");
 //                openPopup();
             }
@@ -144,7 +144,7 @@ public class Statistics2 extends Fragment {
                     });
                     listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                         @Override
-                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
                             Toast.makeText(getActivity(), "LONG", Toast.LENGTH_SHORT).show();
                             return false;
                         }
