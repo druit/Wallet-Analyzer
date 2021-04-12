@@ -89,7 +89,8 @@ public class ReceiptPopup {
 
         receiptPriceTextView = popupView.findViewById(R.id.price_text_view);
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        receiptPriceTextView.setText(Float.valueOf(decimalFormat.format(receipt.getTotalPrice())) + " €");
+        String value = decimalFormat.format(receipt.getTotalPrice());
+        receiptPriceTextView.setText(value + " €");
 
         // set receipt location
         addressTextView = popupView.findViewById(R.id.address_text_view);
@@ -154,7 +155,7 @@ public class ReceiptPopup {
         isReceiptEditPressed = !isReceiptEditPressed;
 
         if (isReceiptEditPressed) {
-            Toast.makeText(activity, "Edit Mode On", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.gen_edit_mode_on, Toast.LENGTH_SHORT).show();
 
             popupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -246,7 +247,7 @@ public class ReceiptPopup {
                 }
             });
         } else {
-            Toast.makeText(activity, "Edit Mode Off", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.gen_edit_mode_off, Toast.LENGTH_SHORT).show();
         }
     }
 

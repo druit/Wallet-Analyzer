@@ -14,6 +14,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -51,7 +52,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     private boolean permissionDenied = false;
     private GoogleMap mMap;
     LatLng zoomlatLng;
-    ImageView imgMyLocation;
+    ImageButton imgMyLocation;
     GPSTracker gpsTracker;
 
     @Override

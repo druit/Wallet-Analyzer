@@ -74,7 +74,7 @@
 
     <TextView
         android:id="@+id/location_text"
-        android:layout_width="70dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="75dp"
@@ -97,7 +97,7 @@
 
     <TextView
         android:id="@+id/date_text"
-        android:layout_width="70dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="50dp"
@@ -120,7 +120,7 @@
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="70dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="25dp"

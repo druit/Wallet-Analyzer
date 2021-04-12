@@ -105,7 +105,6 @@ public class BankEditPopup {
                 boolean alreadyChecked = false;
 
                         for (BankAccount account: myAccountBank) {
-                            System.out.println("ACCOUNT " + account.isSalaryBank());
                             if(account.isSalaryBank() && myBankAccount.getId() != account.getId()){
                                 alreadyChecked = true;
                             }
@@ -135,7 +134,6 @@ public class BankEditPopup {
                     salaryArrayList.add(newSalary);
                     bankAccount = new BankAccount(currentId,bank,desc,salary,0, salaryArrayList, false);
                 }
-                System.out.println("BANK:" +bankAccount.getSalaryArrayList().get(0).getLastUpdate());
                 declare.setValue(bankAccount);
                 popupWindow.dismiss();
             }
@@ -201,10 +199,10 @@ public class BankEditPopup {
 
         switch(choice){
             case "SAVE":
-                actionBtn.setText("ADD");
+                actionBtn.setText(context.getResources().getString(R.string.gen_add));
                 break;
             case "EDIT":
-                actionBtn.setText("SAVE");
+                actionBtn.setText(context.getResources().getString(R.string.gen_save));
                 break;
             default:
                 break;
@@ -213,7 +211,7 @@ public class BankEditPopup {
 
     public void setText(String choice){
         if(choice.contains("SAVE")){
-            actionBtn.setText("ADD");
+            actionBtn.setText(context.getResources().getString(R.string.gen_add));
             String textDate = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
             bankDate.setText(textDate);
             checkBox.setVisibility(View.INVISIBLE);
@@ -246,6 +244,38 @@ public class BankEditPopup {
         });
 
     }
+    public void getSalaryList(DatabaseReference baseReference, final FirebaseResultInterface firebaseResultInterface) {
+        DatabaseReference declare = baseReference.child("bankAccounts");
+//
+        declare.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChildren()) {
+                    Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                    BankAccount bankAccount;
+                    BankAccount currentBank = null;
+                    Salary salary;
+                    ArrayList<Salary> listSalary = new ArrayList<>();
+
+                    for (DataSnapshot child : children) {
+                        bankAccount = child.getValue(BankAccount.class);
+                        salary = bankAccount.getSalaryArrayList().get(bankAccount.getSalaryArrayList().size() - 1);
+//                        if(bankAccount.isSalaryBank() == true) {
+//                            currentBank = bankAccount;
+                            listSalary.add(salary);
+//                        }
+                    }
+                    firebaseResultInterface.onSuccess(listSalary);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                firebaseResultInterface.onFailed(databaseError.toException());
+            }
+        });
+    }
+
 
     // Check for update salary every month
     public void checkSalary(DatabaseReference baseReference){
@@ -285,7 +315,6 @@ public class BankEditPopup {
                             listSalary.add(newSalary);
                             declare.child(currentBank.getId()).child("salary").setValue(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd());
                             declare.child(currentBank.getId()).child("salaryArrayList").setValue(listSalary);
-                            System.out.println("DATE: " + prevMonthSalary + " ..... " + currentMonth);
                         }
 
                     }

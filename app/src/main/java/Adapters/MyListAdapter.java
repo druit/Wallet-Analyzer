@@ -38,7 +38,8 @@ public class MyListAdapter extends ArrayAdapter<String> {
         titleText.setText(history.getReceipt().getStoreName());
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-        subtitleText.setText( Float.valueOf(decimalFormat.format(history.getReceipt().getTotalPrice())) + " €");
+
+        subtitleText.setText( decimalFormat.format(history.getReceipt().getTotalPrice()) + " €");
 
         return rowView;
     }

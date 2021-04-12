@@ -17,16 +17,36 @@
     <string name="hint_firstname">FirstName</string>
     <string name="hint_lastname">LastName</string>
     <string name="gen_save">Save</string>
+    <string name="gen_add">Add</string>
+    <string name="gen_total">Total: </string>
+    <string name="gen_accounts">Accounts</string>
     <string name="gen_guest">Not a user?</string>
     <string name="gen_spent_month">Expenses</string>
     <string name="gen_month_limit">Goal</string>
     <string name="gen_history">History</string>
     <string name="gen_full_history">Full History</string>
+    <string name="gen_filters">Filters</string>
+    <string name="gen_edit_mode_on">Edit mode on</string>
+    <string name="gen_edit_mode_off">Edit mode off</string>
+    <string name="gen_income">Income</string>
+    <string name="gen_expenses">Expenses</string>
     <string name="gen_location">Location:</string>
     <string name="gen_date">Date:</string>
     <string name="gen_category">Category:</string>
     <string name="gen_type_category">Supermarket</string>
     <string name="gen_change_language">Change Language</string>
+    <string name="gen_month_fast_1">Jan</string>
+    <string name="gen_month_fast_2">Feb</string>
+    <string name="gen_month_fast_3">Mar</string>
+    <string name="gen_month_fast_4">Apr</string>
+    <string name="gen_month_fast_5">May</string>
+    <string name="gen_month_fast_6">Jun</string>
+    <string name="gen_month_fast_7">Jul</string>
+    <string name="gen_month_fast_8">Aug</string>
+    <string name="gen_month_fast_9">Sep</string>
+    <string name="gen_month_fast_10">Oct</string>
+    <string name="gen_month_fast_11">Nov</string>
+    <string name="gen_month_fast_12">Dec</string>
     <string name="gen_month_1">January</string>
     <string name="gen_month_2">February</string>
     <string name="gen_month_3">March</string>
@@ -60,6 +80,11 @@
     <string name="filter_obj_2">Month</string>
     <string name="filter_obj_3">Last 7 Days</string>
     <string name="filter_obj_4">Year</string>
+    <string name="gen_main_bank">Main bank?</string>
+    <string name="gen_description">Description</string>
+    <string name="gen_salary">Salary</string>
+    <string name="gen_bank_account">Bank Account</string>
+
 
 
 </resources>
