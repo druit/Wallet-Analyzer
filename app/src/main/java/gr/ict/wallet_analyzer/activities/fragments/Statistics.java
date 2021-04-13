@@ -3,7 +3,6 @@ package gr.ict.wallet_analyzer.activities.fragments;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,28 +10,23 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
@@ -40,50 +34,35 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
-import com.google.android.gms.common.util.ArrayUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONException;
-
-import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import Adapters.MyAccountAdapter;
 import data_class.BankAccount;
 import data_class.History;
 import data_class.Receipt;
 import data_class.Salary;
-import data_class.YourData;
 import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.helpers.BankEditPopup;
 import gr.ict.wallet_analyzer.helpers.FirebaseResultInterface;
 import gr.ict.wallet_analyzer.helpers.HistoryArrayList;
 
-import static com.github.mikephil.charting.animation.Easing.Linear;
-
 public class Statistics extends Fragment {
 
     //Line Chart Values
     private LineChart lineChart;
-    private LineDataSet lineDataSet1,lineDataSet2,lineDataSetFormat;
+    private LineDataSet lineDataSet1,lineDataSet2;
     private  List<ILineDataSet> lineDataSet = new ArrayList<>();
     final List<Entry> entries1 = new ArrayList<>();
     final List<Entry> entries2 = new ArrayList<>();
@@ -185,14 +164,12 @@ public class Statistics extends Fragment {
 
 
     private void setLineChart(ArrayList<Salary> salaryList) {
-//        ArrayList<Salary> salaryList = new ArrayList<>();
-//        salaryList = account.getSalaryArrayList();
-        double totalIncome = 50;
+        double totalIncome = 0;
         double totalExpenses = 0;
 
         for (Salary salary: salaryList) {
-            if (salary.getLastUpdate().getYear() == lastYearSelectedInMonths &&  Integer.valueOf(salary.getLastUpdate().getMonth()+1) == lastMonthSelected){
-                totalIncome = salary.getCurrentSalary();
+            if (salary.getUpdateDate().getYear() == lastYearSelectedInMonths &&  Integer.valueOf(salary.getLastUpdate().getMonth()+1) == lastMonthSelected){
+                totalIncome += salary.getCurrentSalary();
             }
         }
 
@@ -215,14 +192,8 @@ public class Statistics extends Fragment {
             previousReceiptMonth = createLineEntries(receipt,previousReceiptMonth,totalIncome,totalExpenses,lastType);
         }
 
-
-//        for (YourData data : dataObjects2) {
-//            // turn your data into Entry objects
-//            entries2.add(new Entry(data.getX(), data.getY()));
-//        }
-
-        String incomes = getContext().getResources().getString(R.string.gen_income);
-        String expenses = getContext().getResources().getString(R.string.gen_expenses);
+        String incomes = getActivity().getBaseContext().getResources().getString(R.string.gen_income);
+        String expenses = getActivity().getBaseContext().getString(R.string.gen_expenses);
 
         lineDataSet1 = new LineDataSet(entries1, incomes); // add entries to dataset
 
@@ -467,11 +438,11 @@ public class Statistics extends Fragment {
             boolean filterFindForLine = false;
             switch (type){
                 case "category":
-                    thereIsCategory = checkThereIsCategorie(history);
+                    thereIsCategory = checkThereIsCategory(history);
                     break;
                 case "year":
                     if(history.getReceipt().getDate().toString().contains(selected)){
-                        thereIsCategory = checkThereIsCategorie(history);
+                        thereIsCategory = checkThereIsCategory(history);
                         filterFind = true;
                     }
                     break;
@@ -483,7 +454,6 @@ public class Statistics extends Fragment {
 
                     int firstDay = Integer.valueOf(getPreviousYearOrDay(-6,"week").split("/")[0]);
                     int lastDay = Integer.valueOf(getPreviousYearOrDay(0,"week").split("/")[0]);
-//                    System.out.println("FIRST: " + firstDay);
 
                     if(Integer.valueOf(d1) >= firstDay &&  Integer.valueOf(d1) <= lastDay){
                         filterFindForLine = true;
@@ -491,9 +461,6 @@ public class Statistics extends Fragment {
 
 
                     if(currentDate == history.getReceipt().getDate().getYear()){
-//                        System.out.println("DATE1 : "+ currentDate);
-//                        System.out.println("HISTORY1 : "+ history.getReceipt().getDate().getYear());
-//                        System.out.println("FULL : "+ d1 + "/" + d2);
                         if(d1.length() == 1){
                             d1 = "0"+ d1;
                         }
@@ -501,9 +468,8 @@ public class Statistics extends Fragment {
                             d2 = "0"+ d2;
                         }
                         receiptDate = d1 + "/" + d2;
-//                        System.out.println("SELECTED: " + receiptDate + "   -    " + selected);
                         if(receiptDate.contains(selected)){
-                            thereIsCategory = checkThereIsCategorie(history);
+                            thereIsCategory = checkThereIsCategory(history);
                             filterFind = true;
                         }
                     }
@@ -517,7 +483,7 @@ public class Statistics extends Fragment {
                         }
 
                         if(month.contains(positionMonths)){
-                            thereIsCategory = checkThereIsCategorie(history);
+                            thereIsCategory = checkThereIsCategory(history);
                             filterFind = true;
                         }
                     }
@@ -547,7 +513,7 @@ public class Statistics extends Fragment {
 
     }
 
-    private boolean checkThereIsCategorie(History history) {
+    private boolean checkThereIsCategory(History history) {
         if(categories.size()> 0) {
             for (String category : categories) {
                 if (category.equals(history.getReceipt().getStoreType())) {
@@ -607,15 +573,6 @@ public class Statistics extends Fragment {
                     default:
                         break;
                 }
-//                ArrayList<History> historyMonthList = getHistoryListByMonth(position + 1);
-
-                // clear graph first
-//                clearChart();
-
-                // add graph values
-//                for (History history : historyMonthList) {
-//                    updateGraph(history);
-//                }
             }
 
             @Override
@@ -640,6 +597,8 @@ public class Statistics extends Fragment {
         Spinner spinner3 = getActivity().findViewById(R.id.filterChart3);
         DateFormat dateFormat = new SimpleDateFormat("MM");
         Date date = new Date();
+        lastMonthSelected = Integer.valueOf(c.get(Calendar.MONTH)+1);
+        lastYearSelectedInMonths = new Date().getYear();
         switch (type){
             case "month":
                 items = new String[]{
@@ -713,6 +672,10 @@ public class Statistics extends Fragment {
                     xData = getDatesOfMonth(daysInMonth);
                     callBackPieDataChart(type, positionMonths);
                 }else{
+                    if (type.equals("year")) {
+                        lastYearSelectedInMonths = new Date().getYear() - position;
+                    }
+//
                     callBackPieDataChart(type,finalItems[position]);
                 }
             }
@@ -728,6 +691,7 @@ public class Statistics extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view,final int position, long l) {
                 lastYearSelectedInMonths = new Date().getYear() - position;
+                System.out.println("POSITION LAST YEAR: " + position);
                 if( finalYearsOrDates.length>0 && type.contains("month")) {
                     currentYear = c.get(Integer.parseInt(finalYearsOrDates[position]));
 
@@ -974,14 +938,6 @@ public class Statistics extends Fragment {
 
             }
         };
-
-        // clear graph first
-//                clearChart();
-
-        // add graph values
-//                for (History history : historyMonthList) {
-//                    updateGraph(history);
-//                }
         historyArrayList.callBackHistoryArrayList(baseReference,firebaseResultInterface);
     }
 
@@ -1051,12 +1007,6 @@ public class Statistics extends Fragment {
             entries.add(new PieEntry(0f, ""));
             chart.getLegend().setEnabled(false);
         }
-
-//        entries.add(new PieEntry(18,"Green"));
-//        entries.add(new PieEntry(26, "Yellow"));
-//        entries.add(new PieEntry(30, "Blue"));
-//        entries.add(new PieEntry(12, "EN"));
-//        entries.add(new PieEntry(2f, "EL"));
     }
 
     private void setOptionsChart() {

@@ -84,7 +84,13 @@
     <string name="gen_description">Description</string>
     <string name="gen_salary">Salary</string>
     <string name="gen_bank_account">Bank Account</string>
-
+    <string name="gen_error_add_item">Please complete the form</string>
+    <string name="gen_error_bank_already">There is an activated bank account</string>
+    <string name="gen_error_gps">GPS disabled</string>
+    <string name="gen_login">Login</string>
+    <string name="login_success_message">Logged in successful.</string>
+    <string name="register_success_message">Registered Successful. Please check your email.</string>
+    <string name="gen_forgot_password">Forgot password?</string>
 
 
 </resources>

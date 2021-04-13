@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -95,8 +96,10 @@ public class BankEditPopup {
               if(editable){
                   ArrayList<Salary> salaryArrayList = myBankAccount.getSalaryArrayList();
                   date = salaryArrayList.get(salaryArrayList.size()-1).getLastUpdate();
+                  showDatePickerPopup(activity.findViewById(R.id.fragment2),(Date)date, myBankAccount.getSalaryArrayList(), declare,editable);
+              }else {
+                  showDatePickerPopup(activity.findViewById(R.id.fragment2), (Date) date, null, declare, editable);
               }
-              showDatePickerPopup(activity.findViewById(R.id.fragment2),(Date)date, declare);
           }
       });
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -111,7 +114,7 @@ public class BankEditPopup {
                         }
                         if(alreadyChecked){
                             compoundButton.setChecked(false);
-                            Toast.makeText(activity.getBaseContext(),"There is an activated bank account",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity.getBaseContext(),activity.getBaseContext().getResources().getString(R.string.gen_error_bank_already),Toast.LENGTH_SHORT).show();
                         }else{
 
                             declare.child("salaryBank").setValue(b);
@@ -122,25 +125,37 @@ public class BankEditPopup {
         actionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String bank = bankAccount.getText().toString();
-                String desc = bankDescription.getText().toString();
-                double salary = Double.valueOf(bankSalary.getText().toString());
-                BankAccount bankAccount;
-                if(editable){
-                    bankAccount = new BankAccount(currentId,bank,desc,salary,myBankAccount.isActive(), myBankAccount.getSalaryArrayList(),checkBox.isChecked());
+                if(bankAccount.getText().toString().length() > 0  && bankSalary.getText().toString().length() > 0 && bankDescription.getText().toString().length() > 0){
+                    String bank = bankAccount.getText().toString();
+                    String desc = bankDescription.getText().toString();
+                    double salary = Double.valueOf(bankSalary.getText().toString());
+                    BankAccount bankAccount;
+                    if(editable){
+                        bankAccount = new BankAccount(currentId,bank,desc,salary,myBankAccount.isActive(), myBankAccount.getSalaryArrayList(),checkBox.isChecked());
+                    }else{
+                        Calendar myCal = Calendar.getInstance();
+                        String[] dateSplit = bankDate.getText().toString().split("/");
+                        if(dateSplit.length>0) {
+                            myCal.set(Calendar.YEAR, Integer.parseInt(dateSplit[2]));
+                            myCal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dateSplit[0]));
+                            myCal.set(Calendar.MONTH, Integer.parseInt(dateSplit[1]) - 1);
+                        }
+                        Date selectedDate = new Date(String.valueOf(myCal.getTime()));
+                        Salary newSalary = new Salary(selectedDate,salary,salary,selectedDate);
+                        ArrayList<Salary> salaryArrayList = new ArrayList<>();
+                        salaryArrayList.add(newSalary);
+                        bankAccount = new BankAccount(currentId,bank,desc,salary,0, salaryArrayList, false);
+                    }
+                    declare.setValue(bankAccount);
+                    popupWindow.dismiss();
                 }else{
-                    Salary newSalary = new Salary(new Date(),1000,1000,new Date());
-                    ArrayList<Salary> salaryArrayList = new ArrayList<>();
-                    salaryArrayList.add(newSalary);
-                    bankAccount = new BankAccount(currentId,bank,desc,salary,0, salaryArrayList, false);
+                    Toast.makeText(activity.getBaseContext(),activity.getBaseContext().getResources().getString(R.string.gen_error_add_item),Toast.LENGTH_SHORT).show();
                 }
-                declare.setValue(bankAccount);
-                popupWindow.dismiss();
             }
         });
     }
 
-    private void showDatePickerPopup(View viewToShowAt,Date date, DatabaseReference declare) {
+    private void showDatePickerPopup(View viewToShowAt, Date date, final ArrayList<Salary> salaryArrayList, final DatabaseReference declare,final  boolean editable) {
         Date receiptDate = date;
 
         // inflate the layout of the popup window`
@@ -169,8 +184,34 @@ public class BankEditPopup {
                 int day = datePicker.getDayOfMonth();
                 int month = datePicker.getMonth();
                 int year = datePicker.getYear();
-                Date date = new GregorianCalendar(year, month, day).getTime();
+                final Date date = new GregorianCalendar(year, month, day).getTime();
 
+                if(editable) {
+                    declare.child("salaryArrayList").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                            ArrayList<Salary> listSalary = new ArrayList<>();
+                            int i = 1;
+                            for (DataSnapshot child : children) {
+                                Salary salary = child.getValue(Salary.class);
+
+                                if (i == salaryArrayList.size()) {
+                                    salary.setUpdateDate(date);
+                                    salary.setLastUpdate(date);
+                                    listSalary.add(salary);
+                                }
+                                i++;
+                            }
+                            declare.child("salaryArrayList").setValue(listSalary);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
 //                DatabaseReference dateReference = baseReference.child(firebaseUrl);
 //                dateReference.setValue(date);
 
@@ -253,17 +294,15 @@ public class BankEditPopup {
                 if(dataSnapshot.hasChildren()) {
                     Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                     BankAccount bankAccount;
-                    BankAccount currentBank = null;
                     Salary salary;
                     ArrayList<Salary> listSalary = new ArrayList<>();
 
                     for (DataSnapshot child : children) {
                         bankAccount = child.getValue(BankAccount.class);
                         salary = bankAccount.getSalaryArrayList().get(bankAccount.getSalaryArrayList().size() - 1);
-//                        if(bankAccount.isSalaryBank() == true) {
-//                            currentBank = bankAccount;
+                        if(bankAccount.isActive() == 1) {
                             listSalary.add(salary);
-//                        }
+                        }
                     }
                     firebaseResultInterface.onSuccess(listSalary);
                 }

@@ -85,4 +85,11 @@
     <string name="gen_description">Περιγραφή</string>
     <string name="gen_salary">Ποσό</string>
     <string name="gen_bank_account">Λογαριασμός</string>
+    <string name="gen_error_add_item">Συμπληρώστε όλα τα πεδία</string>
+    <string name="gen_error_bank_already">Υπάρχει ήδη ενεργοποιημένος λογαριασμός μισθοδοσίας</string>
+    <string name="gen_error_gps">Το GPS είναι απενεργοποιημένο</string>
+    <string name="gen_login">Σύνδεση</string>
+    <string name="login_success_message">Συνδεθήκατε με επιτυχία.</string>
+    <string name="register_success_message">Η εγραφή σας έγινε επιτυχής. Παρακαλούμε ελέξτε το email σας</string>
+    <string name="gen_forgot_password">Ξεχάσατε τον κωδικό;</string>
 </resources>
