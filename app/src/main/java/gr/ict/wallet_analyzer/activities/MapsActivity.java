@@ -91,7 +91,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             System.out.println("GPSTRACKER "+ gpsTracker.getLatitude());
         } catch (NullPointerException e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "GPS disabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.gen_error_gps), Toast.LENGTH_SHORT).show();
         }
     }
 

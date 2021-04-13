@@ -84,7 +84,7 @@ public class RegisterActivity extends BaseActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            Toast.makeText(RegisterActivity.this, "Registered Successful. Please check your email", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(RegisterActivity.this, getApplicationContext().getResources().getString(R.string.register_success_message), Toast.LENGTH_SHORT).show();
                                             startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                                         } else {
                                             Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -95,7 +95,7 @@ public class RegisterActivity extends BaseActivity {
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                                Toast.makeText(RegisterActivity.this, task.getException().getMessage(),
                                         Toast.LENGTH_SHORT).show();
                             }
                         }

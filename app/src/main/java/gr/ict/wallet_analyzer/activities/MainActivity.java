@@ -82,9 +82,8 @@ public class MainActivity extends BaseActivity {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
-    private String uid = user.getUid();
-    DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference()
-            .child("users").child(uid);
+    private String uid;
+    DatabaseReference baseReference ;
 
     private LineChart chart;
     private LineDataSet dataSet;
@@ -99,6 +98,9 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if(user!= null && user.isEmailVerified()){
+            uid = user.getUid();
+            baseReference = FirebaseDatabase.getInstance().getReference().child("users").child(uid);
 
         profileImage = findViewById(R.id.profileImage);
         nameProfile = findViewById(R.id.nameMain);
@@ -136,6 +138,7 @@ public class MainActivity extends BaseActivity {
         setFullHistory();
 
         bankEditPopup.checkSalary(baseReference);
+        }
     }
 
     private void setMenuOpener() {
@@ -153,7 +156,8 @@ public class MainActivity extends BaseActivity {
                                 return true;
                             case R.id.action_logout:
                                 FirebaseAuth.getInstance().signOut();
-                                MainActivity.this.finish();
+                                finishAffinity();
+                                startActivity(new Intent(getApplication(), LoginActivity.class));
                                 return true;
                             case R.id.action_portfolio:
                                 openPortfolio();

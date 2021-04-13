@@ -39,6 +39,7 @@ public class LoginActivity extends BaseActivity {
         final EditText emailEditText = findViewById(R.id.email);
         final EditText passwordEditText = findViewById(R.id.password);
         Button loginButton = findViewById(R.id.login_button);
+
         loadingProgressBar = findViewById(R.id.loading);
 
         passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -60,6 +61,14 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
+        TextView forgotPass  = findViewById(R.id.forgotPass);
+        forgotPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
         TextView notAUserText = findViewById(R.id.not_a_user_text);
         notAUserText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +81,7 @@ public class LoginActivity extends BaseActivity {
 
     private void updateUiWithUser(FirebaseUser user) {
         // TODO : initiate successful logged in experience
-        Toast.makeText(LoginActivity.this, "Logged in successful.", Toast.LENGTH_LONG).show();
+        Toast.makeText(LoginActivity.this, getApplicationContext().getResources().getString(R.string.login_success_message), Toast.LENGTH_LONG).show();
         loadingProgressBar.setVisibility(View.INVISIBLE);
 
         Intent intent = new Intent(this, MainActivity.class);
@@ -117,7 +126,8 @@ public class LoginActivity extends BaseActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if (currentUser != null)
+        if (currentUser != null && currentUser.isEmailVerified()) {
             updateUiWithUser(currentUser);
+        }
     }
 }
