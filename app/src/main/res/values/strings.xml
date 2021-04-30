@@ -91,6 +91,8 @@
     <string name="login_success_message">Logged in successful.</string>
     <string name="register_success_message">Registered Successful. Please check your email.</string>
     <string name="gen_forgot_password">Forgot password?</string>
+    <string name="update_photo_wait">The process will take a few seconds.</string>
+    <string name="user_profile_updated_message">User profile updated</string>
 
 
 </resources>

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -45,6 +46,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
@@ -192,14 +195,21 @@ public class MainActivity extends BaseActivity {
 
     private void setProfile() {
         if (user != null) {
-            if (user.getPhotoUrl() != null) {
-                Picasso.get().load(user.getPhotoUrl()).transform(new CircleTransform()).into(profileImage);
-            } else {
-                profileImage.setImageResource(R.drawable.guest);
+
+            Picasso.get().load(user.getPhotoUrl()).placeholder(R.drawable.guest).transform(new CircleTransform()).into(profileImage);
+//            if (user.getPhotoUrl() != null) {
+//                Picasso.get().load(user.getPhotoUrl()).transform(new CircleTransform()).into(profileImage);
+//            } else {
+//                profileImage.setImageResource(R.drawable.guest);
+//            }
+
+            nameProfile.setText("Guest");
+
+            if(user.getDisplayName() != null){
+                if(user.getDisplayName().length()>1)
+                    nameProfile.setText(user.getDisplayName());
             }
-            if (!user.getDisplayName().isEmpty()) {
-                nameProfile.setText(user.getDisplayName());
-            }
+
         }
     }
 
@@ -212,7 +222,23 @@ public class MainActivity extends BaseActivity {
 
         // open Edit Profile
         Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,1);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                String strEditText = data.getStringExtra("displayName");
+                nameProfile.setText(strEditText);
+                String uriPhoto = data.getStringExtra("photoUrl");
+                profileImage.invalidate();
+                user.reload();
+                Picasso.get().load(Uri.parse(uriPhoto)).placeholder(R.drawable.guest).memoryPolicy(MemoryPolicy.NO_CACHE)
+                        .networkPolicy(NetworkPolicy.NO_CACHE)
+                        .noFade().transform(new CircleTransform()).into(profileImage);
+            }
+        }
     }
 
     private void showReceiptPopup(final int itemPosition) {
@@ -668,7 +694,11 @@ public class MainActivity extends BaseActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
                     Integer goal = dataSnapshot.getValue(Integer.class);
-                    monthlyLimitTextView.setText("" + goal);
+                    if(goal!= null) {
+                        monthlyLimitTextView.setText("" + goal);
+                    }else{
+                        monthlyLimitTextView.setText("" + 0);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

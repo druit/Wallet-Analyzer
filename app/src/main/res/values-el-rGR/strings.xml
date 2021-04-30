@@ -92,4 +92,6 @@
     <string name="login_success_message">Συνδεθήκατε με επιτυχία.</string>
     <string name="register_success_message">Η εγραφή σας έγινε επιτυχής. Παρακαλούμε ελέξτε το email σας</string>
     <string name="gen_forgot_password">Ξεχάσατε τον κωδικό;</string>
+    <string name="update_photo_wait">Η διαδικασία θα διαρκέσει μερικά δευτερόλεπτα.</string>
+    <string name="user_profile_updated_message">Το προφιλ σας ενημερώθηκε</string>
 </resources>

@@ -121,6 +121,7 @@ public class EditProfileActivity extends BaseActivity {
 
             @Override
             public void onClick(View view) {
+                Toast.makeText(EditProfileActivity.this, getBaseContext().getResources().getString(R.string.update_photo_wait), Toast.LENGTH_LONG).show();
                 if (user != null) {
                     name = (firstName.getText().toString() + " " + lastName.getText().toString());
                     // TODO: image Uri from galery,camera.
@@ -177,18 +178,19 @@ public class EditProfileActivity extends BaseActivity {
                                     profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(name)
                                             .setPhotoUri(downloadUri)
                                             .build();
-                                    if (downloadUri != null) updateProfileChanges();
+                                    if (downloadUri != null) updateProfileChanges(downloadUri);
 
                                 } else {
                                     // Handle failures
                                     // ...
+                                    updateProfileChanges(user.getPhotoUrl());
                                 }
                             }
                         });
 
+                    }else{
+                        updateProfileChanges(user.getPhotoUrl());
                     }
-
-                    updateProfileChanges();
                 }
             }
         });
@@ -215,13 +217,17 @@ public class EditProfileActivity extends BaseActivity {
         });
     }
 
-    private void updateProfileChanges() {
+    private void updateProfileChanges(final Uri downloadUri) {
         user.updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(EditProfileActivity.this, "User Profile updated", Toast.LENGTH_LONG).show();
+                            Toast.makeText(EditProfileActivity.this, getBaseContext().getResources().getString(R.string.user_profile_updated_message), Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent();
+                            intent.putExtra("displayName",  user.getDisplayName());
+                            intent.putExtra("photoUrl", String.valueOf(downloadUri));
+                            setResult(RESULT_OK, intent);
                             finish();
                         }
                     }
