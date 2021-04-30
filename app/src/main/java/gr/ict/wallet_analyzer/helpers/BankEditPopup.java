@@ -129,6 +129,7 @@ public class BankEditPopup {
                     String bank = bankAccount.getText().toString();
                     String desc = bankDescription.getText().toString();
                     double salary = Double.valueOf(bankSalary.getText().toString());
+
                     BankAccount bankAccount;
                     if(editable){
                         bankAccount = new BankAccount(currentId,bank,desc,salary,myBankAccount.isActive(), myBankAccount.getSalaryArrayList(),checkBox.isChecked());
@@ -294,17 +295,26 @@ public class BankEditPopup {
                 if(dataSnapshot.hasChildren()) {
                     Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                     BankAccount bankAccount;
-                    Salary salary;
+//                    Salary salary;
                     ArrayList<Salary> listSalary = new ArrayList<>();
+                    ArrayList<Salary> sendSalary = new ArrayList<>();
 
                     for (DataSnapshot child : children) {
                         bankAccount = child.getValue(BankAccount.class);
-                        salary = bankAccount.getSalaryArrayList().get(bankAccount.getSalaryArrayList().size() - 1);
-                        if(bankAccount.isActive() == 1) {
-                            listSalary.add(salary);
+//                        salary = bankAccount.getSalaryArrayList().get(bankAccount.getSalaryArrayList().size() - 1);
+                        if(bankAccount.isActive() == 1 ) {
+                            listSalary = bankAccount.getSalaryArrayList();
+//                            if(bankAccount.isSalaryBank()){
+                                for (Salary sal: listSalary) {
+                                    sendSalary.add(sal);
+//                                }
+                            }
+
+
+//                            listSalary.add(salary);
                         }
                     }
-                    firebaseResultInterface.onSuccess(listSalary);
+                    firebaseResultInterface.onSuccess(sendSalary);
                 }
             }
 
@@ -338,21 +348,26 @@ public class BankEditPopup {
                         }
                     }
                     if(listSalary.size()>0) {
-                        Salary currentSalary;
-                        currentSalary = listSalary.get(listSalary.size() - 1);
 
+                        Salary currentSalary = listSalary.get(listSalary.size() - 1);
+
+                        // Current date/month/year
                         Date currentDate = new Date();
-                        Date date = currentSalary.getLastUpdate();
+                        int currentMonth = Integer.valueOf( currentDate.getMonth() + 1);
+                        int currentYear = currentDate.getYear();
 
-                        int currentMonth = currentDate.getMonth() + 1;
-                        int currentDateYear = currentDate.getYear();
-                        int prevMonthSalary = date.getMonth() + 1;
-                        int salaryYear = date.getYear();
+                        // Salary date/month/year
+                        Date dateSalary = currentSalary.getLastUpdate();
+                        int prevMonthSalary = Integer.valueOf( dateSalary.getMonth() + 1);
+                        int salaryYear = dateSalary.getYear();
 
-                        if (currentDate.getDate() >= date.getDate() && prevMonthSalary < currentMonth && salaryYear >= currentDateYear) {
-                            Salary newSalary = new Salary(currentDate,currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd(), currentSalary.getSalaryAdd(), currentSalary.getUpdateDate());
+                        if (currentDate.getDate() >= dateSalary.getDate() && prevMonthSalary < currentMonth && salaryYear >= currentYear) {
+
+                            Salary newSalary = new Salary(currentDate,Double.valueOf(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd()), currentSalary.getSalaryAdd(), currentDate);
+
+                            System.out.println("NEW SALARY: " + newSalary.getCurrentSalary());
                             listSalary.add(newSalary);
-                            declare.child(currentBank.getId()).child("salary").setValue(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd());
+                            declare.child(currentBank.getId()).child("salary").setValue(Double.valueOf(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd()));
                             declare.child(currentBank.getId()).child("salaryArrayList").setValue(listSalary);
                         }
 

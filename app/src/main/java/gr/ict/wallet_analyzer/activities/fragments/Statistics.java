@@ -69,6 +69,8 @@ public class Statistics extends Fragment {
     private ArrayList<String> xEntrys = new ArrayList<>();
     private String[] xData = {};
     private String lastType = "category";
+    double totalIncome = 0;
+    double totalExpenses = 0;
 
     //Pie Chart Values
     private PieChart chart;
@@ -164,32 +166,33 @@ public class Statistics extends Fragment {
 
 
     private void setLineChart(ArrayList<Salary> salaryList) {
-        double totalIncome = 0;
-        double totalExpenses = 0;
-
-        for (Salary salary: salaryList) {
-            if (salary.getUpdateDate().getYear() == lastYearSelectedInMonths &&  Integer.valueOf(salary.getLastUpdate().getMonth()+1) == lastMonthSelected){
-                totalIncome += salary.getCurrentSalary();
-            }
-        }
-
-
-
-
-
-
+        totalIncome = 0;
+        totalExpenses = 0;
         int previousReceiptMonth = 0;
-
-
         if(!receiptArrayList.isEmpty()){
-            entries1.add(new Entry(0, (float) totalIncome));
-            entries2.add(new Entry(0, (float) totalExpenses));
+            for (Salary salary: salaryList) {
+               if (salary.getUpdateDate().getYear() == lastYearSelectedInMonths &&  Integer.valueOf(salary.getLastUpdate().getMonth()+1) == lastMonthSelected ){
+                    totalIncome += salary.getCurrentSalary();
+                }
+            }
+
+            if(lastType.equals("month")){
+                entries1.add(new Entry(0, (float) totalIncome));
+                entries2.add(new Entry(0, (float) totalExpenses));
+            }else{
+                entries1.add(new Entry(0, (float) 0));
+                entries2.add(new Entry(0,(float) 0));
+            }
+
         }
         for (Receipt receipt :receiptArrayList) {
-            totalIncome -= receipt.getTotalPrice();
-            totalExpenses += receipt.getTotalPrice();
-
-            previousReceiptMonth = createLineEntries(receipt,previousReceiptMonth,totalIncome,totalExpenses,lastType);
+            if((lastType.equals("week"))){
+                if(receipt.getDate().getYear() == lastYearSelectedInMonths){
+                    previousReceiptMonth = doAction(receipt,previousReceiptMonth);
+                }
+            }else {
+                previousReceiptMonth = doAction(receipt,previousReceiptMonth);
+            }
         }
 
         String incomes = getActivity().getBaseContext().getResources().getString(R.string.gen_income);
@@ -231,6 +234,13 @@ public class Statistics extends Fragment {
         }
         lineChart.setData(lineData);
 //        lineChart.invalidate(); // refresh
+    }
+
+    private int doAction(Receipt receipt, int previousReceiptMonth) {
+        totalIncome -= receipt.getTotalPrice();
+        totalExpenses += receipt.getTotalPrice();
+
+        return createLineEntries(receipt,previousReceiptMonth,totalIncome,totalExpenses,lastType);
     }
 
     // FORMAT VALUES IN LINE CHART
@@ -325,19 +335,37 @@ public class Statistics extends Fragment {
                 break;
             case "week" :
                 int pos = 0;
-                for(int i = 0; i< xData.length; i++){
-                    if( xData[i].contains(String.valueOf(receipt.getDate().getDate()))){
-                        pos = i;
+                int currentDate = new Date().getYear();
+                if(currentDate == receipt.getDate().getYear()){
+                    String d1 = String.valueOf(receipt.getDate().getDate());
+                    String d2 = String.valueOf(receipt.getDate().getMonth()+1);
+                    System.out.println("RECEIPT: " + receipt.getDate() + " - PRICE: " + receipt.getTotalPrice());
+                    System.out.println("Current Date:  "+ currentDate + " RECEIPT YEAR: " + receipt.getDate().getYear());
+
+
+                    String receiptDate = "";
+                    if(d1.length() == 1){
+                        d1 = "0"+ d1;
                     }
-                }
-                if(Integer.valueOf(pos) == previousReceiptMonth){
-                    int index = Integer.valueOf(entries.size()-1);
-                    entries1.get(entries.size()-index).setY((float)localSalary);
-                    entries2.get(entries.size()-index).setY((float) totalExpenses);
-                } else {
-                    entries1.add(new Entry(Integer.valueOf(pos), (float)localSalary));
-                    entries2.add(new Entry(Integer.valueOf(pos),  (float) totalExpenses));
-                    previousReceiptMonth = Integer.valueOf(pos);
+                    if(d2.length() == 1){
+                        d2 = "0"+ d2;
+                    }
+                    receiptDate = d1 + "/" + d2;
+
+                    for(int i = 0; i< xData.length; i++){
+                        if( xData[i].equals(receiptDate) && currentDate == receipt.getDate().getYear()){
+                            pos = i;
+                        }
+                    }
+                    if(Integer.valueOf(pos) == previousReceiptMonth){
+                        int index = Integer.valueOf(entries1.size()-1);
+                        entries1.get(index).setY((float)localSalary);
+                        entries2.get(index).setY((float) totalExpenses);
+                    } else {
+                        entries1.add(new Entry(Integer.valueOf(pos), (float)localSalary));
+                        entries2.add(new Entry(Integer.valueOf(pos),  (float) totalExpenses));
+                        previousReceiptMonth = Integer.valueOf(pos);
+                    }
                 }
                 break;
             default:
