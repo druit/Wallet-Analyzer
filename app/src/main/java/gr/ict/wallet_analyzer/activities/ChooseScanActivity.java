@@ -349,17 +349,6 @@ public class ChooseScanActivity extends BaseActivity {
         }
     }
 
-    private boolean isSameLine(FirebaseVisionText.TextBlock currentBlock, FirebaseVisionText.TextBlock previousBlock) {
-        int height = currentBlock.getBoundingBox().height();
-
-        int previousBlockHeight = previousBlock.getBoundingBox().height();
-
-        int currentMeanY = currentBlock.getCornerPoints()[0].y - height / 2;
-        int previousMeanY = previousBlock.getCornerPoints()[0].y + previousBlockHeight / 2;
-
-        return Math.abs(currentMeanY - previousMeanY) >= 5;
-    }
-
     private void getBarcodeData(HashMap<String, Object> parent, HashMap<String, Object> info, HashMap<String, Double> items, String barcode) {
         final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -433,33 +422,6 @@ public class ChooseScanActivity extends BaseActivity {
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
         return image;
-    }
-
-    private boolean isHorizontallyCentered(Point[] point, int width, int height) {
-        final int X_CENTER = width / 2;
-
-        Point topLeftCorner = point[0];
-        Point topRightCorner = point[1];
-
-        int middleXValue = (topLeftCorner.x + topRightCorner.x) / 2;
-
-        return X_CENTER - middleXValue >= 20;
-    }
-
-    private boolean isOnTopSpace(Point[] point, int height) {
-        final int Y_TOP = (int) (height * 0.3); // top 30% of the image
-
-        Point topLeftCorner = point[0];
-        Point bottomLeftCorner = point[3];
-
-        int middleYValue = (topLeftCorner.y + bottomLeftCorner.y) / 2;
-
-        return middleYValue <= Y_TOP;
-    }
-
-    // if 2 points are parallel on y axis returns true
-    private boolean arePointsHParallel(Point[] point1, Point[] point2) {
-        return point1[0].y - point2[0].y <= 20;
     }
 
     /*
