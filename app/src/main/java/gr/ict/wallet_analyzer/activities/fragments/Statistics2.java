@@ -27,13 +27,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import Adapters.MyAccountAdapter;
 import data_class.BankAccount;
+import data_class.History;
 import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.helpers.BankEditPopup;
 import gr.ict.wallet_analyzer.helpers.FirebaseResultInterface;
+import gr.ict.wallet_analyzer.helpers.HistoryArrayList;
 
 public class Statistics2 extends Fragment {
 
@@ -92,15 +95,40 @@ public class Statistics2 extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                 BankAccount bankAccount;
+                BankAccount activeBankAccount = null;
                 double totalSalary = 0;
                 for (DataSnapshot child : children) {
                     bankAccount = child.getValue(BankAccount.class);
                     if(bankAccount.isActive() == 1){
+                        activeBankAccount = bankAccount;
                         totalSalary += bankAccount.getSalary();
                     }
                 }
-                totalBankAccount.setText(String.valueOf(totalSalary) + " €");
+                HistoryArrayList historyArrayList = new HistoryArrayList();
+
+                final double[] finalTotalSalary = {totalSalary};
+                final BankAccount finalActiveBankAccount = activeBankAccount;
+                FirebaseResultInterface firebaseResultInterface = new FirebaseResultInterface<ArrayList<History>>() {
+                    @Override
+                    public void onSuccess(ArrayList<History> histories) {
+                        for (History history:histories) {
+                            if(finalActiveBankAccount!= null && finalActiveBankAccount.isSalaryBank() && finalActiveBankAccount.isActive() == 1 && finalActiveBankAccount.getSalaryArrayList().get(0).getUpdateDate().getTime() <= history.getReceipt().getDate().getTime()){
+                                finalTotalSalary[0] -= history.getReceipt().getTotalPrice();
+                            }
+                        }
+                        DecimalFormat decimalFormat = new DecimalFormat("#.###");
+                        totalBankAccount.setText(String.valueOf(decimalFormat.format(finalTotalSalary[0])) + " €");
+                    }
+
+                    @Override
+                    public void onFailed(Throwable error) {
+
+                    }
+                };
+                historyArrayList.callBackHistoryArrayList(baseReference,firebaseResultInterface);
+
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {

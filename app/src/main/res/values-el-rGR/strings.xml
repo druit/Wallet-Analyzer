@@ -20,6 +20,7 @@
     <string name="gen_save">Αποθήκευση</string>
     <string name="gen_add">Προσθήκη</string>
     <string name="gen_total">Σύνολο: </string>
+    <string name="gen_total_2">Σύνολο</string>
     <string name="gen_accounts">Λογαριασμοί</string>
     <string name="gen_guest">Δεν έχεις λογαριασμό;</string>
     <string name="gen_spent_month">Έξοδα</string>

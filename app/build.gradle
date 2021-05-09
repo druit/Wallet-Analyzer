@@ -49,12 +49,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-ml-vision:'
     implementation 'com.google.firebase:firebase-ml-vision-barcode-model:16.0.1'
     implementation 'com.journeyapps:zxing-android-embedded:3.4.0'
+    implementation 'com.google.firebase:firebase-bom:27.1.0'
+
 
     // Add the SDKs for any other Firebase products you want to use in your app
     // For example, to use Firebase Authentication and Cloud Firestore
     implementation 'com.google.firebase:firebase-auth:19.2.0'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
-    implementation 'com.google.firebase:firebase-database:19.3.0'
+    implementation 'com.google.firebase:firebase-database:19.7.0'
 
     // A small library containing a wrapper/helper for the shared preferences of Android
     implementation 'com.pixplicity.easyprefs:library:1.9.0'

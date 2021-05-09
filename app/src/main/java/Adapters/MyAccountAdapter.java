@@ -22,14 +22,18 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import data_class.BankAccount;
+import data_class.History;
 import data_class.Salary;
 import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.activities.fragments.Statistics2;
 import gr.ict.wallet_analyzer.helpers.BankEditPopup;
+import gr.ict.wallet_analyzer.helpers.FirebaseResultInterface;
+import gr.ict.wallet_analyzer.helpers.HistoryArrayList;
 
 public class MyAccountAdapter extends ArrayAdapter<BankAccount> {
     Context context;
@@ -73,7 +77,35 @@ public class MyAccountAdapter extends ArrayAdapter<BankAccount> {
 //        images.setImageResource(myAccount.get(position).getImages());
         myTitle.setText(myAccount.get(position).getBankTitle());
         myDescription.setText(myAccount.get(position).getDescription());
-        mySalary.setText(String.valueOf(myAccount.get(position).getSalary())+" €");
+        HistoryArrayList historyArrayList = new HistoryArrayList();
+
+        if(myAccount.get(position).isSalaryBank()){
+            FirebaseResultInterface firebaseResultInterface = new FirebaseResultInterface<ArrayList<History>>() {
+                @Override
+                public void onSuccess(ArrayList<History> histories) {
+
+                    double totalPrices = 0.0;
+                    for (History history:histories) {
+                            if(myAccount.get(position).getSalaryArrayList().get(0).getUpdateDate().getTime() <= history.getReceipt().getDate().getTime()){
+                                totalPrices += history.getReceipt().getTotalPrice();
+                            }
+                    }
+                    DecimalFormat decimalFormat = new DecimalFormat("#.###");
+//                totalBankAccount.setText(String.valueOf(decimalFormat.format(finalTotalSalary[0])) + " €");
+                    mySalary.setText(String.valueOf(decimalFormat.format((Double.valueOf(myAccount.get(position).getSalary() - totalPrices))))+" €");
+                }
+
+                @Override
+                public void onFailed(Throwable error) {
+
+                }
+            };
+            historyArrayList.callBackHistoryArrayList(baseReference,firebaseResultInterface);
+        }else{
+            mySalary.setText(String.valueOf(myAccount.get(position).getSalary())+" €");
+        }
+
+
 
         if(myAccount.get(position).isActive() == 1){
             mSwitch.setChecked(true);
