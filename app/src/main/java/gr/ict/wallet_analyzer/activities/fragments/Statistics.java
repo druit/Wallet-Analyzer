@@ -62,10 +62,11 @@ public class Statistics extends Fragment {
 
     //Line Chart Values
     private LineChart lineChart;
-    private LineDataSet lineDataSet1,lineDataSet2;
+    private LineDataSet lineDataSet1,lineDataSet2,lineDataSet3;
     private  List<ILineDataSet> lineDataSet = new ArrayList<>();
     final List<Entry> entries1 = new ArrayList<>();
     final List<Entry> entries2 = new ArrayList<>();
+    final List<Entry> entries3 = new ArrayList<>();
     private ArrayList<String> xEntrys = new ArrayList<>();
     private String[] xData = {};
     private String lastType = "category";
@@ -147,7 +148,7 @@ public class Statistics extends Fragment {
                 createPieEntries(historyHashMap);
 
                 // set Line Graph
-                setLineChart(salaryArrayList);
+                setLineChart(salaryArrayList,historyArrayList);
 
 
                 // PieDataSet
@@ -165,47 +166,100 @@ public class Statistics extends Fragment {
 
 
 
-    private void setLineChart(ArrayList<Salary> salaryList) {
+    private void setLineChart(ArrayList<Salary> salaryList, ArrayList<History> historyArrayList) {
         totalIncome = 0;
         totalExpenses = 0;
+        double prevTotalMonth = 0;
+        ArrayList<Double> totalIncomeArray = new ArrayList<>();
+        ArrayList<Double> incomes = new ArrayList<>();
+        ArrayList<Integer> totalIncomeArrayMonthly = new ArrayList<>();
         int previousReceiptMonth = 0;
         if(!receiptArrayList.isEmpty()){
             for (Salary salary: salaryList) {
-               if (salary.getUpdateDate().getYear() == lastYearSelectedInMonths &&  Integer.valueOf(salary.getLastUpdate().getMonth()+1) == lastMonthSelected ){
+                if (salary.getUpdateDate().getYear() == lastYearSelectedInMonths){
+                    totalIncomeArray.add(salary.getCurrentSalary());
+                    incomes.add(salary.getSalaryAdd());
+                    totalIncomeArrayMonthly.add(salary.getLastUpdate().getMonth());
+                }
+
+                if (salary.getUpdateDate().getYear() == lastYearSelectedInMonths &&  Integer.valueOf(salary.getLastUpdate().getMonth()+1) == lastMonthSelected ){
                     totalIncome += salary.getCurrentSalary();
+                    prevTotalMonth = totalIncome - salary.getSalaryAdd();
                 }
             }
 
             if(lastType.equals("month")){
-                entries1.add(new Entry(0, (float) totalIncome));
+
+                for (History history : historyArrayList) {
+                    Receipt receipt = history.getReceipt();
+                    if(Integer.valueOf(receipt.getDate().getYear())<= lastYearSelectedInMonths && (Integer.valueOf(receipt.getDate().getMonth()+1) < lastMonthSelected)){
+                        System.out.println("RECEIPT: "+ receipt.getTotalPrice());
+                        prevTotalMonth -= receipt.getTotalPrice();
+                    }
+                }
+                entries1.add(new Entry(0, (float) prevTotalMonth));
                 entries2.add(new Entry(0, (float) totalExpenses));
+                entries3.add(new Entry(0,(float)0));
             }else{
                 entries1.add(new Entry(0, (float) 0));
                 entries2.add(new Entry(0,(float) 0));
+                entries3.add(new Entry(0,(float)0));
             }
 
         }
         for (Receipt receipt :receiptArrayList) {
             if((lastType.equals("week"))){
                 if(receipt.getDate().getYear() == lastYearSelectedInMonths){
-                    previousReceiptMonth = doAction(receipt,previousReceiptMonth);
+                    previousReceiptMonth = doAction(receipt,previousReceiptMonth, -1,-1);
                 }
             }else {
-                previousReceiptMonth = doAction(receipt,previousReceiptMonth);
+//                if(lastType.equals("year") || lastType.equals("category")){
+                    int findIncomeArray = -1;
+                    for(int i = 0; i < totalIncomeArray.size(); i++){
+                        if( Integer.valueOf(totalIncomeArrayMonthly.get(i)) == Integer.valueOf(receipt.getDate().getMonth())){
+                            findIncomeArray = i;
+                        }
+                    }if(findIncomeArray != -1){
+                        previousReceiptMonth = doAction(receipt,previousReceiptMonth,totalIncomeArray.get(findIncomeArray),incomes.get(findIncomeArray));
+                        totalIncomeArray.set(findIncomeArray,Double.valueOf(totalIncomeArray.get(findIncomeArray)-receipt.getTotalPrice()));
+                    }else{
+                        previousReceiptMonth = doAction(receipt,previousReceiptMonth, -1,-1);
+                    }
+
+//                }else{
+//                    previousReceiptMonth = doAction(receipt,previousReceiptMonth, -1,-1);
+//                }
             }
         }
 
-        String incomes = getActivity().getBaseContext().getResources().getString(R.string.gen_income);
-        String expenses = getActivity().getBaseContext().getString(R.string.gen_expenses);
+        if(incomes.size()>0 && (incomes.size() != entries3.size()-1) && (lastType.equals("category") || lastType.equals("year"))){
+            double valueIncomes = incomes.get(Integer.valueOf(incomes.size()-1));
+            double valueLocalSalary = entries1.get(Integer.valueOf(entries1.size()-1)).getY() +  salaryList.get(Integer.valueOf(salaryList.size() -1)).getSalaryAdd() ;
+//            double valueTotalExpenses = totalExpenses;
+            entries3.add(new Entry(Integer.valueOf(currentDate.getMonth() + 1), (float) valueIncomes));
+            entries1.add(new Entry(Integer.valueOf(currentDate.getMonth() + 1), (float) valueLocalSalary));
+            entries2.add(new Entry(Integer.valueOf(currentDate.getMonth() + 1), (float) 0));
+        }
 
-        lineDataSet1 = new LineDataSet(entries1, incomes); // add entries to dataset
+        String incomesTitle = getActivity().getBaseContext().getResources().getString(R.string.gen_income);
+        String expenses = getActivity().getBaseContext().getString(R.string.gen_expenses);
+        String total = getActivity().getBaseContext().getString(R.string.gen_total_2);
+
+        lineDataSet3 = new LineDataSet(entries3, incomesTitle);
+
+        lineDataSet1 = new LineDataSet(entries1, total); // add entries to dataset
 
         lineDataSet2 = new LineDataSet(entries2, expenses);
 
+
+
+
         setLineDataSetValueFormat();
 
+        lineDataSet.add(lineDataSet3);
         lineDataSet.add(lineDataSet1);
         lineDataSet.add(lineDataSet2);
+
 
         LineData lineData = new LineData(lineDataSet);
         if(!categories.isEmpty()) {
@@ -236,11 +290,18 @@ public class Statistics extends Fragment {
 //        lineChart.invalidate(); // refresh
     }
 
-    private int doAction(Receipt receipt, int previousReceiptMonth) {
-        totalIncome -= receipt.getTotalPrice();
+    private int doAction(Receipt receipt, int previousReceiptMonth, double totalIncomeArrayNumber,double incomes) {
         totalExpenses += receipt.getTotalPrice();
+        if(totalIncomeArrayNumber != -1){
+            totalIncomeArrayNumber -= receipt.getTotalPrice();
+            return createLineEntries(receipt,previousReceiptMonth,totalIncomeArrayNumber,totalExpenses,lastType,incomes);
+        }else{
+            totalIncome -= receipt.getTotalPrice();
+            return createLineEntries(receipt,previousReceiptMonth,totalIncome,totalExpenses,lastType,0);
+        }
 
-        return createLineEntries(receipt,previousReceiptMonth,totalIncome,totalExpenses,lastType);
+
+
     }
 
     // FORMAT VALUES IN LINE CHART
@@ -254,6 +315,12 @@ public class Statistics extends Fragment {
         });
 
         lineDataSet2.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return super.getFormattedValue(Float.parseFloat(value + " €"));
+            }
+        });
+        lineDataSet3.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 return super.getFormattedValue(Float.parseFloat(value + " €"));
@@ -294,6 +361,32 @@ public class Statistics extends Fragment {
         lineDataSet2.setColor(Color.RED);
         // values text color
         lineDataSet2.setValueTextColor(Color.rgb(255, 255, 255));
+
+
+
+
+
+        // make line curvy
+        lineDataSet3.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+
+        // circles color
+        lineDataSet3.setCircleColor(Color.GREEN);
+        lineDataSet3.setCircleHoleColor(Color.GREEN);
+
+        // Gradient fill
+        lineDataSet3.setDrawFilled(true);
+        Drawable drawable3 = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.gradient_background_linechart2);
+        lineDataSet3.setFillDrawable(drawable3);
+
+        // line color
+        lineDataSet3.setColor(Color.GREEN);
+        // values text color
+        lineDataSet3.setValueTextColor(Color.rgb(255, 255, 255));
+
+        lineDataSet1.setValueTextSize(8);
+        lineDataSet2.setValueTextSize(8);
+        lineDataSet3.setValueTextSize(8);
+
     }
 
     // X data in graph (labels) LINE CHART
@@ -305,20 +398,24 @@ public class Statistics extends Fragment {
     }
 
     //ENTRIES LINE CHART
-    private int createLineEntries(Receipt receipt,int previousReceiptMonth,double localSalary,double totalExpenses,String type) {
+    private int createLineEntries(Receipt receipt,int previousReceiptMonth,double localSalary,double totalExpenses,String type,double incomes) {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         switch (type){
             case "category" :
             case "year" :
                 if(Integer.valueOf(receipt.getDate().getMonth()+1) == previousReceiptMonth){
                     int index = Integer.valueOf(entries.size()-1);
-                    String value = decimalFormat.format(localSalary);
+//                    String value = decimalFormat.format(localSalary);
                     entries1.get(entries.size()-index).setY((float)localSalary);
 
                     entries2.get(entries.size()-index).setY((float)totalExpenses);
+
                 } else {
                     entries1.add(new Entry(Integer.valueOf(receipt.getDate().getMonth() + 1), (float) localSalary));
                     entries2.add(new Entry(Integer.valueOf(receipt.getDate().getMonth() + 1), (float) totalExpenses));
+                    if(incomes!= -1){
+                        entries3.add(new Entry(Integer.valueOf(receipt.getDate().getMonth() + 1), (float) incomes));
+                    }
                     previousReceiptMonth = Integer.valueOf(receipt.getDate().getMonth()+1);
                 }
                 break;
@@ -384,6 +481,7 @@ public class Statistics extends Fragment {
         Description description = new Description();
         switch(lastType){
             case "year":
+            case "category":
                 contextString = getContext().getResources().getString(R.string.filter_obj_4);
                 break;
             case "week":
@@ -397,12 +495,15 @@ public class Statistics extends Fragment {
         lineChart.setDescription(description);
         lineChart.getLegend().setEnabled(true);
 
+        lineChart.getLegend().setYEntrySpace(5);
+        lineChart.getLegend().setXEntrySpace(5);
+
         // hide values in left and right side
         lineChart.getAxisRight().setDrawLabels(false);
         lineChart.getAxisLeft().setDrawLabels(false);
 
         // no zoom
-        lineChart.setScaleEnabled(false);
+//        lineChart.setScaleEnabled(false);
 
         // grid lines color
         lineChart.getXAxis().setGridColor(R.color.colorButton);
@@ -425,7 +526,29 @@ public class Statistics extends Fragment {
         lineChart.getAxisLeft().setTextColor(Color.argb(50, 255, 255, 255));
 
 //        lineChart.getAxisLeft().setAxisMinimum(0);
-//        lineChart.getXAxis().setAxisMaximum(5);
+        int counter = -1;
+        switch(lastType){
+            case "year":
+            case "category":
+                for(int i = 0; i < xData.length; i++){
+                    if(Integer.valueOf(currentDate.getMonth() + 1) == i && lastYearSelectedInMonths == currentDate.getYear()){
+                        counter = i;
+                    }
+                }
+                break;
+
+            default:
+                for(int i = 0; i < xData.length; i++){
+                    if(Integer.valueOf(currentDate.getDate()) == i && Integer.valueOf(currentDate.getMonth() + 1) == lastMonthSelected && lastYearSelectedInMonths == Integer.valueOf(currentDate.getYear())){
+                        counter = i;
+                    }
+                }
+
+        }
+        if(counter!= -1)
+            lineChart.getXAxis().setAxisMaximum(counter);
+        else
+            lineChart.getXAxis().setAxisMaximum(xData.length);
 //        lineChart.getXAxis().setAxisMinimum(0);
 
 //        lineChart.getXAxis().setLabelCount(5, true);
@@ -760,146 +883,32 @@ public class Statistics extends Fragment {
         String datesOfMonth[] = {};
         switch (daysInMonth){
             case 28:
-                datesOfMonth = new String[]{
-                        getCurrentDayOfSelected(-1),
-                        getCurrentDayOfSelected(0),
-                        getCurrentDayOfSelected(1),
-                        getCurrentDayOfSelected(2),
-                        getCurrentDayOfSelected(3),
-                        getCurrentDayOfSelected(4),
-                        getCurrentDayOfSelected(5),
-                        getCurrentDayOfSelected(6),
-                        getCurrentDayOfSelected(7),
-                        getCurrentDayOfSelected(8),
-                        getCurrentDayOfSelected(9),
-                        getCurrentDayOfSelected(10),
-                        getCurrentDayOfSelected(11),
-                        getCurrentDayOfSelected(12),
-                        getCurrentDayOfSelected(13),
-                        getCurrentDayOfSelected(14),
-                        getCurrentDayOfSelected(15),
-                        getCurrentDayOfSelected(16),
-                        getCurrentDayOfSelected(17),
-                        getCurrentDayOfSelected(18),
-                        getCurrentDayOfSelected(19),
-                        getCurrentDayOfSelected(20),
-                        getCurrentDayOfSelected(21),
-                        getCurrentDayOfSelected(22),
-                        getCurrentDayOfSelected(23),
-                        getCurrentDayOfSelected(24),
-                        getCurrentDayOfSelected(25),
-                        getCurrentDayOfSelected(26),
-                        getCurrentDayOfSelected(27),
-                        getCurrentDayOfSelected(28)
-                };
+                datesOfMonth = new String[30];
+
+                for (int i = 0; i < 30; i++) {
+                    datesOfMonth[i] = getCurrentDayOfSelected(i - 1);
+                }
                 break;
             case 29:
-                datesOfMonth = new String[]{
-                        getCurrentDayOfSelected(-1),
-                        getCurrentDayOfSelected(0),
-                        getCurrentDayOfSelected(1),
-                        getCurrentDayOfSelected(2),
-                        getCurrentDayOfSelected(3),
-                        getCurrentDayOfSelected(4),
-                        getCurrentDayOfSelected(5),
-                        getCurrentDayOfSelected(6),
-                        getCurrentDayOfSelected(7),
-                        getCurrentDayOfSelected(8),
-                        getCurrentDayOfSelected(9),
-                        getCurrentDayOfSelected(10),
-                        getCurrentDayOfSelected(11),
-                        getCurrentDayOfSelected(12),
-                        getCurrentDayOfSelected(13),
-                        getCurrentDayOfSelected(14),
-                        getCurrentDayOfSelected(15),
-                        getCurrentDayOfSelected(16),
-                        getCurrentDayOfSelected(17),
-                        getCurrentDayOfSelected(18),
-                        getCurrentDayOfSelected(19),
-                        getCurrentDayOfSelected(20),
-                        getCurrentDayOfSelected(21),
-                        getCurrentDayOfSelected(22),
-                        getCurrentDayOfSelected(23),
-                        getCurrentDayOfSelected(24),
-                        getCurrentDayOfSelected(25),
-                        getCurrentDayOfSelected(26),
-                        getCurrentDayOfSelected(27),
-                        getCurrentDayOfSelected(28),
-                        getCurrentDayOfSelected(29)
-                };
+                datesOfMonth = new String[31];
+
+                for (int i = 0; i < 31; i++) {
+                    datesOfMonth[i] = getCurrentDayOfSelected(i - 1);
+                }
                 break;
             case 30:
-                datesOfMonth = new String[]{
-                        getCurrentDayOfSelected(-1),
-                        getCurrentDayOfSelected(0),
-                        getCurrentDayOfSelected(1),
-                        getCurrentDayOfSelected(2),
-                        getCurrentDayOfSelected(3),
-                        getCurrentDayOfSelected(4),
-                        getCurrentDayOfSelected(5),
-                        getCurrentDayOfSelected(6),
-                        getCurrentDayOfSelected(7),
-                        getCurrentDayOfSelected(8),
-                        getCurrentDayOfSelected(9),
-                        getCurrentDayOfSelected(10),
-                        getCurrentDayOfSelected(11),
-                        getCurrentDayOfSelected(12),
-                        getCurrentDayOfSelected(13),
-                        getCurrentDayOfSelected(14),
-                        getCurrentDayOfSelected(15),
-                        getCurrentDayOfSelected(16),
-                        getCurrentDayOfSelected(17),
-                        getCurrentDayOfSelected(18),
-                        getCurrentDayOfSelected(19),
-                        getCurrentDayOfSelected(20),
-                        getCurrentDayOfSelected(21),
-                        getCurrentDayOfSelected(22),
-                        getCurrentDayOfSelected(23),
-                        getCurrentDayOfSelected(24),
-                        getCurrentDayOfSelected(25),
-                        getCurrentDayOfSelected(26),
-                        getCurrentDayOfSelected(27),
-                        getCurrentDayOfSelected(28),
-                        getCurrentDayOfSelected(29),
-                        getCurrentDayOfSelected(30)
-                };
+                datesOfMonth = new String[32];
+
+                for (int i = 0; i < 32; i++) {
+                    datesOfMonth[i] = getCurrentDayOfSelected(i - 1);
+                }
                 break;
             case 31:
-                datesOfMonth = new String[]{
-                        getCurrentDayOfSelected(-1),
-                        getCurrentDayOfSelected(0),
-                        getCurrentDayOfSelected(1),
-                        getCurrentDayOfSelected(2),
-                        getCurrentDayOfSelected(3),
-                        getCurrentDayOfSelected(4),
-                        getCurrentDayOfSelected(5),
-                        getCurrentDayOfSelected(6),
-                        getCurrentDayOfSelected(7),
-                        getCurrentDayOfSelected(8),
-                        getCurrentDayOfSelected(9),
-                        getCurrentDayOfSelected(10),
-                        getCurrentDayOfSelected(11),
-                        getCurrentDayOfSelected(12),
-                        getCurrentDayOfSelected(13),
-                        getCurrentDayOfSelected(14),
-                        getCurrentDayOfSelected(15),
-                        getCurrentDayOfSelected(16),
-                        getCurrentDayOfSelected(17),
-                        getCurrentDayOfSelected(18),
-                        getCurrentDayOfSelected(19),
-                        getCurrentDayOfSelected(20),
-                        getCurrentDayOfSelected(21),
-                        getCurrentDayOfSelected(22),
-                        getCurrentDayOfSelected(23),
-                        getCurrentDayOfSelected(24),
-                        getCurrentDayOfSelected(25),
-                        getCurrentDayOfSelected(26),
-                        getCurrentDayOfSelected(27),
-                        getCurrentDayOfSelected(28),
-                        getCurrentDayOfSelected(29),
-                        getCurrentDayOfSelected(30),
-                        getCurrentDayOfSelected(31)
-                };
+                datesOfMonth = new String[33];
+
+                for (int i = 0; i < 33; i++) {
+                    datesOfMonth[i] = getCurrentDayOfSelected(i - 1);
+                }
                 break;
             default:
                 break;
@@ -944,7 +953,7 @@ public class Statistics extends Fragment {
 
                 setOptionLineChart();
                 // set Line Graph
-                setLineChart(salaryArrayList);
+                setLineChart(salaryArrayList, historyArrayList);
 
                 // PieDataSet
                 createPieDataSet();
@@ -1003,9 +1012,11 @@ public class Statistics extends Fragment {
         lineDataSet2.clear();
         entries1.clear();
         entries2.clear();
+        entries3.clear();
 
         lineDataSet1.notifyDataSetChanged();
         lineDataSet2.notifyDataSetChanged();
+        lineDataSet3.notifyDataSetChanged();
 //        lineDataSet.notifyAll();
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();

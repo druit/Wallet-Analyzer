@@ -19,6 +19,7 @@
     <string name="gen_save">Save</string>
     <string name="gen_add">Add</string>
     <string name="gen_total">Total: </string>
+    <string name="gen_total_2">Total</string>
     <string name="gen_accounts">Accounts</string>
     <string name="gen_guest">Not a user?</string>
     <string name="gen_spent_month">Expenses</string>

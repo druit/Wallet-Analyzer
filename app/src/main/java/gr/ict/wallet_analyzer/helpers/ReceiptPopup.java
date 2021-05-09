@@ -67,7 +67,9 @@ public class ReceiptPopup {
 
         this.itemPosition = itemPosition;
     }
-    public ReceiptPopup() {}
+
+    public ReceiptPopup() {
+    }
 
     public void showReceiptPopup() {
         final History showingHistory = historyArrayList.get(itemPosition);
@@ -269,7 +271,7 @@ public class ReceiptPopup {
     }
 
     private void deleteReceipt() {
-        AlertDialog.Builder alertDeclare = new AlertDialog.Builder(context);
+        AlertDialog.Builder alertDeclare = new AlertDialog.Builder(activity);
         alertDeclare.setMessage(activity.getString(R.string.alert_delete_receipt)).setCancelable(false)
                 .setPositiveButton(activity.getString(R.string.gen_yes), new DialogInterface.OnClickListener() {
                     @Override

@@ -336,15 +336,15 @@ public class BankEditPopup {
                     Iterable<DataSnapshot> children = dataSnapshot.getChildren();
                     BankAccount bankAccount;
                     BankAccount currentBank = null;
-                    Salary salary;
+//                    Salary salary;
                     ArrayList<Salary> listSalary = new ArrayList<>();
 
                     for (DataSnapshot child : children) {
                         bankAccount = child.getValue(BankAccount.class);
-                        salary = bankAccount.getSalaryArrayList().get(bankAccount.getSalaryArrayList().size() - 1);
+//                        salary = bankAccount.getSalaryArrayList().get(bankAccount.getSalaryArrayList().size() - 1);
                         if(bankAccount.isSalaryBank() == true) {
                             currentBank = bankAccount;
-                            listSalary.add(salary);
+                            listSalary = bankAccount.getSalaryArrayList();
                         }
                     }
                     if(listSalary.size()>0) {
@@ -365,7 +365,6 @@ public class BankEditPopup {
 
                             Salary newSalary = new Salary(currentDate,Double.valueOf(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd()), currentSalary.getSalaryAdd(), currentDate);
 
-                            System.out.println("NEW SALARY: " + newSalary.getCurrentSalary());
                             listSalary.add(newSalary);
                             declare.child(currentBank.getId()).child("salary").setValue(Double.valueOf(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd()));
                             declare.child(currentBank.getId()).child("salaryArrayList").setValue(listSalary);
