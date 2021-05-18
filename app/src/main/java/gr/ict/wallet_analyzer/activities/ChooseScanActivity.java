@@ -13,9 +13,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,7 +50,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -55,32 +62,53 @@ import data_class.History;
 import data_class.Item;
 import data_class.Receipt;
 import gr.ict.wallet_analyzer.R;
+import gr.ict.wallet_analyzer.helpers.ReceiptBubbleChoice;
 import me.pqpo.smartcropperlib.view.CropImageView;
 
 public class ChooseScanActivity extends BaseActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    private final String CROP_STEP = "CROP_STEP";
-    private final String INFORMATION_STEP = "INFORMATION_STEP";
-    private final String PRODUCT_STEP = "PRODUCT_STEP";
+
+    public final static String CROP_STEP = "CROP_STEP";
+
+    public final static String SHOP_NAME_STEP = "INFORMATION_STEP";
+    public final static String LOCATION_STEP = "LOCATION_STEP";
+    public final static String PRODUCT_STEP = "PRODUCT_STEP";
+
+    public static String cropFlag = CROP_STEP;
+
+    private final ArrayList<Item> itemsArrayList = new ArrayList<>();
+
     String currentPhotoPath;
+
     HashMap<String, Object> parentKey = new HashMap<>();
     HashMap<String, Double> itemList = new HashMap<>();
     HashMap<String, Object> infoList = new HashMap<>();
     ArrayList<String> barcodeList = new ArrayList<>();
+
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseUser user = mAuth.getCurrentUser();
+    DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+
     private Button scanBarcode, scanPhoto, finishScanningButton;
     private ImageView imageView;
     private Bitmap imageBitmap;
+
     private Uri photoURI;
     private String uid;
     private CropImageView ivCrop;
     private TextView recognizedTextView;
-    private RelativeLayout mainRelativeLayout, cameraRelativelayout;
-    private String cropFlag = this.CROP_STEP;
+    private RelativeLayout mainRelativeLayout, cameraRelativeLayout;
 
-    private static Bitmap rotateImage(Bitmap source, float angle) {
+    private History history;
+    private double finalPrice = 0;
+    private Date date;
+    public static String shopName = "";
+    public static String shopAddress = "";
+
+    private static Bitmap rotateImage(Bitmap source) {
         Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
+        matrix.postRotate((float) 90);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
     }
@@ -113,7 +141,7 @@ public class ChooseScanActivity extends BaseActivity {
         });
 
         mainRelativeLayout = findViewById(R.id.main_relative_layout);
-        cameraRelativelayout = findViewById(R.id.camera_relative_layout);
+        cameraRelativeLayout = findViewById(R.id.camera_relative_layout);
 
         recognizedTextView = findViewById(R.id.recognized_text_view);
 
@@ -164,9 +192,9 @@ public class ChooseScanActivity extends BaseActivity {
                 try {
                     imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
                     if (imageBitmap != null) {
-                        imageBitmap = rotateImage(imageBitmap, 90);
+                        imageBitmap = rotateImage(imageBitmap);
                         mainRelativeLayout.setVisibility(View.GONE);
-                        cameraRelativelayout.setVisibility(View.VISIBLE);
+                        cameraRelativeLayout.setVisibility(View.VISIBLE);
                         ivCrop.setImageToCrop(imageBitmap);
                     } else {
                         Toast.makeText(this, "No image was captures", Toast.LENGTH_LONG).show();
@@ -258,10 +286,13 @@ public class ChooseScanActivity extends BaseActivity {
             public void onSuccess(FirebaseVisionText firebaseVisionText) {
                 scanBarcode.setEnabled(true);
 
-                if (cropFlag.equals(INFORMATION_STEP)) {
-                    shopInformationRecognition(firebaseVisionText);
-                } else if (cropFlag.equals(PRODUCT_STEP)) {
-                    productsRecognition(firebaseVisionText);
+                switch (cropFlag) {
+                    case SHOP_NAME_STEP:
+                        shopInformationRecognition(firebaseVisionText);
+                        break;
+                    case PRODUCT_STEP:
+                        productsRecognition(firebaseVisionText);
+                        break;
                 }
             }
         })
@@ -280,19 +311,19 @@ public class ChooseScanActivity extends BaseActivity {
         if (blockList.size() == 0) {
             Toast.makeText(this, "No Text Found in Image, please try again", Toast.LENGTH_LONG).show();
         } else {
-            ArrayList<FirebaseVisionText.TextBlock> discoveredStringSets = new ArrayList<>();
-            discoveredStringSets.addAll(result.getTextBlocks());
-
-            for (FirebaseVisionText.TextBlock block : discoveredStringSets) {
-                String blockText = block.getText();
-
-                String[] lines = blockText.split("\\r?\\n");
-                for (String line : lines) {
-
-                }
-            }
-            cropFlag = PRODUCT_STEP;
+            ArrayList<String> allWords = returnWordArray(result);
+            ReceiptBubbleChoice bubbleChoicePopup = new ReceiptBubbleChoice(this, allWords, finishScanningButton);
         }
+    }
+
+    private ArrayList<String> returnWordArray(FirebaseVisionText result) {
+        ArrayList<String> allWords = new ArrayList<>();
+        for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
+            String blockText = block.getText();
+            String[] lines = blockText.split("\\r?\\n");
+            allWords.addAll(Arrays.asList(lines));
+        }
+        return allWords;
     }
 
     private void productsRecognition(FirebaseVisionText result) {
@@ -333,19 +364,8 @@ public class ChooseScanActivity extends BaseActivity {
                     }
                 }
             }
-
-            int i = 0;
-            for (Map.Entry<String, Double> entry : matchedMap.entrySet()) {
-                String key = entry.getKey();
-                Double value = entry.getValue();
-
-                System.out.println("entry: " + i);
-                System.out.println("product = " + key);
-                System.out.println("price = " + value);
-                i++;
-            }
-
-            cameraScan(matchedMap);
+            populateHistoryWithProducts(matchedMap);
+            showDatePickerPopup(imageView);
         }
     }
 
@@ -428,7 +448,7 @@ public class ChooseScanActivity extends BaseActivity {
      * in cropFlag case 0 we have the initial crop for the image to seem like document
      * 1: select shop information
      * 2: select products
-     * 3: select whatever
+     * 3: select location
      */
     private void finishScanning() {
         if (ivCrop != null) {
@@ -445,60 +465,65 @@ public class ChooseScanActivity extends BaseActivity {
                     };
                     ivCrop.setCropPoints(points);
                     recognizedTextView.setText("Select Information");
-                    cropFlag = INFORMATION_STEP;
+                    cropFlag = SHOP_NAME_STEP;
                     break;
-                case INFORMATION_STEP:
+                case SHOP_NAME_STEP:
                     detectTextFromImage(crop);
                     recognizedTextView.setText("Select Products");
                     break;
                 case PRODUCT_STEP:
-                    recognizedTextView.setText("Hmmm");
                     detectTextFromImage(crop);
-//                    cropFlag = 3;
+                    recognizedTextView.setText("Select Date");
                     break;
-//                case; 3:
-////                    recognizedTextView.setText("Select Date");
-////                    detectTextFromImage(crop);
-////                    cropFlag++;
-////                    break
             }
-
-//            imageView.setImageBitmap(crop);
-//            ivCrop.setVisibility(View.GONE);
-//            detectTextFromImage(crop);
         } else {
             Toast.makeText(ChooseScanActivity.this, "Image capture error", Toast.LENGTH_LONG).show();
         }
     }
 
-    public void cameraScan(HashMap<String, Double> matchedMap) {
-        final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-
+    private void populateHistoryWithProducts(HashMap<String, Double> matchedMap) {
         // create the object and send it to firebase
-        List<Item> list = new ArrayList<>();
-        double finalPrice = 0;
+        itemsArrayList.clear();
+        finalPrice = 0;
         for (Map.Entry<String, Double> item : matchedMap.entrySet()) {
             Item newItem = new Item(item.getKey(), item.getValue());
-            list.add(newItem);
+            itemsArrayList.add(newItem);
             finalPrice += item.getValue();
         }
+    }
 
-        // TODO: date
-        Date date;
-        try {
-            String d = "1619155851";
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-            date = format.parse(d);
-        } catch (ParseException e) {
-            date = new Date();
-            e.printStackTrace();
-        }
+    private void showDatePickerPopup(View viewToShowAt) {
+        // inflate the layout of the popup window`
+        LayoutInflater genericInflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View datePickerView = genericInflater.inflate(R.layout.datepicker_popup, null);
 
-        // TODO: address
-        String address = "address";
+        // create the popup window
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+        final PopupWindow datePickerPopup = new PopupWindow(datePickerView, width, height, true);
 
-        // TODO: store name
-        String storeName = "store name";
+        final DatePicker datePicker = datePickerView.findViewById(R.id.date_picker_widget);
+        Button finishButton = datePickerView.findViewById(R.id.finish_property_edit_button);
+
+        // show the popup window
+        datePickerPopup.showAtLocation(viewToShowAt, Gravity.CENTER, 0, 0);
+
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int day = datePicker.getDayOfMonth();
+                int month = datePicker.getMonth();
+                int year = datePicker.getYear();
+                date = new GregorianCalendar(year, month, day).getTime();
+
+                datePickerPopup.dismiss();
+                createHistoryObject();
+            }
+        });
+    }
+
+    private void createHistoryObject() {
+        final String id = baseReference.push().getKey();
 
         // TODO: store type;
         String storeType = "shop type";
@@ -506,15 +531,14 @@ public class ChooseScanActivity extends BaseActivity {
         // TODO: image;
         String imagePath = "image path";
 
-        final String id = mDatabase.push().getKey();
-
-        Receipt receipt = new Receipt(list, address, storeType, imagePath, finalPrice, id, date, storeName);
+        Receipt receipt = new Receipt(itemsArrayList, shopAddress.trim(), storeType, imagePath, finalPrice, id, date, shopName.trim());
         final History history = new History(id, receipt);
 
-        mDatabase.child("users").child(uid).child("history").child(id).setValue(history);
+        baseReference.child("history").child(id).setValue(history);
 
         // print message
         Toast.makeText(this, "Receipt Added", Toast.LENGTH_LONG).show();
+        this.finish();
     }
 }
 
