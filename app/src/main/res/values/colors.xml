@@ -5,9 +5,45 @@
     <color name="colorAccent">#6EAFFF</color>
     <color name="colorButton">#353644</color>
     <color name="color1">#F3BA7D</color>
-    <color name="color2">#68F37A</color>
-    <color name="color3">#6EAFFF</color>
+    <color name="colorLightGreen">#68F37A</color>
+    <color name="colorBlue">#6EAFFF</color>
+    <color name="colorDarkBlue">#040F2E</color>
+    <color name="colorOrange">#FF5722</color>
+    <color name="colorSalmon">#E91E63</color>
+    <color name="colorViolet">#5121FF</color>
+
+    <color name="colorSidebarIcons">#B56EAFFF</color>
+
+    <!--  main graph  -->
+    <color name="colorMainGraphGrid">#3B353644</color>
+
+
+    <color name="colorPie1">#3E2059</color>
+    <color name="colorPie2">#A281C3</color>
+    <color name="colorPie3">#3D2595</color>
+    <color name="colorPie4">#461CFB</color>
+    <color name="colorPie5">#964BD8</color>
+
+    <color name="colorLineChart1">#E91E63</color>
+    <color name="colorLineChart1End">#E91E63</color>
+
+
+    <color name="colorLineChart2">#77DD7B</color>
+    <color name="colorLineChart2End">#77DD7B</color>
+
+    <color name="colorLineChart3">#4C1AC1</color>
+    <color name="colorLineChart3End">#C68FDD</color>
+
+    <color name="colorLineChart4">#461CFB</color>
+    <color name="colorLineChart4End">#461CFB</color>
+
+    <color name="colorLineChart5">#964BD8</color>
+    <color name="colorLineChart5End">#964BD8</color>
+
     <color name="colorWhite">#E4E4E4</color>
+    <color name="colorGreyBlack">#252525</color>
+    <color name="colorBlack">#000000</color>
     <color name="colorBlackTransparent1">#A1000000</color>
     <color name="colorButtonLight">#17B7FF</color>
+    <color name="colorBlur">#8B353643</color>
 </resources>

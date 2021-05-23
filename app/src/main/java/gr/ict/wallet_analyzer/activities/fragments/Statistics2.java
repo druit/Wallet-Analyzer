@@ -42,15 +42,15 @@ public class Statistics2 extends Fragment {
 
     PopupWindow popupWindow;
     ListView listView;
+    ArrayList<BankAccount> myAccount = new ArrayList<>();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
     private String uid = user.getUid();
     DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference().child("users").child(uid);
-    ArrayList<BankAccount> myAccount = new ArrayList<>();
 
     @NonNull
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.statistics2_fragment,container,false);
+        return inflater.inflate(R.layout.statistics2_fragment, container, false);
 //        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -67,9 +67,7 @@ public class Statistics2 extends Fragment {
             @Override
             public void onClick(View view) {
                 //open edit or save pop up window
-
-
-                bankEditPopup.ShowBankPopup(false,null,baseReference, myAccount);
+                bankEditPopup.ShowBankPopup(false, null, baseReference, myAccount);
                 bankEditPopup.setText("SAVE");
 //                openPopup();
             }
@@ -99,7 +97,7 @@ public class Statistics2 extends Fragment {
                 double totalSalary = 0;
                 for (DataSnapshot child : children) {
                     bankAccount = child.getValue(BankAccount.class);
-                    if(bankAccount.isActive() == 1){
+                    if (bankAccount.isActive() == 1) {
                         activeBankAccount = bankAccount;
                         totalSalary += bankAccount.getSalary();
                     }
@@ -111,8 +109,8 @@ public class Statistics2 extends Fragment {
                 FirebaseResultInterface firebaseResultInterface = new FirebaseResultInterface<ArrayList<History>>() {
                     @Override
                     public void onSuccess(ArrayList<History> histories) {
-                        for (History history:histories) {
-                            if(finalActiveBankAccount!= null && finalActiveBankAccount.isSalaryBank() && finalActiveBankAccount.isActive() == 1 && finalActiveBankAccount.getSalaryArrayList().get(0).getUpdateDate().getTime() <= history.getReceipt().getDate().getTime()){
+                        for (History history : histories) {
+                            if (finalActiveBankAccount != null && finalActiveBankAccount.isSalaryBank() && finalActiveBankAccount.isActive() == 1 && finalActiveBankAccount.getSalaryArrayList().get(0).getUpdateDate().getTime() <= history.getReceipt().getDate().getTime()) {
                                 finalTotalSalary[0] -= history.getReceipt().getTotalPrice();
                             }
                         }
@@ -125,7 +123,7 @@ public class Statistics2 extends Fragment {
 
                     }
                 };
-                historyArrayList.callBackHistoryArrayList(baseReference,firebaseResultInterface);
+                historyArrayList.callBackHistoryArrayList(baseReference, firebaseResultInterface);
 
             }
 
@@ -155,12 +153,12 @@ public class Statistics2 extends Fragment {
 //
 //            }
 //        });
-        FirebaseResultInterface firebaseResultInterface =  new FirebaseResultInterface<ArrayList<BankAccount>>() {
+        FirebaseResultInterface firebaseResultInterface = new FirebaseResultInterface<ArrayList<BankAccount>>() {
 
             @Override
             public void onSuccess(ArrayList<BankAccount> data) {
                 myAccount = data;
-                if(getActivity() != null) {
+                if (getActivity() != null) {
                     MyAccountAdapter adapter = new MyAccountAdapter(getContext(), myAccount, getActivity());
                     listView.setAdapter(adapter);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -186,13 +184,13 @@ public class Statistics2 extends Fragment {
             }
         };
 
-        bankEditPopup.callBackMyAccount(baseReference,firebaseResultInterface);
+        bankEditPopup.callBackMyAccount(baseReference, firebaseResultInterface);
     }
 
     private void openPopup() {
         // inflate the layout of the popup window
 
-        LayoutInflater inflater = (LayoutInflater)getActivity().getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getActivity().getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.add_item_my_account, null);
 
         // create the popup window

@@ -1,40 +1,20 @@
 package gr.ict.wallet_analyzer.activities;
 
-import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 
-import com.github.mikephil.charting.charts.LineChart;
+import androidx.viewpager.widget.ViewPager;
+
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import data_class.YourData;
 import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.activities.ui.main.SectionsPagerAdapter;
 
-public class Portfolio extends BaseActivity {
+public class PortfolioActivity extends BaseActivity {
     private PieChart chart;
     private PieDataSet dataSet;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

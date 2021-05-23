@@ -4,4 +4,5 @@
     <item name="ocr_analyze" type="id" />
     <item name="ocr_text" type="id" />
     <item name="ocr_analyze_barcode" type="id" />
+    <item name="drawer_blur_view" type="id" />
 </resources>

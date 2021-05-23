@@ -68,9 +68,6 @@ public class ReceiptPopup {
         this.itemPosition = itemPosition;
     }
 
-    public ReceiptPopup() {
-    }
-
     public void showReceiptPopup() {
         final History showingHistory = historyArrayList.get(itemPosition);
         receipt = showingHistory.getReceipt();
@@ -115,7 +112,7 @@ public class ReceiptPopup {
 
         // blur effect
         BlurView blurView = popupView.findViewById(R.id.blurView);
-        new BlurEffect().setBlurEffect(activity, blurView);
+        new BlurEffect().setBlurEffect(activity, blurView, true);
 
         // show the popup window
         popupWindow.showAtLocation(activity.findViewById(R.id.list), Gravity.CENTER, 0, 0);
