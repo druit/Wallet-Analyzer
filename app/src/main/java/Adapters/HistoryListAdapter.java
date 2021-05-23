@@ -9,18 +9,19 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import data_class.History;
 import gr.ict.wallet_analyzer.R;
 
-public class MyListAdapter extends ArrayAdapter<String> {
+public class HistoryListAdapter extends ArrayAdapter<String> {
 
     private final Activity context;
     private ArrayList<History> historyArrayList;
 
-    public MyListAdapter(Activity context, ArrayList<History> historyArrayList) {
-        super(context, R.layout.mylist);
+    public HistoryListAdapter(Activity context, ArrayList<History> historyArrayList) {
+        super(context, R.layout.history_list);
 
         this.context = context;
         this.historyArrayList = historyArrayList;
@@ -28,18 +29,24 @@ public class MyListAdapter extends ArrayAdapter<String> {
 
     public View getView(int position, View view, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
-        @SuppressLint("ViewHolder") View rowView = inflater.inflate(R.layout.mylist, null, true);
+        @SuppressLint("ViewHolder") View rowView = inflater.inflate(R.layout.history_list, null, true);
 
         History history = historyArrayList.get(position);
 
         TextView titleText = rowView.findViewById(R.id.title);
         TextView subtitleText = rowView.findViewById(R.id.subtitle);
+        TextView dateTextView = rowView.findViewById(R.id.date);
 
         titleText.setText(history.getReceipt().getStoreName());
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
 
         subtitleText.setText( decimalFormat.format(history.getReceipt().getTotalPrice()) + " €");
+
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+        String strDate = formatter.format(history.getReceipt().getDate());
+
+        dateTextView.setText(strDate);
 
         return rowView;
     }

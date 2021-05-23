@@ -15,12 +15,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Collections;
 
-import Adapters.MyListAdapter;
+import Adapters.HistoryListAdapter;
 import data_class.History;
 import gr.ict.wallet_analyzer.R;
 
 public class HistoryListView {
-    private MyListAdapter mainAdapter;
+    private HistoryListAdapter mainAdapter;
     private Activity activity;
     private HistoryArrayList historyArrayList = new HistoryArrayList();
     private DatabaseReference baseReference;
@@ -35,7 +35,7 @@ public class HistoryListView {
     public void setListView() {
         ListView mainListView;
 
-        mainAdapter = new MyListAdapter(activity, historyArrayList.getHistoryArrayList());
+        mainAdapter = new HistoryListAdapter(activity, historyArrayList.getHistoryArrayList());
         mainListView = activity.findViewById(R.id.list);
         mainListView.setAdapter(mainAdapter);
 

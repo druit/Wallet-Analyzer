@@ -11,7 +11,7 @@
         android:id="@+id/blurView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:blurOverlayColor="#3E2F5E95">
+        app:blurOverlayColor="#25282F51">
         <!--Any child View here, TabLayout for example-->
     </eightbitlab.com.blurview.BlurView>
 
@@ -90,7 +90,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginBottom="75dp"
         android:text="Argyropoulou 16, Thessaloniki"
-        android:textColor="@color/color2"
+        android:textColor="@color/colorLightGreen"
         android:textAlignment="textStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/location_text" />
@@ -114,7 +114,7 @@
         android:layout_marginBottom="50dp"
         android:text="21/3/2020"
         android:textAlignment="textStart"
-        android:textColor="@color/color2"
+        android:textColor="@color/colorLightGreen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/date_text" />
 
@@ -137,7 +137,7 @@
         android:layout_marginBottom="25dp"
         android:text="@string/gen_type_category"
         android:textAlignment="textStart"
-        android:textColor="@color/color2"
+        android:textColor="@color/colorLightGreen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView4" />
 

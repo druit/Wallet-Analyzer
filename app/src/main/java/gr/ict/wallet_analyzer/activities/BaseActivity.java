@@ -14,15 +14,14 @@ import java.util.Locale;
 
 public class BaseActivity extends AppCompatActivity {
     @Override
-    protected  void attachBaseContext(Context newBase ) {
+    protected void attachBaseContext(Context newBase) {
 //        SharedPreferences prefs = getSharedPreferences("Settings", Activity.MODE_PRIVATE);
-        String language = Prefs.getString("My_Lang","en");
+        String language = Prefs.getString("My_Lang", "en");
         Context newContext = wrap(newBase, new Locale(language));
         super.attachBaseContext(newContext);
     }
 
-    private ContextWrapper wrap(Context mContext , Locale newLocale )  {
-
+    private ContextWrapper wrap(Context mContext, Locale newLocale) {
         Configuration configuration = mContext.getResources().getConfiguration();
         Locale.setDefault(newLocale);
 

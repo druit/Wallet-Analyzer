@@ -119,7 +119,7 @@
                     android:layout_marginStart="5dp"
                     android:text="21/3/2020"
                     android:textAlignment="textStart"
-                    android:textColor="@color/color2" />
+                    android:textColor="@color/colorLightGreen" />
             </LinearLayout>
             <CheckBox
                 android:id="@+id/mainBankCheckBox"
@@ -127,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="55dp"
                 android:layout_weight="1"
-                android:textColor="@color/color2"
+                android:textColor="@color/colorLightGreen"
                 android:text="@string/gen_main_bank"
                 android:buttonTint="@color/colorPrimary"/>
 

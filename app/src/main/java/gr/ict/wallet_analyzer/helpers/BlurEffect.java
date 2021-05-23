@@ -9,7 +9,7 @@ import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
 
 public class BlurEffect {
-    public void setBlurEffect(Activity activity, BlurView blurView) {
+    public void setBlurEffect(Activity activity, BlurView blurView, boolean fixed) {
         // blur effect
         float radius = 10f;
 
@@ -25,6 +25,6 @@ public class BlurEffect {
                 .setFrameClearDrawable(windowBackground)
                 .setBlurAlgorithm(new RenderScriptBlur(activity.getApplicationContext()))
                 .setBlurRadius(radius)
-                .setHasFixedTransformationMatrix(true);
+                .setHasFixedTransformationMatrix(fixed);
     }
 }

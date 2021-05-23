@@ -20,7 +20,7 @@ public class ItemAdapter extends ArrayAdapter<String> {
     private List<Item> itemArrayList;
 
     public ItemAdapter(Activity context, List<Item> itemArrayList) {
-        super(context, R.layout.mylist);
+        super(context, R.layout.history_list);
 
         this.context = context;
         this.itemArrayList = itemArrayList;
@@ -29,7 +29,7 @@ public class ItemAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
-        @SuppressLint("ViewHolder") View rowView = inflater.inflate(R.layout.mylist, null, true);
+        @SuppressLint("ViewHolder") View rowView = inflater.inflate(R.layout.item_list, null, true);
 
         Item item = itemArrayList.get(position);
 
