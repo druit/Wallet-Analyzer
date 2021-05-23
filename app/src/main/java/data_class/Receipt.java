@@ -16,7 +16,7 @@ public class Receipt implements Serializable {
 
     public Receipt() {}
 
-    public Receipt(List<Item> items, String address, String storeType, String image, double totalPrice, String barcode, Date date, String storeName){
+    public Receipt(List<Item> items, String address, String storeType, String image, double totalPrice, String barcode, Date date, String storeName) {
         this.items = items;
         this.address = address;
         this.storeType = storeType;
@@ -94,7 +94,7 @@ public class Receipt implements Serializable {
 
     public double updateTotalPrice() {
         double tempTotalPrice = 0;
-        for (Item tempItem: items) {
+        for (Item tempItem : items) {
             tempTotalPrice += tempItem.getPrice();
         }
         this.totalPrice = tempTotalPrice;

@@ -40,6 +40,9 @@
     <color name="colorLineChart5">#964BD8</color>
     <color name="colorLineChart5End">#964BD8</color>
 
+    <color name="colorListGradientStart">@color/colorSalmon</color>
+    <color name="colorListGradientEnd">#353643</color>
+
     <color name="colorWhite">#E4E4E4</color>
     <color name="colorGreyBlack">#252525</color>
     <color name="colorBlack">#000000</color>

@@ -2,6 +2,7 @@ package Adapters;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,10 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import data_class.Gradient;
 import data_class.History;
 import gr.ict.wallet_analyzer.R;
+import gr.ict.wallet_analyzer.helpers.StoreTypeFinder;
 
 public class HistoryListAdapter extends ArrayAdapter<String> {
 
@@ -40,15 +43,29 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
         titleText.setText(history.getReceipt().getStoreName());
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-
-        subtitleText.setText( decimalFormat.format(history.getReceipt().getTotalPrice()) + " €");
+        subtitleText.setText(decimalFormat.format(history.getReceipt().getTotalPrice()) + " €");
 
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
         String strDate = formatter.format(history.getReceipt().getDate());
 
         dateTextView.setText(strDate);
 
+        Gradient gradient = StoreTypeFinder.findGradient(history.getReceipt().getStoreType());
+        setGradientBackground(rowView, gradient);
+
         return rowView;
+    }
+
+    private void setGradientBackground(View layout, Gradient itemGradient) {
+        int colorStart = itemGradient.getStartColor();
+        int colorEnd = itemGradient.getEndColor();
+
+        GradientDrawable gradient = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[]{colorStart, colorEnd});
+        gradient.setCornerRadius(0f);
+
+        layout.setBackgroundDrawable(gradient);
     }
 
     public void notifyDataSetChanged() {
