@@ -27,10 +27,10 @@
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12/03/2021" />
+            android:text="12/03/2021"
+            android:textColor="#88FFFFFF" />
 
     </com.google.android.flexbox.FlexboxLayout>
-
 
     <View
         android:layout_width="0dp"

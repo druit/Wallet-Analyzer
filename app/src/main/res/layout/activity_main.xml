@@ -136,7 +136,7 @@
                     android:minWidth="20dp"
                     android:selectAllOnFocus="true"
                     android:text="120"
-                    android:textColor="@color/color1"
+                    android:textColor="@color/colorGold"
                     android:textSize="30sp"
                     app:layout_constraintEnd_toStartOf="@+id/euro_symbol" />
 
@@ -146,7 +146,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="€"
-                    android:textColor="@color/color1"
+                    android:textColor="@color/colorGold"
                     android:textSize="30sp"
                     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -221,7 +221,7 @@
 
             <!--    </com.google.android.flexbox.FlexboxLayout>-->
 
-            <ListView
+            <gr.ict.wallet_analyzer.helpers.RoundedCornerListView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
@@ -242,7 +242,7 @@
                 android:layout_marginBottom="10dp"
                 android:background="@color/colorButton"
                 android:src="@drawable/scan_icon"
-                app:backgroundTint="@color/colorButton"
+                app:backgroundTint="@color/colorSalmon"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:rippleColor="#313131" />
@@ -307,6 +307,7 @@
                             app:flexDirection="column">
 
                             <com.google.android.flexbox.FlexboxLayout
+                                android:id="@+id/sidebar_portfolio_opener"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:alignItems="center">
@@ -329,6 +330,7 @@
                             </com.google.android.flexbox.FlexboxLayout>
 
                             <com.google.android.flexbox.FlexboxLayout
+                                android:id="@+id/sidebar_profile_opener"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:alignItems="center">
@@ -351,6 +353,7 @@
                             </com.google.android.flexbox.FlexboxLayout>
 
                             <com.google.android.flexbox.FlexboxLayout
+                                android:id="@+id/sidebar_settings_opener"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:alignItems="center">
@@ -373,6 +376,7 @@
                             </com.google.android.flexbox.FlexboxLayout>
 
                             <com.google.android.flexbox.FlexboxLayout
+                                android:id="@+id/sidebar_help_opener"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:alignItems="center">
@@ -398,6 +402,7 @@
 
                         <!-- LOGOUT TO BOTTOM -->
                         <com.google.android.flexbox.FlexboxLayout
+                            android:id="@+id/sidebar_logout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:alignItems="center">

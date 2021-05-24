@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import data_class.Gradient;
 import data_class.History;
 import gr.ict.wallet_analyzer.R;
-import gr.ict.wallet_analyzer.helpers.StoreTypeFinder;
 
 public class HistoryListAdapter extends ArrayAdapter<String> {
 
@@ -50,8 +49,8 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
 
         dateTextView.setText(strDate);
 
-        Gradient gradient = StoreTypeFinder.findGradient(history.getReceipt().getStoreType());
-        setGradientBackground(rowView, gradient);
+//        Gradient gradient = StoreTypeFinder.findGradient(history.getReceipt().getStoreType());
+//        setGradientBackground(rowView, gradient);
 
         return rowView;
     }

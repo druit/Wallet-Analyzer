@@ -306,6 +306,9 @@ public class MainActivity extends BaseActivity {
         // values text color
         dataSet.setValueTextColor(Color.rgb(255, 255, 255));
 
+        // disable cross on click
+        dataSet.setHighlightEnabled(false);
+
         LineData lineData = new LineData(dataSet);
         chart.setData(lineData);
         chart.invalidate(); // refresh
@@ -494,6 +497,43 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 mDrawer.openMenu();
+            }
+        });
+
+        // sidebar listeners
+        View portfolioOpener = findViewById(R.id.sidebar_portfolio_opener);
+        portfolioOpener.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openPortfolio();
+            }
+        });
+
+        View profileOpener = findViewById(R.id.sidebar_profile_opener);
+        profileOpener.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSettings();
+            }
+        });
+
+        View settingsOpener = findViewById(R.id.sidebar_settings_opener);
+        settingsOpener.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSettings();
+            }
+        });
+
+        View helpOpener = findViewById(R.id.sidebar_help_opener);
+
+        View logoutSidebar = findViewById(R.id.sidebar_logout);
+        logoutSidebar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                finishAffinity();
+                startActivity(new Intent(getApplication(), LoginActivity.class));
             }
         });
     }

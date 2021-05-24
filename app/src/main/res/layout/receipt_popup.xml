@@ -35,7 +35,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="20dp"
         android:text="$32,5"
-        android:textColor="@color/color1"
+        android:textColor="@color/colorGold"
         android:textSize="52sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -60,14 +60,14 @@
             android:layout_height="25dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/edit"
-            android:backgroundTint="@color/color1" />
+            android:backgroundTint="@color/colorGold" />
 
         <Button
             android:id="@+id/trash_button"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:background="@drawable/trash"
-            android:backgroundTint="@color/color1" />
+            android:backgroundTint="@color/colorGold" />
 
     </LinearLayout>
 

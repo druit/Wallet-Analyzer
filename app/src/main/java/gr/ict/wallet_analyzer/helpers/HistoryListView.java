@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 
@@ -20,6 +19,7 @@ import data_class.History;
 import gr.ict.wallet_analyzer.R;
 
 public class HistoryListView {
+    RoundedCornerListView mainListView;
     private HistoryListAdapter mainAdapter;
     private Activity activity;
     private HistoryArrayList historyArrayList = new HistoryArrayList();
@@ -33,8 +33,6 @@ public class HistoryListView {
     }
 
     public void setListView() {
-        ListView mainListView;
-
         mainAdapter = new HistoryListAdapter(activity, historyArrayList.getHistoryArrayList());
         mainListView = activity.findViewById(R.id.list);
         mainListView.setAdapter(mainAdapter);
