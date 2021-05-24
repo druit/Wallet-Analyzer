@@ -57,6 +57,7 @@ import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.helpers.BankEditPopup;
 import gr.ict.wallet_analyzer.helpers.FirebaseResultInterface;
 import gr.ict.wallet_analyzer.helpers.HistoryArrayList;
+import gr.ict.wallet_analyzer.helpers.RoundedSlicesPieChartRenderer;
 
 public class Statistics extends Fragment {
 
@@ -380,8 +381,8 @@ public class Statistics extends Fragment {
         lineDataSet1.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 
         // circles color
-        lineDataSet1.setCircleColor(Color.rgb(95, 115, 193));
-        lineDataSet1.setCircleHoleColor(Color.rgb(95, 115, 193));
+        lineDataSet1.setCircleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart1));
+        lineDataSet1.setCircleHoleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart1));
 
         // Gradient fill
         lineDataSet1.setDrawFilled(true);
@@ -389,7 +390,7 @@ public class Statistics extends Fragment {
         lineDataSet1.setFillDrawable(drawable);
 
         // line color
-        lineDataSet1.setColor(Color.rgb(95, 115, 193));
+        lineDataSet1.setColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart1));
         // values text color
         lineDataSet1.setValueTextColor(Color.rgb(255, 255, 255));
 
@@ -397,8 +398,8 @@ public class Statistics extends Fragment {
         lineDataSet2.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 
         // circles color
-        lineDataSet2.setCircleColor(Color.RED);
-        lineDataSet2.setCircleHoleColor(Color.RED);
+        lineDataSet2.setCircleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart2));
+        lineDataSet2.setCircleHoleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart2));
 
         // Gradient fill
         lineDataSet2.setDrawFilled(true);
@@ -406,7 +407,7 @@ public class Statistics extends Fragment {
         lineDataSet2.setFillDrawable(drawable2);
 
         // line color
-        lineDataSet2.setColor(Color.RED);
+        lineDataSet2.setColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart2));
         // values text color
         lineDataSet2.setValueTextColor(Color.rgb(255, 255, 255));
 
@@ -414,8 +415,8 @@ public class Statistics extends Fragment {
         lineDataSet3.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 
         // circles color
-        lineDataSet3.setCircleColor(Color.GREEN);
-        lineDataSet3.setCircleHoleColor(Color.GREEN);
+        lineDataSet3.setCircleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart3));
+        lineDataSet3.setCircleHoleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart3));
 
         // Gradient fill
         lineDataSet3.setDrawFilled(true);
@@ -423,7 +424,7 @@ public class Statistics extends Fragment {
         lineDataSet3.setFillDrawable(drawable3);
 
         // line color
-        lineDataSet3.setColor(Color.GREEN);
+        lineDataSet3.setColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart3));
         // values text color
         lineDataSet3.setValueTextColor(Color.rgb(255, 255, 255));
 
@@ -652,6 +653,14 @@ public class Statistics extends Fragment {
         PieData pieData = new PieData(dataSet);
         chart.setData(pieData);
         chart.invalidate(); // refresh
+
+        chart.setRenderer(new RoundedSlicesPieChartRenderer(chart, chart.getAnimator(), chart.getViewPortHandler()));
+
+        // these needs to be called last
+        chart.setHoleColor(0x00ffffff);
+        chart.setTransparentCircleAlpha(0);
+        chart.setCenterTextColor(Color.WHITE);
+        chart.setHoleRadius(65f);
 
         if (!categories.isEmpty()) {
             DecimalFormat decimalFormat = new DecimalFormat("#.##");
@@ -1125,15 +1134,21 @@ public class Statistics extends Fragment {
 //        lineDataSet.notifyAll();
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
-
     }
 
     private void createPieDataSet() {
         dataSet = new PieDataSet(entries, ""); // add entries to dataset
 
         dataSet.setValueFormatter(new PercentFormatter(chart));
+
         // line color
-        dataSet.setColors(new int[]{Color.argb(70, 155, 55, 69), Color.argb(70, 192, 106, 0), Color.argb(70, 161, 161, 0), Color.argb(70, 0, 57, 69), Color.argb(70, 20, 81, 111), Color.argb(70, 20, 99, 61),});
+        int[] dataSetColors = {
+                ContextCompat.getColor(getActivity(), R.color.colorPie1),
+                ContextCompat.getColor(getActivity(), R.color.colorPie2),
+                ContextCompat.getColor(getActivity(), R.color.colorPie3),
+                ContextCompat.getColor(getActivity(), R.color.colorPie4),
+        };
+        dataSet.setColors(dataSetColors);
 
         // values text color
         dataSet.setValueTextColor(Color.rgb(255, 255, 255));
@@ -1163,7 +1178,7 @@ public class Statistics extends Fragment {
 
         chart.setDrawHoleEnabled(true);
 //        chart.setHoleColor(Color.WHITE);
-        chart.setHoleColor(0);
+        chart.setHoleColor(0x00ffffff);
         chart.setCenterTextColor(Color.WHITE);
         chart.getLegend().setTextColor(Color.WHITE);
         chart.setTransparentCircleColor(Color.WHITE);
