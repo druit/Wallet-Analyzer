@@ -5,6 +5,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -25,7 +26,7 @@ public class BubbleChoicePopup {
     protected TextView finalWordTextView;
     protected TextView title;
     protected PopupWindow bubbleChoicePopup;
-    protected Button clearButton;
+    protected ImageView clearButton;
 
     public BubbleChoicePopup(Activity activity, ArrayList<String> allWords) {
         this.activity = activity;

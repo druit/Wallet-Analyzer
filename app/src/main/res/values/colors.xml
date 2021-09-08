@@ -6,7 +6,7 @@
     <color name="colorButton">#8B353644</color>
 
     <color name="colorGold">#F3BA7D</color>
-    <color name="colorLightGreen">#68F37A</color>
+    <color name="colorLightGreen">#9CECA6</color>
     <color name="colorBlue">#6EAFFF</color>
     <color name="colorDarkBlue">#040F2E</color>
     <color name="colorOrange">#FF5722</color>
@@ -25,17 +25,17 @@
     <color name="colorPie5">#3052FA</color>
 
     <color name="colorLineChart1">#E91E63</color>
-    <color name="colorLineChart1End">#E91E63</color>
+    <color name="colorLineChart1End">#00E91E63</color>
 
 
     <color name="colorLineChart2">#77DD7B</color>
-    <color name="colorLineChart2End">#77DD7B</color>
+    <color name="colorLineChart2End">#0077DD7B</color>
 
     <color name="colorLineChart3">#4C1AC1</color>
-    <color name="colorLineChart3End">#C68FDD</color>
+    <color name="colorLineChart3End">#00C68FDD</color>
 
-    <color name="colorLineChart4">#461CFB</color>
-    <color name="colorLineChart4End">#461CFB</color>
+    <color name="colorLineChart4">#FBB246</color>
+    <color name="colorLineChart4End">#00461CFB</color>
 
     <color name="colorLineChart5">#964BD8</color>
     <color name="colorLineChart5End">#964BD8</color>
@@ -45,6 +45,10 @@
 
     <color name="colorMainGradientStart">#110E20</color>
     <color name="colorMainGradientEnd">#151519</color>
+
+    <!--  main graph colors  -->
+    <color name="colorMainGraphStart">#4C1AC1</color>
+    <color name="colorMainGraphEnd">#C68FDD</color>
 
     <color name="colorWhite">#E4E4E4</color>
     <color name="colorGreyBlack">#252525</color>

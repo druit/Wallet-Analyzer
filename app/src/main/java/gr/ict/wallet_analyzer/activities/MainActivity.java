@@ -2,8 +2,6 @@ package gr.ict.wallet_analyzer.activities;
 
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -25,11 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,18 +46,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import Adapters.HistoryListAdapter;
 import data_class.CircleTransform;
 import data_class.History;
-import data_class.YourData;
 import eightbitlab.com.blurview.BlurView;
 import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.helpers.BankEditPopup;
 import gr.ict.wallet_analyzer.helpers.BlurEffect;
 import gr.ict.wallet_analyzer.helpers.HistoryListView;
 import gr.ict.wallet_analyzer.helpers.ListeningVariable;
+import gr.ict.wallet_analyzer.helpers.MainGraph;
 
 public class MainActivity extends BaseActivity {
 
@@ -96,8 +91,6 @@ public class MainActivity extends BaseActivity {
             nameProfile = findViewById(R.id.nameMain);
             totalPriceMonth = findViewById(R.id.sum_text_view);
 
-            // GraphView
-            setGraphView();
 
             // set profile name and image
             setProfile();
@@ -116,6 +109,9 @@ public class MainActivity extends BaseActivity {
                     totalPriceMonth.setText(String.format("%.2f", object) + "€");
                 }
             });
+
+            // GraphView
+            MainGraph mainGraph = new MainGraph(this, historyListView.getHistoryArrayList(), dataSet);
 
             // spinner for the graph
 //            monthlyGraph();
@@ -265,93 +261,6 @@ public class MainActivity extends BaseActivity {
         spinner.setSelection(Integer.parseInt(dateFormat.format(date)) - 1);
 
         // TODO: set current month
-    }
-
-    // TODO: Show 10 latest records or 15
-    private void setGraphView() {
-        chart = findViewById(R.id.chart);
-
-        YourData[] dataObjects = {
-                new YourData(1, 3),
-                new YourData(2, 1),
-                new YourData(3, 6),
-                new YourData(4, 3),
-                new YourData(5, 5),
-                new YourData(6, 4),
-        };
-
-        List<Entry> entries = new ArrayList<>();
-
-        for (YourData data : dataObjects) {
-            // turn your data into Entry objects
-            entries.add(new Entry(data.getX(), data.getY()));
-        }
-
-        dataSet = new LineDataSet(entries, "April"); // add entries to dataset
-
-        // make line curvy
-        dataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
-
-        // circles color
-        dataSet.setCircleColor(R.color.colorLineChart3);
-        dataSet.setCircleHoleColor(R.color.colorLineChart3);
-
-        // Gradient fill
-        dataSet.setDrawFilled(true);
-        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.gradient_background_linechart3);
-        dataSet.setFillDrawable(drawable);
-
-        // line color
-        dataSet.setColor(Color.rgb(53, 54, 67));
-        // values text color
-        dataSet.setValueTextColor(Color.rgb(255, 255, 255));
-
-        // disable cross on click
-        dataSet.setHighlightEnabled(false);
-
-        LineData lineData = new LineData(dataSet);
-        chart.setData(lineData);
-        chart.invalidate(); // refresh
-
-        chart.getDescription().setEnabled(false);
-        chart.getLegend().setEnabled(false);
-
-        // hide values in left and right side
-        chart.getAxisRight().setDrawLabels(false);
-        chart.getAxisLeft().setDrawLabels(false);
-
-        // no zoom
-        chart.setScaleEnabled(false);
-
-        // grid lines color
-        chart.getXAxis().setGridColor(R.color.colorMainGraphGrid);
-        chart.getAxisLeft().setGridColor(R.color.colorMainGraphGrid);
-        chart.getAxisRight().setGridColor(R.color.colorMainGraphGrid);
-
-        chart.getAxisRight().setDrawGridLines(false);
-        chart.getAxisLeft().setDrawGridLines(false);
-        chart.getXAxis().setDrawGridLines(false);
-
-        // show outlines of the grid
-        chart.getAxisLeft().setDrawAxisLine(false);
-        chart.getAxisRight().setDrawAxisLine(false);
-        chart.getXAxis().setDrawAxisLine(false);
-
-        chart.getXAxis().setAxisLineColor(R.color.colorMainGraphGrid);
-        chart.getAxisLeft().setAxisLineColor(R.color.colorMainGraphGrid);
-        chart.getAxisRight().setAxisLineColor(R.color.colorMainGraphGrid);
-
-        // text color of labels in x axis
-        chart.getXAxis().setTextColor(Color.argb(50, 255, 255, 255));
-        chart.getAxisLeft().setTextColor(Color.argb(50, 255, 255, 255));
-
-//        chart.getAxisLeft().setAxisMinimum(0);
-//        chart.getXAxis().setAxisMaximum(30);
-//        chart.getXAxis().setAxisMinimum(0);
-//        chart.getXAxis().setLabelCount(30, true);
-
-//        chart.setVisibleXRangeMaximum(10);
-
     }
 
     // TODO: days that have no receipts get a value of 0 and days that have more than one receipt should make a sum

@@ -432,8 +432,8 @@ public class Statistics extends Fragment {
         lineDataSet4.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 
         // circles color
-        lineDataSet4.setCircleColor(R.color.colorExpenses4);
-        lineDataSet4.setCircleHoleColor(R.color.colorExpenses4);
+        lineDataSet4.setCircleColor(R.color.colorLineChart4);
+        lineDataSet4.setCircleHoleColor(R.color.colorLineChart4);
 
         // Gradient fill
         lineDataSet4.setDrawFilled(true);
@@ -441,9 +441,9 @@ public class Statistics extends Fragment {
         lineDataSet4.setFillDrawable(drawable4);
 
         // line color
-        lineDataSet4.setColor(R.color.colorExpenses4);
+        lineDataSet4.setColor(R.color.colorLineChart4);
         // values text color
-        lineDataSet4.setValueTextColor(Color.rgb(255, 255, 255));
+        lineDataSet4.setValueTextColor(R.color.colorLineChart4);
 
         lineDataSet1.setValueTextSize(8);
         lineDataSet2.setValueTextSize(8);

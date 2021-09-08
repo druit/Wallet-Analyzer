@@ -20,8 +20,10 @@ import gr.ict.wallet_analyzer.R;
 
 public class HistoryListView {
     RoundedCornerListView mainListView;
+
     private HistoryListAdapter mainAdapter;
     private Activity activity;
+
     private HistoryArrayList historyArrayList = new HistoryArrayList();
     private DatabaseReference baseReference;
     private ListeningVariable<Double> totalPrice;
@@ -58,9 +60,7 @@ public class HistoryListView {
                     Collections.sort(historyArrayList.getHistoryArrayList());
                     mainAdapter.notifyDataSetChanged();
 
-                    // show receipts for current month
-                    // TODO: get this from listener
-                    // fillGraphFromCurrentMonth();
+                    // TODO: show receipts for current month
                 }
             }
 
@@ -77,5 +77,9 @@ public class HistoryListView {
                 receiptPopup.showReceiptPopup();
             }
         });
+    }
+
+    public HistoryArrayList getHistoryArrayList() {
+        return historyArrayList;
     }
 }

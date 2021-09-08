@@ -39,11 +39,12 @@
                 android:padding="10dp"
                 android:text="" />
 
-            <Button
+            <ImageView
                 android:id="@+id/clear_final_word_button"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_margin="10dp"
+                android:src="@drawable/outline_close_24"
                 android:background="@drawable/button_background_2" />
 
         </com.google.android.flexbox.FlexboxLayout>
