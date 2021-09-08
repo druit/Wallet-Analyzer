@@ -360,8 +360,8 @@ public class BankEditPopup {
                         Date dateSalary = currentSalary.getLastUpdate();
                         int prevMonthSalary = Integer.valueOf( dateSalary.getMonth() + 1);
                         int salaryYear = dateSalary.getYear();
-
-                        if (currentDate.getDate() >= dateSalary.getDate() && prevMonthSalary < currentMonth && salaryYear >= currentYear) {
+//                        currentDate.getDate() >= dateSalary.getDate() &&
+                        if ( prevMonthSalary < currentMonth && salaryYear >= currentYear) {
 
                             Salary newSalary = new Salary(currentDate,Double.valueOf(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd()), currentSalary.getSalaryAdd(), currentDate);
 

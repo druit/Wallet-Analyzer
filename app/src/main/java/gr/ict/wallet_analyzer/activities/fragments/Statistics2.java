@@ -110,7 +110,7 @@ public class Statistics2 extends Fragment {
                     @Override
                     public void onSuccess(ArrayList<History> histories) {
                         for (History history : histories) {
-                            if (finalActiveBankAccount != null && finalActiveBankAccount.isSalaryBank() && finalActiveBankAccount.isActive() == 1 && finalActiveBankAccount.getSalaryArrayList().get(0).getUpdateDate().getTime() <= history.getReceipt().getDate().getTime()) {
+                           if (finalActiveBankAccount != null && finalActiveBankAccount.isSalaryBank() && finalActiveBankAccount.isActive() == 1 && finalActiveBankAccount.getSalaryArrayList().get(0).getUpdateDate().getTime() <= history.getReceipt().getDate().getTime()) {
                                 finalTotalSalary[0] -= history.getReceipt().getTotalPrice();
                             }
                         }
