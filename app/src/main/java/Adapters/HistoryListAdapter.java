@@ -2,12 +2,16 @@ package Adapters;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -16,6 +20,7 @@ import java.util.ArrayList;
 import data_class.Gradient;
 import data_class.History;
 import gr.ict.wallet_analyzer.R;
+import gr.ict.wallet_analyzer.helpers.CategoryIconSelector;
 
 public class HistoryListAdapter extends ArrayAdapter<String> {
 
@@ -44,10 +49,16 @@ public class HistoryListAdapter extends ArrayAdapter<String> {
 
         subtitleText.setText(decimalFormat.format(history.getReceipt().getTotalPrice()) + " €");
 
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         String strDate = formatter.format(history.getReceipt().getDate());
 
         dateTextView.setText(strDate);
+
+        // set category icon
+        CategoryIconSelector categoryIconSelector = new CategoryIconSelector(context);
+        Drawable drawable = categoryIconSelector.getDrawableIcon(history.getReceipt().getStoreType());
+        ImageView icon = rowView.findViewById(R.id.category_icon);
+        icon.setImageDrawable(drawable);
 
 //        Gradient gradient = StoreTypeFinder.findGradient(history.getReceipt().getStoreType());
 //        setGradientBackground(rowView, gradient);
