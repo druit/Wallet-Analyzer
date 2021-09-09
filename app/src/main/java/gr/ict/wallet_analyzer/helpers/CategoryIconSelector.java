@@ -17,6 +17,9 @@ public class CategoryIconSelector {
     public Drawable getDrawableIcon(String category) {
         Drawable drawable;
         switch (category) {
+            case "gas station":
+                drawable = ContextCompat.getDrawable(context, R.drawable.asset_11);
+                break;
             case "shoes":
                 drawable = ContextCompat.getDrawable(context, R.drawable.asset_6);
                 break;

@@ -28,6 +28,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,44 +68,38 @@ import me.pqpo.smartcropperlib.view.CropImageView;
 
 public class ChooseScanActivity extends BaseActivity {
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-
     public final static String CROP_STEP = "CROP_STEP";
-
     public final static String SHOP_NAME_STEP = "INFORMATION_STEP";
     public final static String LOCATION_STEP = "LOCATION_STEP";
     public final static String PRODUCT_STEP = "PRODUCT_STEP";
-
+    static final int REQUEST_IMAGE_CAPTURE = 1;
     public static String cropFlag = CROP_STEP;
-
+    public static String shopName = "";
+    public static String shopAddress = "";
     private final ArrayList<Item> itemsArrayList = new ArrayList<>();
-
     String currentPhotoPath;
-
     HashMap<String, Object> parentKey = new HashMap<>();
     HashMap<String, Double> itemList = new HashMap<>();
     HashMap<String, Object> infoList = new HashMap<>();
     ArrayList<String> barcodeList = new ArrayList<>();
-
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
     DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
-
     private Button scanBarcode, scanPhoto, finishScanningButton;
     private ImageView imageView;
     private Bitmap imageBitmap;
-
     private Uri photoURI;
     private String uid;
     private CropImageView ivCrop;
     private TextView recognizedTextView;
     private RelativeLayout mainRelativeLayout, cameraRelativeLayout;
-
     private History history;
     private double finalPrice = 0;
     private Date date;
-    public static String shopName = "";
-    public static String shopAddress = "";
+
+    private String selectedCategory;
+    private ArrayList<String> categories = new ArrayList<>();
+    private TextView selectedTextView;
 
     private static Bitmap rotateImage(Bitmap source) {
         Matrix matrix = new Matrix();
@@ -492,7 +487,7 @@ public class ChooseScanActivity extends BaseActivity {
         }
     }
 
-    private void showDatePickerPopup(View viewToShowAt) {
+    private void showDatePickerPopup(final View viewToShowAt) {
         // inflate the layout of the popup window`
         LayoutInflater genericInflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
         View datePickerView = genericInflater.inflate(R.layout.datepicker_popup, null);
@@ -517,16 +512,88 @@ public class ChooseScanActivity extends BaseActivity {
                 date = new GregorianCalendar(year, month, day).getTime();
 
                 datePickerPopup.dismiss();
+
+                // Choose Category
+                DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference();
+                getCategories(baseReference, viewToShowAt);
+            }
+        });
+    }
+
+    private void getCategories(DatabaseReference baseReference, final View viewToShowAt) {
+        DatabaseReference categoriesRef = baseReference.child("categories/en/");
+
+        categoriesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                for (DataSnapshot child : children) {
+                    String category = child.getValue(String.class);
+                    categories.add(category);
+                }
+                showCategoryPopup(viewToShowAt);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+    }
+
+
+    private void showCategoryPopup(View viewToShowAt) {
+        // inflate the layout of the popup window
+        LayoutInflater genericInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View selectCategoryView = genericInflater.inflate(R.layout.select_category_popup, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+        final PopupWindow selectCategoryPopup = new PopupWindow(selectCategoryView, width, height, true);
+
+        final FlexboxLayout flexboxLayout = selectCategoryView.findViewById(R.id.category_select_list);
+        Button finishButton = selectCategoryView.findViewById(R.id.finish_property_edit_button);
+
+        for (String s : categories) {
+            final TextView textView = new TextView(this);
+            textView.setText(s);
+            flexboxLayout.addView(textView);
+
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TextView currentTextView = (TextView) v;
+                    deselectOthers(flexboxLayout);
+                    currentTextView.setTextSize(30);
+                    selectedTextView = currentTextView;
+                }
+            });
+        }
+
+        // show the popup window
+        selectCategoryPopup.showAtLocation(viewToShowAt, Gravity.CENTER, 0, 0);
+
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedCategory = String.valueOf(selectedTextView.getText());
+                selectCategoryPopup.dismiss();
                 createHistoryObject();
             }
         });
     }
 
+    private void deselectOthers(FlexboxLayout flexboxLayout) {
+        for (int index = 0; index < ((FlexboxLayout) flexboxLayout).getChildCount(); index++) {
+            TextView nextChild = (TextView) ((FlexboxLayout) flexboxLayout).getChildAt(index);
+            nextChild.setTextSize(15);
+        }
+    }
+
     private void createHistoryObject() {
         final String id = baseReference.push().getKey();
 
-        // TODO: store type;
-        String storeType = "shop type";
+        String storeType = selectedCategory;
 
         // TODO: image;
         String imagePath = "image path";
