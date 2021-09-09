@@ -280,7 +280,7 @@ public class ReceiptPopup {
                         // totalPrice -= historyArrayList.get(itemPosition).getReceipt().getTotalPrice();
                         declare.removeValue();
 
-                        activity.finish();
+//                        activity.finish();
                         popupWindow.dismiss();
                     }
                 })
