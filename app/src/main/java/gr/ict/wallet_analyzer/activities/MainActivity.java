@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,11 +20,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -63,7 +67,7 @@ public class MainActivity extends BaseActivity {
     public ArrayList<History> historyArrayList = new ArrayList<>();
     ImageView profileImage;
     TextView nameProfile, totalPriceMonth;
-    EditText monthlyLimitTextView;
+    TextView monthlyLimitTextView;
     DatabaseReference baseReference;
     //    double totalPrice;
     private ListeningVariable<Double> totalPrice = new ListeningVariable<>(Double.class);
@@ -120,6 +124,7 @@ public class MainActivity extends BaseActivity {
             setMenuOpener();
 
             setGoal();
+            bindGoalClick();
 
             setFullHistory();
 
@@ -366,6 +371,44 @@ public class MainActivity extends BaseActivity {
                     databaseReference.setValue(Integer.valueOf(s.toString()));
                 }
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            }
+        });
+    }
+
+    private void bindGoalClick() {
+        ConstraintLayout constraintLayout2 = findViewById(R.id.constraintLayout2);
+        constraintLayout2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showGoalPopup();
+            }
+        });
+    }
+
+    private void showGoalPopup() {
+        // inflate the layout of the popup window
+        LayoutInflater genericInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View goalPopupView = genericInflater.inflate(R.layout.goal_popup, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+        final PopupWindow goalPopup = new PopupWindow(goalPopupView, width, height, true);
+
+        final EditText editText = goalPopupView.findViewById(R.id.goal_edit_text);
+        editText.setText(monthlyLimitTextView.getText());
+
+        Button finishButton = goalPopupView.findViewById(R.id.finish_goal_edit_button);
+
+        // show the popup window
+        goalPopup.showAtLocation(monthlyLimitTextView, Gravity.CENTER, 0, 0);
+
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String monthlyLimit = String.valueOf(editText.getText());
+                monthlyLimitTextView.setText(monthlyLimit);
+                goalPopup.dismiss();
             }
         });
     }

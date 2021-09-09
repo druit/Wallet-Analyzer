@@ -4,10 +4,10 @@
     android:id="@+id/popup_flexbox_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
-    android:gravity="center"
     android:background="#B7000000"
+    android:gravity="center"
     android:orientation="vertical"
+    android:padding="10dp"
     app:alignItems="center"
     app:flexDirection="column"
     app:justifyContent="center">
@@ -15,34 +15,43 @@
     <com.google.android.flexbox.FlexboxLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:flexDirection="column"
-        app:justifyContent="center"
+        android:background="@drawable/dark_background"
         app:alignItems="center"
-        android:background="@drawable/dark_background">
+        app:flexDirection="column"
+        app:justifyContent="center">
 
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/category_select_list"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            app:flexDirection="column"
-            app:justifyContent="center"
-            app:alignItems="center"
-            android:background="@drawable/dark_background"/>
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="25dp"
+            android:layout_marginTop="20dp"
+            android:text="Change Goal" />
+
+        <EditText
+            android:id="@+id/goal_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp"
+            android:inputType="numberDecimal"
+            android:text="560"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="20dp" />
 
         <Button
-            android:id="@+id/finish_property_edit_button"
+            android:id="@+id/finish_goal_edit_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="5dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/button_background_2"
-            android:text="SELECT"
+            android:text="Change"
             android:textColor="#333" />
 
     </com.google.android.flexbox.FlexboxLayout>
-
 
 
 </com.google.android.flexbox.FlexboxLayout>
