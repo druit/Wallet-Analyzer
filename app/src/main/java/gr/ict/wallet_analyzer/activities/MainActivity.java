@@ -115,7 +115,7 @@ public class MainActivity extends BaseActivity {
             });
 
             // GraphView
-            MainGraph mainGraph = new MainGraph(this, historyListView.getHistoryArrayList(), dataSet);
+            MainGraph mainGraph = new MainGraph(this, historyListView.getHistoryArrayList());
 
             // spinner for the graph
 //            monthlyGraph();

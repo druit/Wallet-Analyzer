@@ -12,8 +12,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Collections;
-
 import Adapters.HistoryListAdapter;
 import data_class.History;
 import gr.ict.wallet_analyzer.R;
@@ -56,8 +54,6 @@ public class HistoryListView {
                     history = child.getValue(History.class);
                     totalPrice.setObject(totalPrice.getObject() + history.getReceipt().getTotalPrice());
                     historyArrayList.add(history);
-                    // sort the array every time, any better ideas would be greatly valued
-                    Collections.sort(historyArrayList.getHistoryArrayList());
                     mainAdapter.notifyDataSetChanged();
 
                     // TODO: show receipts for current month
