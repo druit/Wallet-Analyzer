@@ -376,6 +376,13 @@ public class MainActivity extends BaseActivity {
     }
 
     private void bindGoalClick() {
+        monthlyLimitTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showGoalPopup();
+            }
+        });
+
         ConstraintLayout constraintLayout2 = findViewById(R.id.constraintLayout2);
         constraintLayout2.setOnClickListener(new View.OnClickListener() {
             @Override
