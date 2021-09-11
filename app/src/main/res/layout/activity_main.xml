@@ -180,6 +180,7 @@
                         android:id="@+id/imageView2"
                         android:layout_width="25dp"
                         android:layout_height="25dp"
+                        android:alpha=".60"
                         android:contentDescription="history icon"
                         android:elevation="2dp"
                         android:src="@drawable/baseline_history_white_48dp" />
@@ -188,11 +189,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/constraintLayout2"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="6dp"
                         android:layout_toEndOf="@+id/imageView2"
                         android:elevation="2dp"
                         android:text="@string/gen_history"
-                        android:textColor="#fff"
+                        android:textColor="#A6FFFFFF"
                         app:layout_constraintStart_toEndOf="@+id/imageView2"
                         app:layout_constraintTop_toTopOf="parent" />
 
