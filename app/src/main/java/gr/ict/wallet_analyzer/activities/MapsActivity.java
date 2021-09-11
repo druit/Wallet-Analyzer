@@ -1,7 +1,6 @@
 package gr.ict.wallet_analyzer.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,7 +14,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,7 +21,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -144,7 +141,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             pos++;
         }
         float zoomLevel = 50.0f; //This goes up to 21
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(zoomlatLng, zoomLevel));
+
+        if (zoomlatLng != null)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(zoomlatLng, zoomLevel));
+        else
+            Toast.makeText(this, "The location was not found", Toast.LENGTH_SHORT).show();
     }
 
     private BitmapDescriptor bitmapDescriptor(Context context, int vendorResId) {
