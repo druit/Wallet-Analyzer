@@ -1,5 +1,7 @@
 package gr.ict.wallet_analyzer.helpers;
 
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -35,8 +37,6 @@ import data_class.Receipt;
 import eightbitlab.com.blurview.BlurView;
 import gr.ict.wallet_analyzer.R;
 import gr.ict.wallet_analyzer.activities.MapsActivity;
-
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class ReceiptPopup {
     private ArrayList<History> historyArrayList;
@@ -102,7 +102,9 @@ public class ReceiptPopup {
 
         // set receipt category
         categoryTextView = popupView.findViewById(R.id.category_text_view);
-        categoryTextView.setText(receipt.getStoreType());
+        String storeType = receipt.getStoreType();
+        storeType = storeType.substring(0, 1).toUpperCase() + storeType.substring(1);
+        categoryTextView.setText(storeType);
 
         // popupListView view in popup
 
