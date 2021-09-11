@@ -179,6 +179,9 @@ public class MainGraph {
         // make line curvy
         dataSet2.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 
+        // disable cross on click
+        dataSet2.setHighlightEnabled(false);
+
         // Gradient fill
         dataSet2.setDrawFilled(false);
         Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.transparent);
