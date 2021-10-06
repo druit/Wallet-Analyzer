@@ -12,16 +12,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import Adapters.HistoryListAdapter;
 import data_class.History;
 import gr.ict.wallet_analyzer.R;
 
 public class HistoryListView {
-    RoundedCornerListView mainListView;
 
+    RoundedCornerListView mainListView;
     private HistoryListAdapter mainAdapter;
     private Activity activity;
-
     private HistoryArrayList historyArrayList = new HistoryArrayList();
     private DatabaseReference baseReference;
     private ListeningVariable<Double> totalPrice;
@@ -33,7 +36,7 @@ public class HistoryListView {
     }
 
     public void setListView() {
-        mainAdapter = new HistoryListAdapter(activity, historyArrayList.getHistoryArrayList());
+        mainAdapter = new HistoryListAdapter(activity, historyArrayList.getList());
         mainListView = activity.findViewById(R.id.list);
         mainListView.setAdapter(mainAdapter);
 
@@ -44,9 +47,6 @@ public class HistoryListView {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 
                 historyArrayList.clear();
-                // TODO: dataset for the graph with the listeners
-//                dataSet.clear();
-//                dataSet.addEntry(new Entry(1, 0));
                 History history;
                 totalPrice.setObject(0.0);
 
@@ -55,8 +55,6 @@ public class HistoryListView {
                     totalPrice.setObject(totalPrice.getObject() + history.getReceipt().getTotalPrice());
                     historyArrayList.add(history);
                     mainAdapter.notifyDataSetChanged();
-
-                    // TODO: show receipts for current month
                 }
             }
 
@@ -69,10 +67,50 @@ public class HistoryListView {
         mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ReceiptPopup receiptPopup = new ReceiptPopup(position, activity, historyArrayList.getHistoryArrayList(), baseReference);
+                ReceiptPopup receiptPopup = new ReceiptPopup(position, activity, historyArrayList.getList(), baseReference);
                 receiptPopup.showReceiptPopup();
             }
         });
+    }
+
+    public void filterDate() {
+        ArrayList<History> tempHistoryList = historyArrayList.getList();
+        tempHistoryList.sort(Comparator.comparing(o -> o.getReceipt().getDate()));
+        historyArrayList.setHistoryArrayList(tempHistoryList);
+    }
+
+    public void filterReverseDate() {
+        ArrayList<History> tempHistoryList = historyArrayList.getList();
+        tempHistoryList.sort(Collections.reverseOrder(Comparator.comparing(o -> o.getReceipt().getDate())));
+        historyArrayList.setHistoryArrayList(tempHistoryList);
+    }
+
+    public void filterByCategory() {
+        ArrayList<History> tempHistoryList = historyArrayList.getList();
+        tempHistoryList.sort(Comparator.comparing(o -> o.getReceipt().getStoreType()));
+        historyArrayList.setHistoryArrayList(tempHistoryList);
+    }
+
+    public void filterReverseCategory() {
+        ArrayList<History> tempHistoryList = historyArrayList.getList();
+        tempHistoryList.sort(Collections.reverseOrder(Comparator.comparing(o -> o.getReceipt().getStoreType())));
+        historyArrayList.setHistoryArrayList(tempHistoryList);
+    }
+
+    public void filterByPrice() {
+        ArrayList<History> tempHistoryList = historyArrayList.getList();
+        tempHistoryList.sort(Comparator.comparing(o -> o.getReceipt().getTotalPrice()));
+        historyArrayList.setHistoryArrayList(tempHistoryList);
+    }
+
+    public void filterReversePrice() {
+        ArrayList<History> tempHistoryList = historyArrayList.getList();
+        tempHistoryList.sort(Collections.reverseOrder(Comparator.comparing(o -> o.getReceipt().getTotalPrice())));
+        historyArrayList.setHistoryArrayList(tempHistoryList);
+    }
+
+    public void notifyDataSet() {
+        mainAdapter.notifyDataSetChanged();
     }
 
     public HistoryArrayList getHistoryArrayList() {

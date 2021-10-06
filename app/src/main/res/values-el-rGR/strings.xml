@@ -28,6 +28,7 @@
     <string name="gen_history">Ιστορικό</string>
     <string name="gen_full_history">Όλο το ιστορικό</string>
     <string name="gen_filters">Φίλτρα</string>
+    <string name="gen_order">Φίλτρα</string>
     <string name="gen_edit_mode_on">Ενεργοποίηση επεξεργασίας</string>
     <string name="gen_edit_mode_off">Απενεργοποίηση επεξεργασίας</string>
     <string name="gen_income">Έσοδα</string>
@@ -75,6 +76,11 @@
     <string name="permission_required_toast">Δικαιώματα τοποθεσίας</string>
     <string name="permission_rationale_location">Τοποθεσία</string>
     <string name="action_portfolio">Χαρτοφύλακας</string>
+    <string name="filter_price">Filter Price</string>
+    <string name="filter_date">Filter Date</string>
+    <string name="filter_category">Filter Category</string>
+    <string name="order_ascending">Αύξουσα</string>
+    <string name="order_descending">Φθήνουσα</string>
     <string name="title_activity_portfolio">Χαρτοφύλακας</string>
     <string name="tab_text_1">Εξοδολόγιο</string>
     <string name="tab_text_2">My Account</string>

@@ -16,7 +16,7 @@ public class HistoryArrayList {
     private ArrayList<History> historyArrayList = new ArrayList<>();
     private ListeningVariable.ChangeListener listener;
 
-    public ArrayList<History> getHistoryArrayList() {
+    public ArrayList<History> getList() {
         return historyArrayList;
     }
 

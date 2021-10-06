@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="gr.ict.wallet_analyzer.activities.ScanPhotoActivity">
+    <item
+        android:id="@+id/ascending_order"
+        android:orderInCategory="100"
+        android:title="@string/order_ascending"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/descending_order"
+        android:orderInCategory="100"
+        android:title="@string/order_descending"
+        app:showAsAction="never" />
+</menu>

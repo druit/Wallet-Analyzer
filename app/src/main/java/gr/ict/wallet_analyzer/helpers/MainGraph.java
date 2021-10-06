@@ -35,8 +35,8 @@ public class MainGraph {
         historyArrayList.setListener(new ListeningVariable.ChangeListener() {
             @Override
             public void onChange(Object object) {
-                secondLine(historyArrayList.getHistoryArrayList());
-                setGraphView(historyArrayList.getHistoryArrayList());
+                secondLine(historyArrayList.getList());
+                setGraphView(historyArrayList.getList());
                 addAllDataSets();
             }
         });

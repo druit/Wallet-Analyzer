@@ -27,6 +27,7 @@
     <string name="gen_history">History</string>
     <string name="gen_full_history">Full History</string>
     <string name="gen_filters">Filters</string>
+    <string name="gen_order">Ascending</string>
     <string name="gen_edit_mode_on">Edit mode on</string>
     <string name="gen_edit_mode_off">Edit mode off</string>
     <string name="gen_income">Income</string>
@@ -74,6 +75,11 @@
     <string name="permission_required_toast">Location Permission</string>
     <string name="permission_rationale_location">Location</string>
     <string name="action_portfolio">Portfolio</string>
+    <string name="filter_price">Filter Price</string>
+    <string name="filter_date">Filter Date</string>
+    <string name="filter_category">Filter Category</string>
+    <string name="order_ascending">Ascending</string>
+    <string name="order_descending">Descending</string>
     <string name="title_activity_portfolio">Portfolio</string>
     <string name="tab_text_1">Expenses Analysis</string>
     <string name="tab_text_2">My Account</string>
