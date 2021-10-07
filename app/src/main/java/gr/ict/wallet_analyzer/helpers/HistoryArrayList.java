@@ -49,12 +49,6 @@ public class HistoryArrayList {
         this.listener = listener;
     }
 
-    public interface ChangeListener {
-        void onChange(ArrayList<History> historyArrayList);
-
-        void onChange(History history);
-    }
-
     public void callBackHistoryArrayList(DatabaseReference baseReference, final FirebaseResultInterface firebaseResultInterface) {
 
         DatabaseReference declare = baseReference.child("history");
@@ -70,7 +64,7 @@ public class HistoryArrayList {
                 for (DataSnapshot child : children) {
                     history = child.getValue(History.class);
                     historyArrayList.add(history);
-                    Collections.sort(historyArrayList,Collections.<History>reverseOrder());
+                    Collections.sort(historyArrayList, Collections.<History>reverseOrder());
                 }
                 firebaseResultInterface.onSuccess(historyArrayList);
             }
@@ -80,6 +74,5 @@ public class HistoryArrayList {
                 firebaseResultInterface.onFailed(databaseError.toException());
             }
         });
-
     }
 }

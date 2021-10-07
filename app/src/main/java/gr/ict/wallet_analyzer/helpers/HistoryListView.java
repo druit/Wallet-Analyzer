@@ -33,10 +33,11 @@ public class HistoryListView {
         this.activity = activity;
         this.baseReference = baseReference;
         this.totalPrice = totalPrice;
+        setListView();
     }
 
     public void setListView() {
-        mainAdapter = new HistoryListAdapter(activity, historyArrayList.getList());
+        mainAdapter = new HistoryListAdapter(activity, historyArrayList);
         mainListView = activity.findViewById(R.id.list);
         mainListView.setAdapter(mainAdapter);
 
@@ -115,5 +116,9 @@ public class HistoryListView {
 
     public HistoryArrayList getHistoryArrayList() {
         return historyArrayList;
+    }
+
+    public HistoryListAdapter getMainAdapter() {
+        return mainAdapter;
     }
 }

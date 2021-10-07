@@ -6,44 +6,58 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background"
     android:fitsSystemWindows="true"
-    tools:context=".activities.MainActivity">
+    android:id="@+id/full_history_parent"
+    tools:context=".activities.FullHistoryActivity">
 
-    <TextView
-        android:id="@+id/title"
+    <SearchView
+        android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/gen_full_history"
-        android:textSize="30sp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search Here"
+        android:background="@drawable/button_background"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!--    <TextView-->
+    <!--        android:id="@id/searchView"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="10dp"-->
+    <!--        android:text="@string/gen_full_history"-->
+    <!--        android:textSize="30sp"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
     <Button
         android:id="@+id/filter_button"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/button_background"
-        android:text="@string/gen_filters"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
         android:drawableLeft="@drawable/outline_filter_list_24"
         android:drawableTint="@color/colorSalmon"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/gen_filters"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        app:layout_constraintTop_toBottomOf="@id/searchView" />
 
     <Button
         android:id="@+id/order_button"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/button_background"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
         android:text="@string/gen_order"
         app:layout_constraintStart_toEndOf="@+id/filter_button"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        app:layout_constraintTop_toBottomOf="@id/searchView" />
 
     <gr.ict.wallet_analyzer.helpers.RoundedCornerListView
         android:id="@+id/list"

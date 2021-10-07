@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.MenuInflater;
 import android.widget.Button;
 import android.widget.PopupMenu;
+import android.widget.SearchView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,14 +20,13 @@ public class FullHistoryActivity extends BaseActivity {
 
     private final int ASCENDING = 0;
     private final int DESCENDING = 1;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
-    private String uid = user.getUid();
+    private final String uid = user.getUid();
     DatabaseReference baseReference = FirebaseDatabase.getInstance().getReference()
             .child("users").child(uid);
     private ListeningVariable<Double> totalPrice = new ListeningVariable<>(Double.class);
     private HistoryListView historyListView;
-
     private int currentFilterId = R.id.filter_Date;
     private int currentOrder = ASCENDING;
 
@@ -36,9 +36,10 @@ public class FullHistoryActivity extends BaseActivity {
         setContentView(R.layout.activity_full_history);
 
         historyListView = new HistoryListView(this, baseReference, totalPrice);
-        historyListView.setListView();
         setFilterMenu();
         setOrderMenu();
+
+        setSearchView();
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -106,4 +107,44 @@ public class FullHistoryActivity extends BaseActivity {
         }
         currentFilterId = id;
     }
+
+    private void setSearchView() {
+        SearchView searchView = findViewById(R.id.searchView);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                historyListView.getMainAdapter().getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                historyListView.getMainAdapter().getFilter().filter(newText);
+                return false;
+            }
+        });
+
+        // anywhere else than searchView make it lose focus
+//        ClearFocusClickListener clearFocusClickListener = new ClearFocusClickListener();
+//
+//        Button filterButton = findViewById(R.id.filter_button);
+//        filterButton.setOnClickListener(clearFocusClickListener);
+//
+//        Button orderButton = findViewById(R.id.order_button);
+//        orderButton.setOnClickListener(clearFocusClickListener);
+//
+//        ConstraintLayout parent = findViewById(R.id.full_history_parent);
+//        parent.setOnClickListener(clearFocusClickListener);
+//
+//        RoundedCornerListView rRoundedCornerListView = findViewById(R.id.list);
+//        rRoundedCornerListView.setOnClickListener(clearFocusClickListener);
+    }
+
+//    private class ClearFocusClickListener implements View.OnClickListener {
+//        @Override
+//        public void onClick(View v) {
+//            FullHistoryActivity.this.getCurrentFocus().clearFocus();
+//        }
+//    }
 }

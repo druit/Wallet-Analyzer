@@ -105,7 +105,6 @@ public class MainActivity extends BaseActivity {
             // list view
             // setListView();
             HistoryListView historyListView = new HistoryListView(this, baseReference, totalPrice);
-            historyListView.setListView();
 
             totalPrice.setListener(new ListeningVariable.ChangeListener<Double>() {
                 @Override
