@@ -15,6 +15,7 @@
     <string name="edit_profile">Επεξεργασία Προφίλ</string>
     <string name="enter_your_email">yourmail@hotmail.com</string>
     <string name="gen_version">v.1.0.0</string>
+    <string name="gen_help">Βοήθεια</string>
     <string name="hint_firstname">Όνομα</string>
     <string name="hint_lastname">Επίθετο</string>
     <string name="gen_save">Αποθήκευση</string>
@@ -28,7 +29,7 @@
     <string name="gen_history">Ιστορικό</string>
     <string name="gen_full_history">Όλο το ιστορικό</string>
     <string name="gen_filters">Φίλτρα</string>
-    <string name="gen_order">Φίλτρα</string>
+    <string name="gen_order">Ταξινόμηση</string>
     <string name="gen_edit_mode_on">Ενεργοποίηση επεξεργασίας</string>
     <string name="gen_edit_mode_off">Απενεργοποίηση επεξεργασίας</string>
     <string name="gen_income">Έσοδα</string>
@@ -101,4 +102,8 @@
     <string name="gen_forgot_password">Ξεχάσατε τον κωδικό;</string>
     <string name="update_photo_wait">Η διαδικασία θα διαρκέσει μερικά δευτερόλεπτα.</string>
     <string name="user_profile_updated_message">Το προφιλ σας ενημερώθηκε</string>
+    <string name="filter_by_category">Κατηγορία</string>
+    <string name="filter_by_price">Κόστος</string>
+    <string name="filter_by_date">Ημερομηνία</string>
+    <string name="gen_search">Αναζήτηση</string>
 </resources>

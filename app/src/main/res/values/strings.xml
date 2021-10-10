@@ -15,6 +15,7 @@
     <string name="enter_your_email">yourmail@hotmail.com</string>
     <string name="gen_version">v.1.0.0</string>
     <string name="hint_firstname">FirstName</string>
+    <string name="gen_help">Help</string>
     <string name="hint_lastname">LastName</string>
     <string name="gen_save">Save</string>
     <string name="gen_add">Add</string>
@@ -27,7 +28,7 @@
     <string name="gen_history">History</string>
     <string name="gen_full_history">Full History</string>
     <string name="gen_filters">Filters</string>
-    <string name="gen_order">Ascending</string>
+    <string name="gen_order">Sorting</string>
     <string name="gen_edit_mode_on">Edit mode on</string>
     <string name="gen_edit_mode_off">Edit mode off</string>
     <string name="gen_income">Income</string>
@@ -100,6 +101,8 @@
     <string name="gen_forgot_password">Forgot password?</string>
     <string name="update_photo_wait">The process will take a few seconds.</string>
     <string name="user_profile_updated_message">User profile updated</string>
-
-
+    <string name="filter_by_category">Filter by category</string>
+    <string name="filter_by_price">Filter by price</string>
+    <string name="filter_by_date">Filter by date</string>
+    <string name="gen_search">Search</string>
 </resources>

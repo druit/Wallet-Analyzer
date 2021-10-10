@@ -120,7 +120,7 @@ public class MainActivity extends BaseActivity {
 //            monthlyGraph();
 
             // open menu when clicked on the username on top right corner
-            setMenuOpener();
+//            setMenuOpener();
 
             setGoal();
             bindGoalClick();
@@ -467,13 +467,13 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        View profileOpener = findViewById(R.id.sidebar_profile_opener);
-        profileOpener.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openSettings();
-            }
-        });
+//        View profileOpener = findViewById(R.id.sidebar_profile_opener);
+//        profileOpener.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                openSettings();
+//            }
+//        });
 
         View settingsOpener = findViewById(R.id.sidebar_settings_opener);
         settingsOpener.setOnClickListener(new View.OnClickListener() {

@@ -201,13 +201,16 @@ public class Statistics extends Fragment {
                         lastExpensesOfPrevMonth += receipt.getTotalPrice();
                         totalIncome -= receipt.getTotalPrice();
                         prevTotalMonth -= receipt.getTotalPrice();
-                    } else if (Integer.valueOf(receipt.getDate().getYear()) <= lastYearSelectedInMonths && (Integer.valueOf(receipt.getDate().getMonth() + 1) <= lastMonthSelected && lastType.equals("week")) && receipt.getDate().getDate() < date.getDate()) {
+                    } else if ((lastType.equals("week")) && receipt.getDate().getTime() <= date.getTime()) {
                         lastExpensesOfPrevMonth += receipt.getTotalPrice();
                         totalIncome -= receipt.getTotalPrice();
                         prevTotalMonth -= receipt.getTotalPrice();
                     }
                 }
-                System.out.println("EDW NA DW: " + lastExpensesOfPrevMonth + " TOTAL: " + prevTotalMonth);
+
+                if(lastType.equals("week")){
+                    prevTotalMonth += monthSalary.getSalaryAdd();
+                }
 
                 entries1.add(new Entry(0, (float) prevTotalMonth));
                 entries2.add(new Entry(0, (float) totalExpenses));
@@ -294,7 +297,7 @@ public class Statistics extends Fragment {
 
         setLineDataSetValueFormat();
 
-        lineDataSet.add(lineDataSet4);
+//        lineDataSet.add(lineDataSet4);
         lineDataSet.add(lineDataSet3);
         lineDataSet.add(lineDataSet1);
         lineDataSet.add(lineDataSet2);

@@ -330,34 +330,34 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:padding="10dp"
-                                    android:text="Portfolio"
+                                    android:text="@string/action_portfolio"
                                     android:textColor="@color/colorWhite"
                                     android:textSize="14sp" />
 
                             </com.google.android.flexbox.FlexboxLayout>
 
-                            <com.google.android.flexbox.FlexboxLayout
-                                android:id="@+id/sidebar_profile_opener"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:alignItems="center">
+<!--                            <com.google.android.flexbox.FlexboxLayout-->
+<!--                                android:id="@+id/sidebar_profile_opener"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                app:alignItems="center">-->
 
-                                <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:contentDescription="profile icon"
-                                    android:src="@drawable/outline_account_circle_24"
-                                    android:tint="@color/colorSidebarIcons" />
+<!--                                <ImageView-->
+<!--                                    android:layout_width="wrap_content"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:contentDescription="profile icon"-->
+<!--                                    android:src="@drawable/outline_account_circle_24"-->
+<!--                                    android:tint="@color/colorSidebarIcons" />-->
 
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:padding="10dp"
-                                    android:text="Profile"
-                                    android:textColor="@color/colorWhite"
-                                    android:textSize="14sp" />
+<!--                                <TextView-->
+<!--                                    android:layout_width="match_parent"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:padding="10dp"-->
+<!--                                    android:text="Profile"-->
+<!--                                    android:textColor="@color/colorWhite"-->
+<!--                                    android:textSize="14sp" />-->
 
-                            </com.google.android.flexbox.FlexboxLayout>
+<!--                            </com.google.android.flexbox.FlexboxLayout>-->
 
                             <com.google.android.flexbox.FlexboxLayout
                                 android:id="@+id/sidebar_settings_opener"
@@ -376,7 +376,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:padding="10dp"
-                                    android:text="Settings"
+                                    android:text="@string/action_settings"
                                     android:textColor="@color/colorWhite"
                                     android:textSize="14sp" />
 
@@ -399,7 +399,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:padding="10dp"
-                                    android:text="Help"
+                                    android:text="@string/gen_help"
                                     android:textColor="@color/colorWhite"
                                     android:textSize="14sp" />
 
@@ -425,7 +425,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:padding="10dp"
-                                android:text="LOGOUT"
+                                android:text="@string/action_logout"
                                 android:textColor="@color/colorWhite"
                                 android:textFontWeight="700"
                                 android:textSize="17sp" />
