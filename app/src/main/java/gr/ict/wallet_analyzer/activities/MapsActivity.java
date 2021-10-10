@@ -37,6 +37,7 @@ import java.util.List;
 import Services.GPSTracker;
 import data_class.History;
 import gr.ict.wallet_analyzer.R;
+import gr.ict.wallet_analyzer.helpers.CategoryIconSelector;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
@@ -128,7 +129,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                     Address currentAddress = addressList.get(0);
                     LatLng latLng = new LatLng(currentAddress.getLatitude(), currentAddress.getLongitude());
                     mMap.addMarker(new MarkerOptions().position(latLng).title(history.getReceipt()
-                            .getStoreName()).icon(bitmapDescriptor(getApplicationContext(), R.drawable.ic_baseline_store_24)));
+                            .getStoreName()).icon(bitmapDescriptor(getApplicationContext(), getDrawableCategory(history.getReceipt().getStoreType()))));
                     if (pos == position) {
                         zoomlatLng = new LatLng(currentAddress.getLatitude(), currentAddress.getLongitude());
                     } else {
@@ -146,6 +147,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(zoomlatLng, zoomLevel));
         else
             Toast.makeText(this, "The location was not found", Toast.LENGTH_SHORT).show();
+    }
+
+    private int getDrawableCategory(String type) {
+        CategoryIconSelector categoryIconSelector = new CategoryIconSelector(getApplicationContext());
+        return categoryIconSelector.getDrawableResource(type);
     }
 
     private BitmapDescriptor bitmapDescriptor(Context context, int vendorResId) {
@@ -185,7 +191,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
     }
 
     @Override

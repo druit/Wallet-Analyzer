@@ -38,4 +38,30 @@ public class CategoryIconSelector {
         }
         return drawable;
     }
+
+    public int getDrawableResource(String category) {
+        int drawable;
+
+        switch (category) {
+            case "gas station":
+                drawable = R.drawable.asset_map_11;
+                break;
+            case "shoes":
+                drawable = R.drawable.asset_map_6;
+                break;
+            case "clothes":
+                drawable = R.drawable.asset_map_5;
+                break;
+            case "supermarket":
+                drawable = R.drawable.asset_map_4;
+                break;
+            case "jewelry":
+                drawable = R.drawable.asset_map_7;
+                break;
+            default:
+                drawable = R.drawable.asset_map_4;
+                break;
+        }
+        return drawable;
+    }
 }
