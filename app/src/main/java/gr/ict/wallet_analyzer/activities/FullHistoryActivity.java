@@ -4,8 +4,11 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.MenuInflater;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.SearchView;
+
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -110,6 +113,11 @@ public class FullHistoryActivity extends BaseActivity {
 
     private void setSearchView() {
         SearchView searchView = findViewById(R.id.searchView);
+
+        ImageView searchIcon = searchView.findViewById(androidx.appcompat.R.id.search_mag_icon);
+
+        if (searchIcon != null)
+            searchIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.search_white_24dp));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

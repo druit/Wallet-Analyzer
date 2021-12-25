@@ -9,7 +9,7 @@
     android:id="@+id/full_history_parent"
     tools:context=".activities.FullHistoryActivity">
 
-    <SearchView
+    <android.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

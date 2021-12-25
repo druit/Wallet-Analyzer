@@ -117,6 +117,7 @@ public class Statistics extends Fragment {
 
         // set Pie Chart options
         setOptionsChart();
+
         //set Line Chart options
         setXDatas();
         setOptionLineChart();
@@ -208,7 +209,7 @@ public class Statistics extends Fragment {
                     }
                 }
 
-                if(lastType.equals("week")){
+                if (lastType.equals("week")) {
                     prevTotalMonth += monthSalary.getSalaryAdd();
                 }
 
@@ -383,6 +384,10 @@ public class Statistics extends Fragment {
         // make line curvy
         lineDataSet1.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 
+        // disable cross hair
+        lineDataSet1.setDrawHorizontalHighlightIndicator(false);
+        lineDataSet1.setDrawVerticalHighlightIndicator(false);
+
         // circles color
         lineDataSet1.setCircleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart1));
         lineDataSet1.setCircleHoleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart1));
@@ -399,6 +404,10 @@ public class Statistics extends Fragment {
 
         // make line curvy
         lineDataSet2.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+
+        // disable cross hair
+        lineDataSet2.setDrawHorizontalHighlightIndicator(false);
+        lineDataSet2.setDrawVerticalHighlightIndicator(false);
 
         // circles color
         lineDataSet2.setCircleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart2));
@@ -417,6 +426,10 @@ public class Statistics extends Fragment {
         // make line curvy
         lineDataSet3.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 
+        // disable cross hair
+        lineDataSet3.setDrawHorizontalHighlightIndicator(false);
+        lineDataSet3.setDrawVerticalHighlightIndicator(false);
+
         // circles color
         lineDataSet3.setCircleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart3));
         lineDataSet3.setCircleHoleColor(ContextCompat.getColor(getActivity(), R.color.colorLineChart3));
@@ -433,6 +446,10 @@ public class Statistics extends Fragment {
 
         // make line curvy
         lineDataSet4.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+
+        // disable cross hair
+        lineDataSet4.setDrawHorizontalHighlightIndicator(false);
+        lineDataSet4.setDrawVerticalHighlightIndicator(false);
 
         // circles color
         lineDataSet4.setCircleColor(R.color.colorLineChart4);
@@ -475,8 +492,8 @@ public class Statistics extends Fragment {
 
                     entries2.get(entries2.size() - 1).setY((float) totalExpenses);
                     float value = entries4.get(Integer.valueOf(entries4.size() - 1)).getY();
-                    value = (float) (value + (float) receipt.getTotalPrice());
-                    entries4.get(entries2.size() - 1).setY((float) value);
+                    value = (value + (float) receipt.getTotalPrice());
+                    entries4.get(entries2.size() - 1).setY(value);
                 } else {
                     entries1.add(new Entry(Integer.valueOf(receipt.getDate().getMonth() + 1), (float) localSalary));
                     entries2.add(new Entry(Integer.valueOf(receipt.getDate().getMonth() + 1), (float) totalExpenses));
@@ -594,6 +611,9 @@ public class Statistics extends Fragment {
 
         lineChart.getLegend().setYEntrySpace(5);
         lineChart.getLegend().setXEntrySpace(5);
+
+        lineChart.getLegend().setTextColor(Color.WHITE);
+        lineChart.setExtraOffsets(10f,10f,10f,10f);
 
         // hide values in left and right side
         lineChart.getAxisRight().setDrawLabels(false);
@@ -1150,6 +1170,7 @@ public class Statistics extends Fragment {
                 ContextCompat.getColor(getActivity(), R.color.colorPie2),
                 ContextCompat.getColor(getActivity(), R.color.colorPie3),
                 ContextCompat.getColor(getActivity(), R.color.colorPie4),
+                ContextCompat.getColor(getActivity(), R.color.colorPie5),
         };
         dataSet.setColors(dataSetColors);
 

@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#3B4360</color>
     <color name="colorAccent">#6EAFFF</color>
     <color name="colorButton">#8B353644</color>
+    <color name="colorDark">#353644</color>
 
     <color name="colorGold">#F3BA7D</color>
     <color name="colorLightGreen">#9CECA6</color>
@@ -51,6 +52,7 @@
     <color name="colorMainGraphEnd">#C68FDD</color>
 
     <color name="colorWhite">#E4E4E4</color>
+    <color name="colorHint">#CCCCCC</color>
     <color name="colorGreyBlack">#252525</color>
     <color name="colorBlack">#000000</color>
     <color name="colorBlackTransparent1">#A1000000</color>

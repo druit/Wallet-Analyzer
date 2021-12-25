@@ -16,6 +16,8 @@
         <item name="android:panelFullBackground">@drawable/spinner_background</item>
 <!--        <item name="android:fontFamily">@font/comfortaa</item>-->
         <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:editTextColor">@android:color/white</item>
+        <item name="android:textColorHint">@color/colorHint</item>
     </style>
 
 </resources>
