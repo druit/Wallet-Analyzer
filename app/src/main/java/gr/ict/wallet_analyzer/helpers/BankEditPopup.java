@@ -89,37 +89,37 @@ public class BankEditPopup {
         // show the popup window
         popupWindow.showAtLocation(activity.findViewById(R.id.fragment2), Gravity.CENTER, 0, 0);
 
-      bankDate.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-              Date date = new Date();
-              if(editable){
-                  ArrayList<Salary> salaryArrayList = myBankAccount.getSalaryArrayList();
-                  date = salaryArrayList.get(salaryArrayList.size()-1).getLastUpdate();
-                  showDatePickerPopup(activity.findViewById(R.id.fragment2),(Date)date, myBankAccount.getSalaryArrayList(), declare,editable);
-              }else {
-                  showDatePickerPopup(activity.findViewById(R.id.fragment2), (Date) date, null, declare, editable);
-              }
-          }
-      });
+        bankDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Date date = new Date();
+                if(editable){
+                    ArrayList<Salary> salaryArrayList = myBankAccount.getSalaryArrayList();
+                    date = salaryArrayList.get(salaryArrayList.size()-1).getLastUpdate();
+                    showDatePickerPopup(activity.findViewById(R.id.fragment2),(Date)date, myBankAccount.getSalaryArrayList(), declare,editable);
+                }else {
+                    showDatePickerPopup(activity.findViewById(R.id.fragment2), (Date) date, null, declare, editable);
+                }
+            }
+        });
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(final CompoundButton compoundButton,final boolean b) {
                 boolean alreadyChecked = false;
 
-                        for (BankAccount account: myAccountBank) {
-                            if(account.isSalaryBank() && myBankAccount.getId() != account.getId()){
-                                alreadyChecked = true;
-                            }
-                        }
-                        if(alreadyChecked){
-                            compoundButton.setChecked(false);
-                            Toast.makeText(activity.getBaseContext(),activity.getBaseContext().getResources().getString(R.string.gen_error_bank_already),Toast.LENGTH_SHORT).show();
-                        }else{
-
-                            declare.child("salaryBank").setValue(b);
-                        }
+                for (BankAccount account: myAccountBank) {
+                    if(account.isSalaryBank() && myBankAccount.getId() != account.getId()){
+                        alreadyChecked = true;
                     }
+                }
+                if(alreadyChecked){
+                    compoundButton.setChecked(false);
+                    Toast.makeText(activity.getBaseContext(),activity.getBaseContext().getResources().getString(R.string.gen_error_bank_already),Toast.LENGTH_SHORT).show();
+                }else{
+
+                    declare.child("salaryBank").setValue(b);
+                }
+            }
         });
 
         actionBtn.setOnClickListener(new View.OnClickListener() {
@@ -305,8 +305,8 @@ public class BankEditPopup {
                         if(bankAccount.isActive() == 1 ) {
                             listSalary = bankAccount.getSalaryArrayList();
 //                            if(bankAccount.isSalaryBank()){
-                                for (Salary sal: listSalary) {
-                                    sendSalary.add(sal);
+                            for (Salary sal: listSalary) {
+                                sendSalary.add(sal);
 //                                }
                             }
 
@@ -361,12 +361,29 @@ public class BankEditPopup {
                         int prevMonthSalary = Integer.valueOf( dateSalary.getMonth() + 1);
                         int salaryYear = dateSalary.getYear();
 //                        currentDate.getDate() >= dateSalary.getDate() &&
-                        if ( prevMonthSalary < currentMonth && salaryYear >= currentYear) {
-
+                        if (prevMonthSalary < currentMonth && salaryYear == currentYear ) {
                             Salary newSalary = new Salary(currentDate,Double.valueOf(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd()), currentSalary.getSalaryAdd(), currentDate);
-
+                            // Add salary for the month where user didn't login app
+                            int  count = currentMonth - prevMonthSalary;
+                            double salar = newSalary.getCurrentSalary();
+                            for(int i = 1 ; i <count;i++){
+                                salar += newSalary.getSalaryAdd();
+                            }
+                            newSalary.setCurrentSalary(salar);
                             listSalary.add(newSalary);
-                            declare.child(currentBank.getId()).child("salary").setValue(Double.valueOf(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd()));
+                            declare.child(currentBank.getId()).child("salary").setValue(Double.valueOf(salar));
+                            declare.child(currentBank.getId()).child("salaryArrayList").setValue(listSalary);
+                        }else if (prevMonthSalary > currentMonth && salaryYear < currentYear){
+                            Salary newSalary = new Salary(currentDate,Double.valueOf(currentSalary.getCurrentSalary()+ currentSalary.getSalaryAdd()), currentSalary.getSalaryAdd(), currentDate);
+                            // Add salary for the month where user didn't login app
+                            int  count =   (currentMonth+12) - prevMonthSalary ; // add 12 for getting months from the new year
+                            double salar = newSalary.getCurrentSalary();
+                            for(int i = 1 ; i < count;i++){
+                                salar += newSalary.getSalaryAdd();
+                            }
+                            newSalary.setCurrentSalary(salar);
+                            listSalary.add(newSalary);
+                            declare.child(currentBank.getId()).child("salary").setValue(Double.valueOf(salar));
                             declare.child(currentBank.getId()).child("salaryArrayList").setValue(listSalary);
                         }
 
