@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.net.Uri;
@@ -290,15 +291,14 @@ public class ChooseScanActivity extends BaseActivity {
                         break;
                 }
             }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        scanBarcode.setEnabled(true);
-                        Toast.makeText(ChooseScanActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                        e.printStackTrace();
-                    }
-                });
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                scanBarcode.setEnabled(true);
+                Toast.makeText(ChooseScanActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        });
     }
 
     private void shopInformationRecognition(FirebaseVisionText result) {
@@ -557,14 +557,23 @@ public class ChooseScanActivity extends BaseActivity {
         for (String s : categories) {
             final TextView textView = new TextView(this);
             textView.setText(s);
+
+            FlexboxLayout.LayoutParams params = new FlexboxLayout.LayoutParams(
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 5, 0, 0);
+            textView.setLayoutParams(params);
             flexboxLayout.addView(textView);
+
+            textView.setTextColor(Color.parseColor("#7E81A5"));
 
             textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     TextView currentTextView = (TextView) v;
                     deselectOthers(flexboxLayout);
-                    currentTextView.setTextSize(30);
+                    currentTextView.setTextColor(Color.parseColor("#FFFFFF"));
                     selectedTextView = currentTextView;
                 }
             });
@@ -586,7 +595,7 @@ public class ChooseScanActivity extends BaseActivity {
     private void deselectOthers(FlexboxLayout flexboxLayout) {
         for (int index = 0; index < ((FlexboxLayout) flexboxLayout).getChildCount(); index++) {
             TextView nextChild = (TextView) ((FlexboxLayout) flexboxLayout).getChildAt(index);
-            nextChild.setTextSize(15);
+            nextChild.setTextColor(Color.parseColor("#7E81A5"));
         }
     }
 
